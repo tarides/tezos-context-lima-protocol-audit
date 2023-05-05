@@ -34,6 +34,10 @@
 	  (base32
 	   "02mxvgs0x8x1l9h8lqcdaj58b4svv7b3xcvi476ny1lhjwhw0x53"))))
       (build-system dune-build-system)
+      ;; Only build the tezos-context-trace package. We don't need the
+      ;; recorder shim and tools. They also won't build with the patches we
+      ;; apply on Tezos.
+      (arguments `(#:package "tezos-context-trace"))
       (propagated-inputs
        (list
 
@@ -71,8 +75,9 @@ traces.  This is used to benchmark performance of changes to Irmin.")
 
   ;; Apply patch that exposes Irmin stats to Tezos Context
   #:patches (list
+	     (local-file "./patches/tezos-context-add-irmin-stats.patch")
 	     (local-file
-	      "./patches/tezos-context-add-irmin-stats.patch")))
+	      "./patches/tezos-context-expose-irmin-pack-unix-stats.patch")))
  
  #:origin (origin
 	    (method git-fetch)

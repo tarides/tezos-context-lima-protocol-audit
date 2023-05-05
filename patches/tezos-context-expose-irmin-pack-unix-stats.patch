@@ -1,0 +1,68 @@
+From 6e356292d9a733fb47c021ad237fce7f4a636c2c Mon Sep 17 00:00:00 2001
+From: Adarsh Amirtham <adarsh@tarides.com>
+Date: Fri, 5 May 2023 14:33:36 +0200
+Subject: [PATCH] tezos_context: Expose irmin-pack.unix stats.
+
+---
+ src/lib_context/disk/context.ml   | 2 ++
+ src/lib_context/memory/context.ml | 2 ++
+ src/lib_context/sigs/context.ml   | 2 ++
+ src/lib_context/sigs/dune         | 3 ++-
+ 4 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/lib_context/disk/context.ml b/src/lib_context/disk/context.ml
+index 3491f43456..b1679cc942 100644
+--- a/src/lib_context/disk/context.ml
++++ b/src/lib_context/disk/context.ml
+@@ -522,6 +522,8 @@ module Make (Encoding : module type of Tezos_context_encoding.Context) = struct
+ 
+   let module_tree_stats = Store.Tree.counters
+ 
++  let irmin_stats = Irmin_pack_unix.Stats.get
++
+   (** The light mode relies on the implementation of this
+     function, because it uses Irmin.Type.of_string to rebuild values
+     of type Irmin.Hash.t. This is a temporary workaround until we
+diff --git a/src/lib_context/memory/context.ml b/src/lib_context/memory/context.ml
+index 49671d8a4d..74607b0e74 100644
+--- a/src/lib_context/memory/context.ml
++++ b/src/lib_context/memory/context.ml
+@@ -271,6 +271,8 @@ module Make (Encoding : module type of Tezos_context_encoding.Context) = struct
+ 
+   let module_tree_stats = Store.Tree.counters
+ 
++  let irmin_stats () = raise @@ Failure "Ceci c'est pas irmin-pack.unix"
++
+   (** The light mode relies on the implementation of this
+     function, because it uses Irmin.Type.of_string to rebuild values
+     of type Irmin.Hash.t. This is a temporary workaround until we
+diff --git a/src/lib_context/sigs/context.ml b/src/lib_context/sigs/context.ml
+index 43507a58d8..6c90fc6fc9 100644
+--- a/src/lib_context/sigs/context.ml
++++ b/src/lib_context/sigs/context.ml
+@@ -870,6 +870,8 @@ module type TEZOS_CONTEXT = sig
+   }
+ 
+   val module_tree_stats : unit -> module_tree_stats
++
++  val irmin_stats : unit -> Irmin_pack_unix.Stats.t
+ end
+ 
+ (** Functor `With_get_data` adds a `get_data` function to modules of signature `S`.
+diff --git a/src/lib_context/sigs/dune b/src/lib_context/sigs/dune
+index f01f71e5b5..2dd0005f05 100644
+--- a/src/lib_context/sigs/dune
++++ b/src/lib_context/sigs/dune
+@@ -9,7 +9,8 @@
+  (instrumentation (backend bisect_ppx))
+  (libraries
+   tezos-base
+-  tezos-stdlib)
++  tezos-stdlib
++  irmin-pack.unix)
+  (js_of_ocaml)
+  (flags
+   (:standard)
+-- 
+2.39.2
+
