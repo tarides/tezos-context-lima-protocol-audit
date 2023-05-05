@@ -14,8 +14,8 @@
 
 (define irmin-url "https://github.com/adatario/irmin")
 (define irmin-version "3.7.0-io-stats") ; this is only used for human readability
-(define irmin-commit "2df6ebfcb4194d0548eae9e32d2dea16fc2c0c92")
-(define irmin-sha256 "1qkja1wn7bajyfrzwyhx1h0z3676j51289x9yjfv89r24p53f5bf")
+(define irmin-commit "26477f75e0410e038cfbef328a20d24a46b8068a")
+(define irmin-sha256 "1k468zqig6nsazh9gh1ywjw10bjkbb5px7gr5z2q0clg6azjhkgk")
 
 (define ocaml-tezos-context-trace
   (let ((commit "856c361797cd2dea90f1af8925fe97e8010624df")

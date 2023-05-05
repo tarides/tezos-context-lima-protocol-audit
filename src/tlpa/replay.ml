@@ -31,11 +31,19 @@ module State = struct
   type t = {
     index : Context.index option;
     config : Config.t;
+    (* Irmin Stats*)
+    stats : Irmin_pack_unix.Stats.t;
     (* Tracked objects *)
     contexts : Context.t TrackerMap.t;
   }
 
-  let init config = { index = None; config; contexts = TrackerMap.empty }
+  let init config =
+    {
+      index = None;
+      config;
+      stats = Context.irmin_stats ();
+      contexts = TrackerMap.empty;
+    }
 
   type tracker_id = Optint.Int63.t
   type context_tracked = Replay_actions.scope_end * tracker_id
@@ -163,17 +171,45 @@ module Ops = struct
       | op -> error (fun m -> m "unhandled operation: %a" pp op))
 end
 
-let exec_block state (row : Replay_actions.row) =
+let pp_io_stats =
+  let module ReprMap = Repr.Of_map (struct
+    include Irmin_pack_unix.Stats.Io.PathMap
+
+    let key_t = Repr.string
+  end) in
+  Repr.pp @@ ReprMap.t Irmin_pack_unix.Stats.Io.Activity.t
+
+let diff_io_stats a b =
+  Irmin_pack_unix.Stats.Io.(
+    PathMap.merge
+      (fun _path a b ->
+        match (a, b) with
+        | Some a, Some b -> Option.some @@ Activity.diff a b
+        | Some a, None -> Some a
+        | None, Some b -> Some b
+        | None, None -> None)
+      a b)
+
+let exec_block (state : State.t) (row : Replay_actions.row) =
   Log.app (fun m -> m "level: %d" row.level);
 
-  let stats = Context.irmin_stats () in
-  let io_stats = Irmin_pack_unix.Stats.Io.export stats.io in
-
-  Log.app (fun m ->
-      m "IO reads: %d" (Irmin_pack_unix.Stats.Io.PathMap.cardinal @@ io_stats));
+  let pre_stats = Irmin_pack_unix.Stats.Io.export state.stats.io in
 
   (* execute all operations in block *)
-  Array.to_seq row.ops |> Lwt_seq.of_seq |> Lwt_seq.fold_left_s Ops.exec state
+  let* state' =
+    Array.to_seq row.ops |> Lwt_seq.of_seq |> Lwt_seq.fold_left_s Ops.exec state
+  in
+
+  let post_stats = Irmin_pack_unix.Stats.Io.export state.stats.io in
+
+  let stats_diff = diff_io_stats post_stats pre_stats in
+
+  let level = row.level in
+
+  Log.app (fun m ->
+      m "IO activity for block %d: %a" level pp_io_stats stats_diff);
+
+  return state'
 
 let run (config : Config.t) =
   let version, header, actions =
