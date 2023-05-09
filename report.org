@@ -1,0 +1,19 @@
+#+title: Tezos Context Lima Performance Audit
+#+author: Irmin Team
+
+#+BEGIN_abstract
+#+END_abstract
+
+* Introduction
+
+* Audits
+
+** TODO Dict usage
+
+** TODO Index performance
+
+** TODO I/O Amplification
+
+** TODO CPU boundness
+
+** TODO Entropy of Store
