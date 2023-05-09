@@ -18,6 +18,89 @@ module Log = (val Logs.src_log src : Logs.LOG)
 module Context = Tezos_context_disk.Context
 module Replay_actions = Tezos_context_trace.Replay_actions
 
+module FoldStack = struct
+  (** Datastructure to handle calls to `Context.fold`
+
+     When `Context.fold` is called a sequence of `Fold_start`,
+     multiple `Fold_step_enter` and `Fold_step_exit`s followed by a
+     `Fold_end` is recorded. For example:
+
+     ```
+     Fold_start
+
+     Fold_step_enter
+     (some other operations)
+     Fold_step_exit
+
+     Fold_step_enter
+     (some other operations)
+     Fold_step_exit
+
+     (potentially many Fold_step blocks)
+
+
+     Fold_exit
+     ```
+
+     We handle this by calling `Context.fold` when encoutering a
+     `Fold_start` and storing all trees that are returned in a fifo
+     queue. For every `Fold_step_enter` and `Fold_step_exit` we deque
+     a tree and use it to handle the fold step.
+
+     In order to handle nested folds, we maintain a stack of queues of
+     trees. This module implements this stack of queues.
+
+   *)
+
+  module Queue = struct
+    type 'a t = 'a list * 'a list
+
+    let empty = ([], [])
+    let is_empty = function [], [] -> true | _, _ -> false
+    let enqueue x (pop, push) = (pop, x :: push)
+
+    let rec dequeue = function
+      | [], [] -> (None, empty)
+      | x :: xs, push -> (Some x, (xs, push))
+      | [], push -> dequeue (List.rev push, [])
+  end
+
+  module Stack : sig
+    type 'a t
+
+    val empty : 'a t
+    val push : 'a -> 'a t -> 'a t
+    val pop : 'a t -> 'a option * 'a t
+  end = struct
+    type 'a t = 'a list
+
+    let empty = []
+    let push x s = x :: s
+    let pop = function [] -> (None, empty) | x :: rest -> (Some x, rest)
+  end
+
+  type 'a t = 'a Queue.t Stack.t
+
+  let empty = Stack.empty
+  let fold_start fs = Stack.push Queue.empty fs
+
+  let fold_push_tree x fs =
+    match Stack.pop fs with
+    | Some q, fs' -> Stack.push (Queue.enqueue x q) fs'
+    | None, _fs' -> failwith "fold stack empty"
+
+  let fold_pop_tree fs =
+    match Stack.pop fs with
+    | Some q, fs' ->
+        let tree, q' = Queue.dequeue q in
+        (tree, Stack.push q' fs')
+    | None, _ -> failwith "fold stack empty"
+
+  let fold_end fs =
+    let _, fs' = Stack.pop fs in
+    fs'
+end
+
 (* Replay state *)
 
 module State = struct
@@ -36,6 +119,9 @@ module State = struct
     (* Tracked objects *)
     contexts : Context.t TrackerMap.t;
     trees : Context.tree TrackerMap.t;
+    (* Fold Stack *)
+    folds : Context.tree FoldStack.t;
+    tree_folds : Context.tree FoldStack.t;
   }
 
   let init config =
@@ -45,6 +131,8 @@ module State = struct
       stats = Context.irmin_stats ();
       contexts = TrackerMap.empty;
       trees = TrackerMap.empty;
+      folds = FoldStack.empty;
+      tree_folds = FoldStack.empty;
     }
 
   type tracker_id = Optint.Int63.t
@@ -83,6 +171,33 @@ module State = struct
           { state with trees = TrackerMap.remove id state.trees }
     in
     (tree, state')
+
+  let fold_start state = { state with folds = FoldStack.fold_start state.folds }
+
+  let tree_fold_start state =
+    { state with tree_folds = FoldStack.fold_start state.tree_folds }
+
+  let fold_push_tree tree state =
+    { state with folds = FoldStack.fold_push_tree tree state.folds }
+
+  let tree_fold_push_tree tree state =
+    { state with tree_folds = FoldStack.fold_push_tree tree state.tree_folds }
+
+  let fold_pop_tree state =
+    let tree_opt, folds = FoldStack.fold_pop_tree state.folds in
+    match tree_opt with
+    | Some tree -> (tree, { state with folds })
+    | None ->
+        failwith
+          "attempting to pop a tree during fold while tree queue is empty"
+
+  let tree_fold_pop_tree state =
+    let tree_opt, tree_folds = FoldStack.fold_pop_tree state.tree_folds in
+    match tree_opt with
+    | Some tree -> (tree, { state with tree_folds })
+    | None ->
+        failwith
+          "attempting to pop a tree during Tree.fold while tree queue is empty"
 end
 
 (* Replay logic *)
@@ -161,6 +276,35 @@ module Ops = struct
     let* output_context = Context.remove context key in
     state' |> State.track_context output_context output |> return
 
+  let exec_fold_start state ((depth, order), context_t, key) =
+    let context, state' = State.get_context context_t state in
+    Context.fold ?depth ~order context key ~init:(State.fold_start state')
+      ~f:(fun _key tree state -> return @@ State.fold_push_tree tree state)
+
+  let exec_fold_step_enter state tree_t =
+    let tree, state' = State.fold_pop_tree state in
+    state' |> State.track_tree tree tree_t |> return
+
+  let exec_fold_step_exit state _tree_t = return state
+
+  let exec_fold_end (state : State.t) =
+    return { state with folds = FoldStack.fold_end state.folds }
+
+  let exec_tree_fold_start state ((depth, order), tree_t, key) =
+    let tree, state' = State.get_tree tree_t state in
+    Context.Tree.fold ?depth ~order tree key
+      ~init:(State.tree_fold_start state') ~f:(fun _key tree state ->
+        return @@ State.tree_fold_push_tree tree state)
+
+  let exec_tree_fold_step_enter state tree_t =
+    let tree, state' = State.tree_fold_pop_tree state in
+    state' |> State.track_tree tree tree_t |> return
+
+  let exec_tree_fold_step_exit state _tree_t = return state
+
+  let exec_tree_fold_end (state : State.t) _ =
+    return { state with tree_folds = FoldStack.fold_end state.tree_folds }
+
   let exec_commit state ((time, message, context_t), _hash_t) =
     let time = Tezos_base.Time.Protocol.of_seconds time in
     let context, state' = State.get_context context_t state in
@@ -200,6 +344,16 @@ module Ops = struct
       | Mem args -> exec_mem state args
       | Add args -> exec_add state args
       | Remove args -> exec_remove state args
+      | Fold_start (options, context_t, key) ->
+          exec_fold_start state (options, context_t, key)
+      | Fold_step_enter args -> exec_fold_step_enter state args
+      | Fold_step_exit args -> exec_fold_step_exit state args
+      | Fold_end -> exec_fold_end state
+      | Tree (Tree.Fold_start (options, tree_t, key)) ->
+          exec_tree_fold_start state (options, tree_t, key)
+      | Tree (Tree.Fold_step_enter args) -> exec_tree_fold_step_enter state args
+      | Tree (Tree.Fold_step_exit args) -> exec_tree_fold_step_exit state args
+      | Tree (Tree.Fold_end args) -> exec_tree_fold_end state args
       | Commit args -> exec_commit state args
       | Add_predecessor_block_metadata_hash args ->
           exec_add_predecessor_block_metadata_hash state args
