@@ -305,6 +305,105 @@ module Ops = struct
   let exec_tree_fold_end (state : State.t) _ =
     return { state with tree_folds = FoldStack.fold_end state.tree_folds }
 
+  let exec_tree_empty state (context_t, tree_t) =
+    let context, state' = State.get_context context_t state in
+    let tree = Context.Tree.empty context in
+    state' |> State.track_tree tree tree_t |> return
+
+  let exec_tree_of_value state ((context_t, value), tree_t) =
+    let context, state' = State.get_context context_t state in
+    let* tree = Context.Tree.of_value context value in
+    state' |> State.track_tree tree tree_t |> return
+
+  let exec_tree_of_raw state (raw, tree_t) =
+    let rec conv = function
+      | `Value _ as v -> v
+      | `Tree bindings ->
+          `Tree
+            (bindings |> List.to_seq
+            |> Seq.map (fun (k, v) -> (k, conv v))
+            |> Tezos_base.TzPervasives.String.Map.of_seq)
+    in
+    let raw = conv raw in
+    let tree = Context.Tree.of_raw raw in
+    state |> State.track_tree tree tree_t |> return
+
+  let exec_tree_mem state ((tree_t, key), expected) =
+    let tree, state' = State.get_tree tree_t state in
+    let* result = Context.Tree.mem tree key in
+    if result <> expected then bad_result (fun m -> m "Tree.mem bad result")
+    else return state'
+
+  let exec_tree_find state ((tree_t, key), expected) =
+    let tree, state' = State.get_tree tree_t state in
+    let* result = Context.Tree.find tree key in
+    if Option.is_some result <> expected then
+      bad_result (fun m -> m "Tree.mem bad result")
+    else return state'
+
+  let exec_tree_is_empty state (tree_t, expected) =
+    let tree, state' = State.get_tree tree_t state in
+    let result = Context.Tree.is_empty tree in
+    if result <> expected then
+      bad_result (fun m -> m "Tree.is_empty bad result")
+    else return state'
+
+  let exec_tree_kind state (tree_t, expected) =
+    let tree, state' = State.get_tree tree_t state in
+    let result = Context.Tree.kind tree in
+    if result <> expected then
+      bad_result (fun m -> m "Tree.is_empty bad result")
+    else return state'
+
+  let exec_tree_hash state (tree_t, ()) =
+    let tree, state' = State.get_tree tree_t state in
+    let _ = Context.Tree.hash tree in
+    return state'
+
+  let exec_tree_equal state ((a_t, b_t), expected) =
+    let a, state' = State.get_tree a_t state in
+    let b, state'' = State.get_tree b_t state' in
+    let result = Context.Tree.equal a b in
+    if result <> expected then bad_result (fun m -> m "Tree.equal bad result")
+    else return state''
+
+  let exec_tree_to_value state (tree_t, expected) =
+    let tree, state' = State.get_tree tree_t state in
+    let* result = Context.Tree.to_value tree in
+    if Option.is_some result <> expected then
+      bad_result (fun m -> m "Tree.to_value bad result")
+    else return state'
+
+  let exec_tree_clear state ((depth, tree_t), ()) =
+    let tree, state' = State.get_tree tree_t state in
+    Context.Tree.clear ?depth tree;
+    return state'
+
+  let exec_tree_find_tree state ((tree_t, key), result_t_opt) =
+    let tree, state' = State.get_tree tree_t state in
+    let* result_opt = Context.Tree.find_tree tree key in
+    match (result_opt, result_t_opt) with
+    | Some result, Some result_t ->
+        State.track_tree result result_t state' |> return
+    | None, None -> return state'
+    | _ -> bad_result (fun m -> m "Tree.find_tree bad result")
+
+  let exec_tree_add state ((tree_t, key, value), result_t) =
+    let tree, state' = State.get_tree tree_t state in
+    let* result = Context.Tree.add tree key value in
+    state' |> State.track_tree result result_t |> return
+
+  let exec_tree_add_tree state ((a_t, key, b_t), result_t) =
+    let a, state' = State.get_tree a_t state in
+    let b, state'' = State.get_tree b_t state' in
+    let* result = Context.Tree.add_tree a key b in
+    state'' |> State.track_tree result result_t |> return
+
+  let exec_tree_remove state ((tree_t, key), result_t) =
+    let tree, state' = State.get_tree tree_t state in
+    let* result = Context.Tree.remove tree key in
+    state' |> State.track_tree result result_t |> return
+
   let exec_commit state ((time, message, context_t), _hash_t) =
     let time = Tezos_base.Time.Protocol.of_seconds time in
     let context, state' = State.get_context context_t state in
@@ -349,11 +448,30 @@ module Ops = struct
       | Fold_step_enter args -> exec_fold_step_enter state args
       | Fold_step_exit args -> exec_fold_step_exit state args
       | Fold_end -> exec_fold_end state
-      | Tree (Tree.Fold_start (options, tree_t, key)) ->
-          exec_tree_fold_start state (options, tree_t, key)
-      | Tree (Tree.Fold_step_enter args) -> exec_tree_fold_step_enter state args
-      | Tree (Tree.Fold_step_exit args) -> exec_tree_fold_step_exit state args
-      | Tree (Tree.Fold_end args) -> exec_tree_fold_end state args
+      | Tree ev -> (
+          Tree.(
+            match ev with
+            | Empty args -> exec_tree_empty state args
+            | Of_value args -> exec_tree_of_value state args
+            | Of_raw args -> exec_tree_of_raw state args
+            | Mem data -> exec_tree_mem state data
+            | Mem_tree data -> exec_tree_mem state data
+            | Find data -> exec_tree_find state data
+            | Is_empty data -> exec_tree_is_empty state data
+            | Kind data -> exec_tree_kind state data
+            | Hash data -> exec_tree_hash state data
+            | Equal data -> exec_tree_equal state data
+            | To_value data -> exec_tree_to_value state data
+            | Clear data -> exec_tree_clear state data
+            | Find_tree data -> exec_tree_find_tree state data
+            | Add data -> exec_tree_add state data
+            | Add_tree data -> exec_tree_add_tree state data
+            | Remove data -> exec_tree_remove state data
+            | Fold_start (options, tree_t, key) ->
+                exec_tree_fold_start state (options, tree_t, key)
+            | Fold_step_enter args -> exec_tree_fold_step_enter state args
+            | Fold_step_exit args -> exec_tree_fold_step_exit state args
+            | Fold_end args -> exec_tree_fold_end state args))
       | Commit args -> exec_commit state args
       | Add_predecessor_block_metadata_hash args ->
           exec_add_predecessor_block_metadata_hash state args
