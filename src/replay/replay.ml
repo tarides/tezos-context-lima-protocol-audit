@@ -35,6 +35,7 @@ module State = struct
     stats : Irmin_pack_unix.Stats.t;
     (* Tracked objects *)
     contexts : Context.t TrackerMap.t;
+    trees : Context.tree TrackerMap.t;
   }
 
   let init config =
@@ -43,6 +44,7 @@ module State = struct
       config;
       stats = Context.irmin_stats ();
       contexts = TrackerMap.empty;
+      trees = TrackerMap.empty;
     }
 
   type tracker_id = Optint.Int63.t
@@ -63,6 +65,24 @@ module State = struct
           { state with contexts = TrackerMap.remove id state.contexts }
     in
     (context, state')
+
+  type tree_tracked = Replay_actions.scope_end * tracker_id
+
+  let track_tree context ((scope_end, id) : tree_tracked) state =
+    match scope_end with
+    | Replay_actions.Will_reoccur ->
+        { state with trees = TrackerMap.add id context state.trees }
+    | Replay_actions.Last_occurence -> state
+
+  let get_tree ((scope_end, id) : tree_tracked) state =
+    let tree = TrackerMap.find id state.trees in
+    let state' =
+      match scope_end with
+      | Replay_actions.Will_reoccur -> state
+      | Replay_actions.Last_occurence ->
+          { state with trees = TrackerMap.remove id state.trees }
+    in
+    (tree, state')
 end
 
 (* Replay logic *)
@@ -109,6 +129,21 @@ module Ops = struct
     let* res' = Context.find context key >|= Option.is_some in
     if res <> res' then bad_result (fun m -> m "bad result") else ();
     return state'
+
+  let exec_find_tree state ((context_t, key), expected) =
+    let context, state' = State.get_context context_t state in
+    let* res' = Context.find_tree context key in
+    match (expected, res') with
+    | Some expected_tree_c, Some tree ->
+        state' |> State.track_tree tree expected_tree_c |> return
+    | None, None -> return state
+    | _ -> bad_result (fun m -> m "wrong result in find tree")
+
+  let exec_add_tree state ((context_t, key, tree_t), output_context_t) =
+    let context, state' = State.get_context context_t state in
+    let tree, state'' = State.get_tree tree_t state' in
+    let* result = Context.add_tree context key tree in
+    state'' |> State.track_context result output_context_t |> return
 
   let exec_mem state ((context_t, key), res) =
     let context, state' = State.get_context context_t state in
@@ -160,6 +195,8 @@ module Ops = struct
       | Get_protocol args -> exec_get_protocol state args
       | Get_test_chain args -> exec_get_test_chain state args
       | Find args -> exec_find state args
+      | Find_tree args -> exec_find_tree state args
+      | Add_tree args -> exec_add_tree state args
       | Mem args -> exec_mem state args
       | Add args -> exec_add state args
       | Remove args -> exec_remove state args
