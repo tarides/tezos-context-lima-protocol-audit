@@ -48,13 +48,15 @@ let main root =
   let hash =
     Tezos_context_encoding.Context.Hash.of_context_hash
     @@ Tezos_crypto.Hashed.Context_hash.of_b58check_exn
-         "BLPKFHxqqHk8jVDwG6kBXyiPPr1jHroBpfyZJgVDgT3HyaPvbMX"
+         "CoVuewvaeiWqmvaiCnxyWCpGqiErzozZAtTkgFpTtPub7pbiRYPW"
   in
 
   match Index.find index hash with
   | None -> fail_with "Could not find hash in index"
-  | Some (_offset, length, _kind) ->
-      Log.app (fun m -> m "%d" length);
+  | Some (offset, length, kind) ->
+      Log.app (fun m ->
+          m "offset: %a, length: %d, kind: %a" Optint.Int63.pp offset length
+            Irmin_pack.Pack_value.Kind.pp kind);
       return_unit
 
 let () =
