@@ -14,8 +14,8 @@
 
 (define irmin-url "https://github.com/adatario/irmin")
 (define irmin-version "3.7.0-tclpa") ; this is only used for human readability
-(define irmin-commit "4f951a6661d2e71d63541956cb50f83aee6fb001")
-(define irmin-sha256 "17369j7blj5gmjbac4dy1ad4lkkhxx14rixrp434iz8dybzqfjl5")
+(define irmin-commit "75bca915db412e37fd96596941cb6dccef51064b")
+(define irmin-sha256 "02ww2qalvnhpc371f7rxsizxl65d22avapr583c5hvvqmq9dbczp")
 
 (define ocaml-tezos-context-trace
   (let ((commit "856c361797cd2dea90f1af8925fe97e8010624df")
