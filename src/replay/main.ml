@@ -19,8 +19,7 @@ let setup_logs () =
 
 module Replay_actions = Tezos_context_trace.Replay_actions
 
-let actions_trace_path =
-  "/home/adatario/dev/tezos-lima-performance-audit/inputs/actions.trace"
+let actions_trace_path = "/home/adatario/dev/tlpa/inputs/actions.trace"
 
 (* let pp_row = Repr.pp Tezos_context_trace.Replay_actions.row_t *)
 (* let pp_event = Repr.pp Replay_actions.event_t *)
