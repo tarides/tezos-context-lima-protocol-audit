@@ -430,6 +430,15 @@ module Ops = struct
     in
     state' |> State.track_context output_context output_context_t |> return
 
+  let exec_split (state : State.t) =
+    let* () = Context.split @@ Option.get state.index in
+    return state
+
+  let exec_gc (state : State.t) (hash_t, ()) =
+    let hash = of_commit_hash_lhs hash_t in
+    let* () = Context.gc (Option.get state.index) hash in
+    return state
+
   let exec state op =
     Replay_actions.(
       match op with
@@ -473,6 +482,8 @@ module Ops = struct
             | Fold_step_exit args -> exec_tree_fold_step_exit state args
             | Fold_end args -> exec_tree_fold_end state args))
       | Commit args -> exec_commit state args
+      | Split -> exec_split state
+      | Gc args -> exec_gc state args
       | Add_predecessor_block_metadata_hash args ->
           exec_add_predecessor_block_metadata_hash state args
       | Add_predecessor_ops_metadata_hash args ->
