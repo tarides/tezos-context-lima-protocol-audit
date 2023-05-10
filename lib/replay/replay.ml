@@ -147,6 +147,8 @@ module State = struct
   type t = {
     index : Context.index option;
     config : Config.t;
+    (* The last commit *)
+    last_commit : Tezos_crypto.Hashed.Context_hash.t option;
     (* Irmin Stats*)
     stats : Irmin_pack_unix.Stats.t;
     (* Tracked objects *)
@@ -161,6 +163,7 @@ module State = struct
     {
       index = None;
       config;
+      last_commit = None;
       stats = Context.irmin_stats ();
       contexts = TrackerMap.empty;
       trees = TrackerMap.empty;
@@ -169,6 +172,8 @@ module State = struct
     }
 
   let stats t = t.stats
+  let index t = t.index
+  let last_commit t = t.last_commit
 
   type tracker_id = Optint.Int63.t
   type context_tracked = Replay_actions.scope_end * tracker_id
@@ -442,8 +447,8 @@ module Ops = struct
   let exec_commit state ((time, message, context_t), _hash_t) =
     let time = Tezos_base.Time.Protocol.of_seconds time in
     let context, state' = State.get_context context_t state in
-    let* _hash = Context.commit ~time ?message context in
-    return state'
+    let* hash = Context.commit ~time ?message context in
+    { state' with last_commit = Some hash } |> return
 
   let exec_add_predecessor_block_metadata_hash state
       ((context_t, hash_s), output_context_t) =

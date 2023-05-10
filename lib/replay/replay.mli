@@ -10,10 +10,14 @@ module Config : sig
   val copy_store_to_temp_location : t -> t
 end
 
+module Context = Tezos_context_disk.Context
+
 module State : sig
   type t
 
   val stats : t -> Irmin_pack_unix.Stats.t
+  val index : t -> Context.index option
+  val last_commit : t -> Tezos_crypto.Hashed.Context_hash.t option
 end
 
 module Replay_actions = Tezos_context_trace.Replay_actions
