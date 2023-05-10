@@ -56,7 +56,6 @@ module FoldStack = struct
     type 'a t = 'a list * 'a list
 
     let empty = ([], [])
-    let is_empty = function [], [] -> true | _, _ -> false
     let enqueue x (pop, push) = (pop, x :: push)
 
     let rec dequeue = function
@@ -101,6 +100,40 @@ module FoldStack = struct
     fs'
 end
 
+(* Configuration *)
+module Config = struct
+  type t = { actions_trace_path : string; store_path : string }
+
+  let copy_store_to_temp_location config =
+    let tmp = Filename.get_temp_dir_name () in
+    let store_path =
+      tmp ^ "/tezos-context-store-" ^ string_of_int @@ Unix.getpid ()
+    in
+
+    let cmd =
+      Filename.quote_command "cp"
+        [
+          (* use -L to dereference symbolic links *)
+          "-L";
+          "-r";
+          config.store_path;
+          store_path;
+        ]
+    in
+
+    Log.info (fun m -> m "Copying store to %s" store_path);
+
+    let err_cp = Sys.command cmd in
+
+    let err_chmod =
+      Sys.command @@ Filename.quote_command "chmod" [ "u+w"; "-R"; store_path ]
+    in
+
+    if err_cp + err_chmod <> 0 then
+      Fmt.failwith "Got error code %d for %s" err_cp cmd
+    else { config with store_path }
+end
+
 (* Replay state *)
 
 module State = struct
@@ -134,6 +167,8 @@ module State = struct
       folds = FoldStack.empty;
       tree_folds = FoldStack.empty;
     }
+
+  let stats t = t.stats
 
   type tracker_id = Optint.Int63.t
   type context_tracked = Replay_actions.scope_end * tracker_id
@@ -491,57 +526,38 @@ module Ops = struct
       | op -> error (fun m -> m "unhandled operation: %a" pp op))
 end
 
-let pp_io_stats =
-  let module ReprMap = Repr.Of_map (struct
-    include Irmin_pack_unix.Stats.Io.PathMap
+type block = Replay_actions.row = {
+  level : int;
+  tzop_count : int;
+  tzop_count_tx : int;
+  tzop_count_contract : int;
+  tz_gas_used : int;
+  tz_storage_size : int;
+  tz_cycle_snapshot : int;
+  tz_time : int;
+  tz_solvetime : int;
+  ops : Replay_actions.event array;
+  uses_patch_context : bool;
+}
 
-    let key_t = Repr.string
-  end) in
-  Repr.pp @@ ReprMap.t Irmin_pack_unix.Stats.Io.Activity.t
-
-let diff_io_stats a b =
-  Irmin_pack_unix.Stats.Io.(
-    PathMap.merge
-      (fun _path a b ->
-        match (a, b) with
-        | Some a, Some b -> Option.some @@ Activity.diff a b
-        | Some a, None -> Some a
-        | None, Some b -> Some b
-        | None, None -> None)
-      a b)
-
-let exec_block (state : State.t) (row : Replay_actions.row) =
-  Log.app (fun m -> m "level: %d" row.level);
-
-  let pre_stats = Irmin_pack_unix.Stats.Io.export state.stats.io in
-
+let exec_block (row : Replay_actions.row) (state : State.t) =
   (* execute all operations in block *)
-  let* state' =
-    Array.to_seq row.ops |> Lwt_seq.of_seq |> Lwt_seq.fold_left_s Ops.exec state
-  in
+  Array.to_seq row.ops |> Lwt_seq.of_seq |> Lwt_seq.fold_left_s Ops.exec state
 
-  let post_stats = Irmin_pack_unix.Stats.Io.export state.stats.io in
+type block_level = int
+type hash = string
 
-  let stats_diff = diff_io_stats post_stats pre_stats in
+type header = Replay_actions.header = {
+  initial_block : (block_level * hash) option;
+  last_block : block_level * hash;
+  block_count : int;
+}
 
-  let level = row.level in
-
-  Log.app (fun m ->
-      m "IO activity for block %d: %a" level pp_io_stats stats_diff);
-
-  return state'
-
-let run (config : Config.t) =
-  let version, header, actions =
+let read_blocks (config : Config.t) =
+  let _version, header, actions =
     Replay_actions.open_reader config.actions_trace_path
   in
 
-  let block_count = header.block_count in
-  Log.app (fun m -> m "Version: %d; block_count: %d" version block_count);
+  let state = State.init config in
 
-  let* _final_state =
-    actions |> Lwt_seq.of_seq
-    |> Lwt_seq.fold_left_s exec_block (State.init config)
-  in
-
-  return_unit
+  (header, state, Lwt_seq.of_seq actions)
