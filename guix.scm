@@ -6,6 +6,7 @@
 	     ((guix licenses) #:prefix license:)
 	     (gnu packages certs)
 	     (gnu packages ocaml)
+	     (gnu packages maths)
 	     (tarides packages ocaml)
 	     (tarides packages tezos)
 	     (tarides packages irmin))
@@ -69,6 +70,7 @@ traces.  This is used to benchmark performance of changes to Irmin.")
     (propagated-inputs
      (list ocaml-tezos-context
 	   ocaml-tezos-context-trace))
+    (native-inputs (list gnuplot))
     (synopsis #f)
     (description #f)
     (license license:isc))

@@ -1,0 +1,31 @@
+#+title: IO measurements
+#+STARTUP: inlineimages
+
+#+begin_src gnuplot :exports code :file activity.png
+  reset
+
+  set datafile separator ','
+
+  # use the first line as title
+  set key autotitle columnhead
+
+  set size ratio 0.5
+
+  set xtics 25000
+  set xrange [2981990:3081990]
+  set format x '%.0f'
+
+  set format y '%.0f'
+
+
+  plot 'activity.csv' using 1:2 with lines, \
+       '' using 1:4 with lines, \
+       '' using 1:18 with lines, \
+       '' using 1:22 with lines, \
+       '' using 1:26 with lines, \
+       '' using 1:30 with lines
+#+end_src
+
+#+RESULTS:
+[[file:activity.png]]
+
