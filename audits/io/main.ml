@@ -118,7 +118,7 @@ module Context_hash = Tezos_crypto.Hashed.Context_hash
 let run (config : Replay.Config.t) =
   let header, state, actions = Replay.read_blocks config in
 
-  Log.app (fun m -> m "Blocks in replay: %d." header.block_count);
+  Log.info (fun m -> m "Blocks in replay: %d." header.block_count);
 
   let* _final_state, activity_mapping =
     actions
@@ -126,7 +126,7 @@ let run (config : Replay.Config.t) =
          (fun (state, activity_mapping) (block : Replay.block) ->
            let level = block.level in
 
-           (* Log.app (fun m -> m "Replaying block level: %d" block.level); *)
+           Log.info (fun m -> m "Replaying block level: %d" block.level);
 
            (* Get the IO stats before executing block operations *)
            let stats = Replay.State.stats state in
@@ -147,7 +147,7 @@ let run (config : Replay.Config.t) =
            (* Emit as line of CSV *)
            ActivityCsv.emit level activity_mapping activity;
 
-           Log.app (fun m ->
+           Log.info (fun m ->
                m "IO activity for block %d: %a" level pp_io_stats activity);
 
            return (state', activity_mapping))
