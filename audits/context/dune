@@ -1,0 +1,3 @@
+(executables
+ (names tree_fold)
+ (libraries irmin irmin-pack.unix tezos-context logs))

@@ -1,0 +1,32 @@
+#+title: Structure of the Tezos Context
+
+* Tools
+
+** tree_fold.ml
+
+How much info can we get out with a ~Tree.fold~?
+
+#+begin_src
+node_count: 38441804
+content_count: 79822881
+content_total_size: 1601844889
+content_max_size:
+ /data/contracts/index/01d36be45e8ace95d7dfe812929f64231ff46fcd3f00/data/storage
+ 367707
+content_min_size:
+ /data/active_delegate_with_one_roll/current/ed25519/002fe7db5218a1d674c88dd9d9421ac60b8eb3e5
+ 0
+#+end_src
+
+
+* Notes
+
+** Probably large
+
+Folding over the entire tree of a single context takes around 13 minutes:
+
+#+begin_src ocaml
+  Store.Tree.fold tree ()
+#+end_src
+
+
