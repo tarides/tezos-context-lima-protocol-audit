@@ -27,7 +27,7 @@ We observe that rolling and full nodes [[https://tezos.gitlab.io/user/history_mo
 A quick check confirms this:
 
 #+begin_src shell :exports both
-  dune exec audits/index/count_rolling_node_bindings.exe
+  dune exec audits/index/count_bindings.exe -- inputs/store-level-3081990/
 #+end_src
 
 #+RESULTS:

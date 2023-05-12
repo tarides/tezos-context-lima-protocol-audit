@@ -5,7 +5,7 @@
  *)
 
 open Lwt
-open Lwt.Syntax
+(* open Lwt.Syntax *)
 
 (* Logging *)
 
@@ -13,8 +13,6 @@ let setup_logs () =
   Fmt_tty.setup_std_outputs ();
   Logs.set_reporter (Logs_fmt.reporter ());
   Logs.(set_level @@ Some Info)
-
-let store_path = "/home/adatario/dev/tclpa/inputs/store-level-3081990"
 
 (* The Tezos Context *)
 module Context = Tezos_context_disk.Context
@@ -38,15 +36,10 @@ let cound_bindings index =
   Index.iter (fun _key _value -> count := !count + 1) index;
   !count
 
-let main root =
-  let* repo =
-    Store.Repo.v
-      (Irmin_pack.config ~readonly:true
-         ~indexing_strategy:Irmin_pack.Indexing_strategy.minimal root)
+let main index_path =
+  let index =
+    Index.v ~readonly:true ~log_size:2_500_000 index_path |> Result.get_ok
   in
-
-  let fm = Store.Internal.file_manager repo in
-  let index = File_manager.index fm in
 
   let bindings = cound_bindings index in
 
@@ -56,4 +49,6 @@ let main root =
 
 let () =
   setup_logs ();
-  Lwt_main.run @@ main store_path
+
+  let index_path = Sys.argv.(1) in
+  Lwt_main.run @@ main index_path
