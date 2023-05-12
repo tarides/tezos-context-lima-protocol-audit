@@ -35,6 +35,21 @@ A quick check confirms this:
 
 Note that the number of bindings in the index is slightly higher than 98_304 as the store also contains orphaned commits.
 
+*** Archive node
+
+Tezos archive nodes hold the full history since genesis. When using minimal indexing references to at most 2_500_000 commits/blocks are kept in the log of the index. In July 2022 the Tezos block chain reached that block height. So since at least July 2022 the index of archive nodes will also have a ~data~ part.
+
+**** Archive nodes with indexing strategy ~always~
+
+Archive nodes that were bootstrapped before the new minimal indexing strategy was adopted have many more entries in the index:
+
+#+begin_src shell :exports both
+  dune exec audits/index/count_bindings.exe -- inputs/archive-node-index/
+#+end_src
+
+#+RESULTS:
+: Number of bindings in Index: 2036584177
+
 
 ** TODO I/O Amplification
 
