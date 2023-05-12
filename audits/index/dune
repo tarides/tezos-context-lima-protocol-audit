@@ -1,0 +1,3 @@
+(executables
+ (names count_bindings)
+ (libraries irmin irmin-pack.unix tezos-context logs))

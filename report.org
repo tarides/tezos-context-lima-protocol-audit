@@ -22,6 +22,17 @@ The default number of bindings to keep in the log before moving them to the data
 
 We observe that rolling and full nodes [[https://tezos.gitlab.io/user/history_modes.html#history-mode-additional-cycles][keep a default of 6 cycles]] which corresponds to about 98_304 blocks ([[https://tezos.gitlab.io/active/proof_of_stake.html#ps-constants][16_834 blocks per cycle]]) or, in Irmin terminology, to about 98_304 commits. Rolling and full nodes will by default never create a data part and every index lookup performed is an in-memory operation.
 
+A quick check confirms this:
+
+#+begin_src shell
+  dune exec audits/index/count_bindings.exe
+#+end_src
+
+#+RESULTS:
+: Number of bindings in Index: 100005
+
+Note that the number of bindings in the index is slightly higher than 98_304 as the store also contains orphaned commits.
+
 ** TODO I/O Amplification
 
 ** TODO CPU boundness
