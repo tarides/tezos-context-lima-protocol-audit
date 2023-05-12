@@ -20,18 +20,21 @@ The index datastructure is split into two major parts: the log and the data. The
 
 The default number of bindings to keep in the log before moving them to the data part [[https://gitlab.com/tezos/tezos/-/blob/master/src/lib_context/helpers/env.ml#L41-45][in Octez]] and [[https://github.com/mirage/irmin/blob/main/src/irmin-pack/conf.mli#L93-L94][in ~irmin-pack~]] is set to 2_500_000.
 
+*** Rolling and full node
+
 We observe that rolling and full nodes [[https://tezos.gitlab.io/user/history_modes.html#history-mode-additional-cycles][keep a default of 6 cycles]] which corresponds to about 98_304 blocks ([[https://tezos.gitlab.io/active/proof_of_stake.html#ps-constants][16_834 blocks per cycle]]) or, in Irmin terminology, to about 98_304 commits. Rolling and full nodes will by default never create a data part and every index lookup performed is an in-memory operation.
 
 A quick check confirms this:
 
 #+begin_src shell :exports both
-  dune exec audits/index/count_bindings.exe
+  dune exec audits/index/count_rolling_node_bindings.exe
 #+end_src
 
 #+RESULTS:
 : Number of bindings in Index: 100005
 
 Note that the number of bindings in the index is slightly higher than 98_304 as the store also contains orphaned commits.
+
 
 ** TODO I/O Amplification
 
