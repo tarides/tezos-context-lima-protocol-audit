@@ -12,6 +12,16 @@
 
 ** TODO Index performance
 
+At it's core Irmin is a content-addressable store. Store objects are referenced by their cryptographic hash. In ~irmin-pack~ objects are stored in an append-only pack file. The index is a persistent datastructure that maps the hash of an object to its offset in the append-only pack file.
+
+Since Irmin version 3.0.0 objects in the pack file hold direct references to other objects in the pack file [[[https://github.com/mirage/irmin/pull/1659][irmin #1659]]] this removes the necessity to always query the index when traversing objects. This also allows a smaller index as now only top-level objects (i.e. commits) need to be in the index [[[https://github.com/mirage/irmin/pull/1664][irmin #1664]]]. This is called ~minimal~ indexing and has allowed [[https://tarides.com/blog/2022-04-26-lightning-fast-with-irmin-tezos-storage-is-6x-faster-with-1000-tps-surpassed][considerable performance improvements for the Octez storage layer]].
+
+The index datastructure is split into two major parts: the log and the data. The log is a small and bounded structure that holds recently-added bindings. The log is kept in memory after initialization. The data part holds older bindings. When a certain number of bindings are added to the log, the bindings are merged with the bindings in the data part. The datastructure is similar to a two-level [[https://en.wikipedia.org/wiki/Log-structured_merge-tree][Log-structured merge-tree]].
+
+The default number of bindings to keep in the log before moving them to the data part [[https://gitlab.com/tezos/tezos/-/blob/master/src/lib_context/helpers/env.ml#L41-45][in Octez]] and [[https://github.com/mirage/irmin/blob/main/src/irmin-pack/conf.mli#L93-L94][in ~irmin-pack~]] is set to 2_500_000.
+
+We observe that rolling and full nodes [[https://tezos.gitlab.io/user/history_modes.html#history-mode-additional-cycles][keep a default of 6 cycles]] which corresponds to about 98_304 blocks ([[https://tezos.gitlab.io/active/proof_of_stake.html#ps-constants][16_834 blocks per cycle]]) or, in Irmin terminology, to about 98_304 commits. Rolling and full nodes will by default never create a data part and every index lookup performed is an in-memory operation.
+
 ** TODO I/O Amplification
 
 ** TODO CPU boundness
