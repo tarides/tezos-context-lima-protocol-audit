@@ -39,8 +39,6 @@ Note that the number of bindings in the index is slightly higher than 98_304 as 
 
 Tezos archive nodes hold the full history since genesis. When using minimal indexing references to at most 2_500_000 commits/blocks are kept in the log of the index. In July 2022 the Tezos block chain reached that block height. So since at least July 2022 the index of archive nodes will also have a ~data~ part.
 
-**** Archive nodes with indexing strategy ~always~
-
 Archive nodes that were bootstrapped before the new minimal indexing strategy was adopted have many more entries in the index:
 
 #+begin_src shell :exports both
@@ -50,6 +48,43 @@ Archive nodes that were bootstrapped before the new minimal indexing strategy wa
 #+RESULTS:
 : Number of bindings in Index: 2036584177
 
+*** Find Performance
+
+We measure the performance of index lookups by creating an empty index structure with same parameters as used in Tezos Octez (key size of 30 bytes, value size of 13 bytes and log size of 2_500_000), adding ~c~ random bindings and performing ~c~ lookups for random bindings. We use the [[https://github.com/LexiFi/landmarks][LexiFi/landmarks]] library to measure performance in CPU cycles (as well as system time).
+
+#+tblname: find-performance
+| ^ |   count |           cpu_time |  sys_time | cpu_time per entry |
+|---+---------+--------------------+-----------+--------------------|
+| # |  250000 |  2132773826.000000 |  1.126439 |          8531.0953 |
+| # |  500000 |  4009158441.000000 |  2.119049 |          8018.3169 |
+| # | 1000000 |  8235106179.000000 |  4.351689 |          8235.1062 |
+| # | 2000000 | 16838605030.000000 |  8.893822 |          8419.3025 |
+| # | 2499999 | 20421445765.000000 | 10.791509 |          8168.5816 |
+| # | 2500001 | 23511451504.000000 | 12.446721 |          9404.5768 |
+| # | 3000000 | 31077192851.000000 | 16.442429 |          10359.064 |
+| # | 4000000 | 39358430251.000000 | 20.823590 |          9839.6076 |
+| # | 5000000 | 48122118368.000000 | 25.448949 |          9624.4237 |
+| # | 6000000 | 60941841080.000000 | 32.247097 |          10156.974 |
+| # | 7000000 | 72898690458.000000 | 38.564382 |          10414.099 |
+#+TBLFM: $5=$3/$2
+
+#+begin_src gnuplot :var data=find-performance :exports code :file find-performance.png
+  set title "Index.find performance"
+
+  set xlabel "number of entries"
+  set format x '%.0f'
+
+  set arrow from 2500000, graph 0 to 2500000, graph 1 nohead lc 2 title "log size"
+
+  set ylabel "CPU cycles"
+
+  plot data u 1:4 with point lw 2 title 'CPU cycles per entry'
+#+end_src
+
+#+RESULTS:
+[[file:find-performance.png]]
+
+We note a sharp increase in CPU cycles needed to lookup an entry when the number of bindings jumps over the log size (2_500_000).
 
 ** TODO I/O Amplification
 

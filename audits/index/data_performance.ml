@@ -44,30 +44,44 @@ module Value = struct
 end
 
 module Index = Index_unix.Make (Key) (Value) (Index.Cache.Unbounded)
-
-let cound_bindings index =
-  let count = ref 0 in
-  Index.iter (fun _key _value -> count := !count + 1) index;
-  !count
+module IntMap = Map.Make (Int)
 
 let fill_index index count =
   Seq.forever Key.random |> Seq.take count
-  |> Seq.iter (fun key -> Index.replace index key Value.empty)
+  |> Seq.fold_lefti
+       (fun map i key ->
+         Index.replace index key Value.empty;
+         IntMap.add i key map)
+       IntMap.empty
 
-let main index_path =
+let main count index_path =
+  (* open the index *)
   let index = Index.v ~readonly:false ~log_size:2_500_000 index_path in
 
-  let () = fill_index index 3_500_000 in
+  (* fill index with random key/values and return a set of keys *)
+  let keys = fill_index index count in
 
-  let bindings = cound_bindings index in
-
-  Logs.app (fun m -> m "Number of bindings in Index: %d" bindings);
-
+  (* close the index *)
   Index.close index;
+
+  (* re-open the index *)
+  let index = Index.v ~readonly:false ~log_size:2_500_000 index_path in
+
+  let random_keys =
+    Seq.forever (fun () -> Random.int count)
+    |> Seq.map (fun i -> IntMap.find i keys)
+  in
+
+  random_keys |> Seq.take count
+  |> Seq.iter (fun key ->
+         let[@landmark "index_find"] _ = Index.find index key in
+         ());
+
   return_unit
 
 let () =
   setup_logs ();
 
-  let index_path = Sys.argv.(1) in
-  Lwt_main.run @@ main index_path
+  let count = int_of_string @@ Sys.argv.(1) in
+  let index_path = Sys.argv.(2) in
+  Lwt_main.run @@ main count index_path

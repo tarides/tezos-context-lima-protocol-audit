@@ -69,7 +69,9 @@ traces.  This is used to benchmark performance of changes to Irmin.")
     (build-system dune-build-system)
     (propagated-inputs
      (list ocaml-tezos-context
-	   ocaml-tezos-context-trace))
+	   ocaml-tezos-context-trace
+
+	   ocaml-landmarks))
     (native-inputs (list gnuplot))
     (synopsis #f)
     (description #f)

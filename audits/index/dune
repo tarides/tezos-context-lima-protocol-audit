@@ -1,3 +1,4 @@
 (executables
  (names count_bindings data_performance)
- (libraries irmin irmin-pack.unix tezos-context logs))
+ (libraries irmin irmin-pack.unix tezos-context logs)
+ (instrumentation (backend landmarks)))
