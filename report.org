@@ -68,7 +68,7 @@ We measure the performance of index lookups by creating an empty index structure
 | # | 7000000 | 72898690458.000000 | 38.564382 |          10414.099 |
 #+TBLFM: $5=$3/$2
 
-#+begin_src gnuplot :var data=find-performance :exports code :file find-performance.png
+#+begin_src gnuplot :var data=find-performance :exports results :file find-performance.png
   set title "Index.find performance"
 
   set xlabel "number of entries"
