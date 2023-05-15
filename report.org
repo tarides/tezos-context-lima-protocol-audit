@@ -5,11 +5,8 @@
 #+END_abstract
 
 * Introduction
-
 * Audits
-
 ** TODO Dict usage
-
 ** TODO Index performance
 
 At it's core Irmin is a content-addressable store. Store objects are referenced by their cryptographic hash. In ~irmin-pack~ objects are stored in an append-only pack file. The index is a persistent datastructure that maps the hash of an object to its offset in the append-only pack file.
@@ -87,7 +84,6 @@ We measure the performance of index lookups by creating an empty index structure
 We note a sharp increase in CPU cycles needed to lookup an entry when the number of bindings jumps over the log size (2_500_000).
 
 ** TODO I/O Amplification
-
 ** TODO CPU boundness
-
 ** TODO Entropy of Store
+* Conclusion

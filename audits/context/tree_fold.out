@@ -1,5 +1,8 @@
 node_count: 38441804
 content_count: 79822881
+content_sizes: 0: 596661; 1: 23722650; 2: 38698770; 3: 1125580; 4: 3131048;
+ 5: 4194650; 6: 7477058; 7: 532486; 8: 194262; 9: 35410; 10: 35600; 11:
+ 71535; 12: 4289; 13: 2583; 14: 260; 15: 9; 16: 1; 17: 3; 18: 7
 content_total_size: 1601844889
 content_max_size:
  /data/contracts/index/01d36be45e8ace95d7dfe812929f64231ff46fcd3f00/data/storage

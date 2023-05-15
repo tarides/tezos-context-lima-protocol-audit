@@ -40,12 +40,32 @@ let context_hash_of_level_3081990 =
   Context_hash.of_b58check_exn
     "CoUr71WP9479RrsT6BdeFatazHbLdZGsCPfY2YaMgZhAeYe5z7QU"
 
+module IntMap = Map.Make (Int)
+
+module Size_binning = struct
+  include Binning.Make (IntMap)
+
+  type nonrec t = (int, unit, int) t
+
+  let empty =
+    create
+      ~projection:(fun size -> Float.(to_int @@ floor @@ log2 @@ of_int size))
+      ~add:(fun () summary ->
+        match summary with None -> Some 0 | Some c -> Some (c + 1))
+
+  let add size b = add size () b
+
+  let pp f t =
+    Fmt.(pf f "%a" (seq ~sep:semi @@ pair ~sep:(any ":@ ") int int) @@ to_seq t)
+end
+
 module Stats = struct
   type t = {
     (* Stats for internal nodes. Not much more we can get out from the exposed API. *)
     node_count : int;
     (* Stats for content *)
     content_count : int;
+    content_sizes : Size_binning.t;
     content_total_size : int;
     content_max_size : Store.path * int;
     content_min_size : Store.path * int;
@@ -55,6 +75,7 @@ module Stats = struct
     {
       node_count = 0;
       content_count = 0;
+      content_sizes = Size_binning.empty;
       content_total_size = 0;
       content_max_size = ([], -1);
       content_min_size = ([], max_int);
@@ -66,6 +87,7 @@ module Stats = struct
         [
           field "node_count" (fun t -> t.node_count) int;
           field "content_count" (fun t -> t.content_count) int;
+          field "content_sizes" (fun t -> t.content_sizes) Size_binning.pp;
           field "content_total_size" (fun t -> t.content_total_size) int;
           field "content_max_size" (fun t -> t.content_max_size)
           @@ pair (Repr.pp Store.path_t) int;
@@ -107,10 +129,13 @@ let main root =
           else stats.content_min_size
         in
 
+        let content_sizes = Size_binning.add len stats.content_sizes in
+
         return
           {
             stats with
             content_count = stats.content_count + 1;
+            content_sizes;
             content_total_size = stats.content_total_size + len;
             content_max_size;
             content_min_size;
