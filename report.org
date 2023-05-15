@@ -66,6 +66,8 @@ We measure the performance of index lookups by creating an empty index structure
 #+TBLFM: $5=$3/$2
 
 #+begin_src gnuplot :var data=find-performance :exports results :file find-performance.png
+  reset
+
   set title "Index.find performance"
 
   set xlabel "number of entries"
@@ -85,5 +87,44 @@ We note a sharp increase in CPU cycles needed to lookup an entry when the number
 
 ** TODO I/O Amplification
 ** TODO CPU boundness
-** TODO Entropy of Store
+** TODO Context Structure
+
+*** Content Size distribution
+
+#+tblname: context-content-size
+| Exponent |    Count |
+|----------+----------|
+|        0 |   596661 |
+|        1 | 23722650 |
+|        2 | 38698770 |
+|        3 |  1125580 |
+|        4 |  3131048 |
+|        5 |  4194650 |
+|        6 |  7477058 |
+|        7 |   532486 |
+|        8 |   194262 |
+|        9 |    35410 |
+|       10 |    35600 |
+|       11 |    71535 |
+|       12 |     4289 |
+|       13 |     2583 |
+|       14 |      260 |
+|       15 |        9 |
+|       16 |        1 |
+|       17 |        3 |
+|       18 |        7 |
+
+#+begin_src gnuplot :var data=context-content-size :exports results :file context-content-size.png
+  reset
+
+  set title "Context Content Size"
+  set style data histogram
+
+  plot data using 2:xticlabels(1)
+#+end_src
+
+#+RESULTS:
+[[file:context-content-size.png]]
+
+
 * Conclusion
