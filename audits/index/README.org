@@ -5,42 +5,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 250_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 250_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |         |                     |
-| "nodes":           | [                                                 |         |                     |
-| {                  |                                                   |         |                     |
-| "id":              | 0,                                                |         |                     |
-| "kind":            | "root",                                           |         |                     |
-| "landmark_id":     | "0",                                              |         |                     |
-| "name":            | "ROOT",                                           |         |                     |
-| "location":        | "src/landmark.ml",                                |         |                     |
-| "calls":           | 0,                                                |         |                     |
-| "time":            | 5304209290.000000,                                |         |                     |
-| "children":        | [1],                                              |         |                     |
-| "sys_time":        | 2.901052,                                         |         |                     |
-| "allocated_bytes": | 0.000000,                                         |         |                     |
-| "distrib":         | []                                                |         |                     |
-| },                 |                                                   |         |                     |
-| {                  |                                                   |         |                     |
-| "id":              | 1,                                                |         |                     |
-| "kind":            | "normal",                                         |         |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |         |                     |
-| "name":            | "Data_performance.index_find",                    |         |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |         |                     |
-| "calls":           | 250000,                                           |         |                     |
-| "time":            | 2132773826.000000,                                |         |                     |
-| "children":        | [],                                               |         |                     |
-| "sys_time":        | 1.126439,                                         |         |                     |
-| "allocated_bytes": | 0.000000,                                         |         |                     |
-| "distrib":         | []                                                |         |                     |
-| }                  |                                                   |         |                     |
-| ],                 |                                                   |         |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 250_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |         |                     |
-| }                  |                                                   |         |                     |
+| {                  |                                                        |         |                     |
+| "nodes":           | [                                                      |         |                     |
+| {                  |                                                        |         |                     |
+| "id":              | 0,                                                     |         |                     |
+| "kind":            | "root",                                                |         |                     |
+| "landmark_id":     | "0",                                                   |         |                     |
+| "name":            | "ROOT",                                                |         |                     |
+| "location":        | "src/landmark.ml",                                     |         |                     |
+| "calls":           | 0,                                                     |         |                     |
+| "time":            | 5304209290.000000,                                     |         |                     |
+| "children":        | [1],                                                   |         |                     |
+| "sys_time":        | 2.901052,                                              |         |                     |
+| "allocated_bytes": | 0.000000,                                              |         |                     |
+| "distrib":         | []                                                     |         |                     |
+| },                 |                                                        |         |                     |
+| {                  |                                                        |         |                     |
+| "id":              | 1,                                                     |         |                     |
+| "kind":            | "normal",                                              |         |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |         |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |         |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |         |                     |
+| "calls":           | 250000,                                                |         |                     |
+| "time":            | 2132773826.000000,                                     |         |                     |
+| "children":        | [],                                                    |         |                     |
+| "sys_time":        | 1.126439,                                              |         |                     |
+| "allocated_bytes": | 0.000000,                                              |         |                     |
+| "distrib":         | []                                                     |         |                     |
+| }                  |                                                        |         |                     |
+| ],                 |                                                        |         |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 250_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |         |                     |
+| }                  |                                                        |         |                     |
 
 
 #+begin_src scheme :exports both
@@ -54,42 +54,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 500_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 500_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |         |                     |
-| "nodes":           | [                                                 |         |                     |
-| {                  |                                                   |         |                     |
-| "id":              | 0,                                                |         |                     |
-| "kind":            | "root",                                           |         |                     |
-| "landmark_id":     | "0",                                              |         |                     |
-| "name":            | "ROOT",                                           |         |                     |
-| "location":        | "src/landmark.ml",                                |         |                     |
-| "calls":           | 0,                                                |         |                     |
-| "time":            | 10543744765.000000,                               |         |                     |
-| "children":        | [1],                                              |         |                     |
-| "sys_time":        | 5.665940,                                         |         |                     |
-| "allocated_bytes": | 0.000000,                                         |         |                     |
-| "distrib":         | []                                                |         |                     |
-| },                 |                                                   |         |                     |
-| {                  |                                                   |         |                     |
-| "id":              | 1,                                                |         |                     |
-| "kind":            | "normal",                                         |         |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |         |                     |
-| "name":            | "Data_performance.index_find",                    |         |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |         |                     |
-| "calls":           | 500000,                                           |         |                     |
-| "time":            | 4009158441.000000,                                |         |                     |
-| "children":        | [],                                               |         |                     |
-| "sys_time":        | 2.119049,                                         |         |                     |
-| "allocated_bytes": | 0.000000,                                         |         |                     |
-| "distrib":         | []                                                |         |                     |
-| }                  |                                                   |         |                     |
-| ],                 |                                                   |         |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 500_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |         |                     |
-| }                  |                                                   |         |                     |
+| {                  |                                                        |         |                     |
+| "nodes":           | [                                                      |         |                     |
+| {                  |                                                        |         |                     |
+| "id":              | 0,                                                     |         |                     |
+| "kind":            | "root",                                                |         |                     |
+| "landmark_id":     | "0",                                                   |         |                     |
+| "name":            | "ROOT",                                                |         |                     |
+| "location":        | "src/landmark.ml",                                     |         |                     |
+| "calls":           | 0,                                                     |         |                     |
+| "time":            | 10543744765.000000,                                    |         |                     |
+| "children":        | [1],                                                   |         |                     |
+| "sys_time":        | 5.665940,                                              |         |                     |
+| "allocated_bytes": | 0.000000,                                              |         |                     |
+| "distrib":         | []                                                     |         |                     |
+| },                 |                                                        |         |                     |
+| {                  |                                                        |         |                     |
+| "id":              | 1,                                                     |         |                     |
+| "kind":            | "normal",                                              |         |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |         |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |         |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |         |                     |
+| "calls":           | 500000,                                                |         |                     |
+| "time":            | 4009158441.000000,                                     |         |                     |
+| "children":        | [],                                                    |         |                     |
+| "sys_time":        | 2.119049,                                              |         |                     |
+| "allocated_bytes": | 0.000000,                                              |         |                     |
+| "distrib":         | []                                                     |         |                     |
+| }                  |                                                        |         |                     |
+| ],                 |                                                        |         |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 500_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |         |                     |
+| }                  |                                                        |         |                     |
 
 
 #+begin_src scheme :exports both
@@ -103,42 +103,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 1_000_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 1_000_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 21072284229.000000,                               |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 11.217364,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 1000000,                                          |           |                     |
-| "time":            | 8235106179.000000,                                |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 4.351689,                                         |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 1_000_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 21072284229.000000,                                    |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 11.217364,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 1000000,                                               |           |                     |
+| "time":            | 8235106179.000000,                                     |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 4.351689,                                              |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 1_000_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |
 
 
 #+begin_src scheme :exports both
@@ -152,42 +152,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 2_000_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 2_000_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 42857352698.000000,                               |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 22.701610,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 2000000,                                          |           |                     |
-| "time":            | 16838605030.000000,                               |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 8.893822,                                         |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 2_000_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 42857352698.000000,                                    |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 22.701610,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 2000000,                                               |           |                     |
+| "time":            | 16838605030.000000,                                    |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 8.893822,                                              |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 2_000_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |
 
 
 #+begin_src scheme :exports both
@@ -201,42 +201,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 2_499_999 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 2_499_999 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 54051096165.000000,                               |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 28.598885,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 2499999,                                          |           |                     |
-| "time":            | 20421445765.000000,                               |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 10.791509,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 2_499_999 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 54051096165.000000,                                    |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 28.598885,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 2499999,                                               |           |                     |
+| "time":            | 20421445765.000000,                                    |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 10.791509,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 2_499_999 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |
 
 
 #+begin_src scheme :exports both
@@ -250,42 +250,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 2_500_001 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 2_500_001 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 58827386256.000000,                               |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 31.099320,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 2500001,                                          |           |                     |
-| "time":            | 23511451504.000000,                               |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 12.446721,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 2_500_001 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 58827386256.000000,                                    |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 31.099320,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 2500001,                                               |           |                     |
+| "time":            | 23511451504.000000,                                    |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 12.446721,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 2_500_001 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |
 
 
 #+begin_src scheme :exports both
@@ -299,42 +299,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks audits/index/data_performance.exe -- 3_000_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks audits/index/add_and_find_bindings.exe -- 3_000_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 73499098571.000000,                               |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 38.817388,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 3000000,                                          |           |                     |
-| "time":            | 31077192851.000000,                               |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 16.442429,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 3_000_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 73499098571.000000,                                    |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 38.817388,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 3000000,                                               |           |                     |
+| "time":            | 31077192851.000000,                                    |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 16.442429,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 3_000_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |
 
 
 #+begin_src scheme :exports both
@@ -348,42 +348,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 4_000_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 4_000_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 95362140988.000000,                               |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 50.348337,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 4000000,                                          |           |                     |
-| "time":            | 39358430251.000000,                               |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 20.823590,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 4_000_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 95362140988.000000,                                    |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 50.348337,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 4000000,                                               |           |                     |
+| "time":            | 39358430251.000000,                                    |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 20.823590,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 4_000_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |
 
 
 #+begin_src scheme :exports both
@@ -397,42 +397,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 5_000_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 5_000_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 120711940779.000000,                              |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 63.698863,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 5000000,                                          |           |                     |
-| "time":            | 48122118368.000000,                               |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 25.448949,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 5_000_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 120711940779.000000,                                   |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 63.698863,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 5000000,                                               |           |                     |
+| "time":            | 48122118368.000000,                                    |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 25.448949,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 5_000_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |
 
 
 #+begin_src scheme :exports both
@@ -446,42 +446,42 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks audits/index/data_performance.exe -- 6_000_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks audits/index/add_and_find_bindings.exe -- 6_000_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 146482551753.000000,                              |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 77.247365,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 6000000,                                          |           |                     |
-| "time":            | 60941841080.000000,                               |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 32.247097,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 6_000_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 146482551753.000000,                                   |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 77.247365,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 6000000,                                               |           |                     |
+| "time":            | 60941841080.000000,                                    |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 32.247097,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 6_000_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |
 
 #+begin_src scheme :exports both
   (/ 60941841080.000000 6000000)
@@ -494,39 +494,39 @@
 
 #+begin_src shell :exports both
   rm -r /tmp/tclpa-index
-  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./data_performance.exe -- 7_000_000 /tmp/tclpa-index/
+  OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./add_and_find_bindings.exe -- 7_000_000 /tmp/tclpa-index/
 #+end_src
 
 #+RESULTS:
-| {                  |                                                   |           |                     |
-| "nodes":           | [                                                 |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 0,                                                |           |                     |
-| "kind":            | "root",                                           |           |                     |
-| "landmark_id":     | "0",                                              |           |                     |
-| "name":            | "ROOT",                                           |           |                     |
-| "location":        | "src/landmark.ml",                                |           |                     |
-| "calls":           | 0,                                                |           |                     |
-| "time":            | 176176047944.000000,                              |           |                     |
-| "children":        | [1],                                              |           |                     |
-| "sys_time":        | 92.890772,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| },                 |                                                   |           |                     |
-| {                  |                                                   |           |                     |
-| "id":              | 1,                                                |           |                     |
-| "kind":            | "normal",                                         |           |                     |
-| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",            |           |                     |
-| "name":            | "Data_performance.index_find",                    |           |                     |
-| "location":        | "audits/index/data_performance.ml:77",            |           |                     |
-| "calls":           | 7000000,                                          |           |                     |
-| "time":            | 72898690458.000000,                               |           |                     |
-| "children":        | [],                                               |           |                     |
-| "sys_time":        | 38.564382,                                        |           |                     |
-| "allocated_bytes": | 0.000000,                                         |           |                     |
-| "distrib":         | []                                                |           |                     |
-| }                  |                                                   |           |                     |
-| ],                 |                                                   |           |                     |
-| "label":           | "_build/default/audits/index/data_performance.exe | 7_000_000 | /tmp/tclpa-index/", |
-| "root":            | 0                                                 |           |                     |
-| }                  |                                                   |           |                     |
+| {                  |                                                        |           |                     |
+| "nodes":           | [                                                      |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 0,                                                     |           |                     |
+| "kind":            | "root",                                                |           |                     |
+| "landmark_id":     | "0",                                                   |           |                     |
+| "name":            | "ROOT",                                                |           |                     |
+| "location":        | "src/landmark.ml",                                     |           |                     |
+| "calls":           | 0,                                                     |           |                     |
+| "time":            | 176176047944.000000,                                   |           |                     |
+| "children":        | [1],                                                   |           |                     |
+| "sys_time":        | 92.890772,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| },                 |                                                        |           |                     |
+| {                  |                                                        |           |                     |
+| "id":              | 1,                                                     |           |                     |
+| "kind":            | "normal",                                              |           |                     |
+| "landmark_id":     | "#4e2ff28184edd59aff66976e474229d6_1",                 |           |                     |
+| "name":            | "add_and_find_bindings.index_find",                    |           |                     |
+| "location":        | "audits/index/add_and_find_bindings.ml:77",            |           |                     |
+| "calls":           | 7000000,                                               |           |                     |
+| "time":            | 72898690458.000000,                                    |           |                     |
+| "children":        | [],                                                    |           |                     |
+| "sys_time":        | 38.564382,                                             |           |                     |
+| "allocated_bytes": | 0.000000,                                              |           |                     |
+| "distrib":         | []                                                     |           |                     |
+| }                  |                                                        |           |                     |
+| ],                 |                                                        |           |                     |
+| "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 7_000_000 | /tmp/tclpa-index/", |
+| "root":            | 0                                                      |           |                     |
+| }                  |                                                        |           |                     |

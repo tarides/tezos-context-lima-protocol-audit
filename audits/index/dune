@@ -1,4 +1,4 @@
 (executables
- (names count_bindings data_performance find_existing_bindings)
+ (names count_bindings add_and_find_bindings find_existing_bindings)
  (libraries irmin irmin-pack.unix tezos-context logs)
  (instrumentation (backend landmarks)))
