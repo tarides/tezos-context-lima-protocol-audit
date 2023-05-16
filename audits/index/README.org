@@ -530,3 +530,16 @@
 | "label":           | "_build/default/audits/index/add_and_find_bindings.exe | 7_000_000 | /tmp/tclpa-index/", |
 | "root":            | 0                                                      |           |                     |
 | }                  |                                                        |           |                     |
+
+* find performance on archive node with non-minimal indexing
+
+When trying to read from the index of an non-minimal archive node I get following error:
+
+#+begin_src shell :exports both
+OCAML_LANDMARKS="format=json,output=stdout,time" dune exec --instrument-with landmarks ./find_existing_bindings.exe -- 1_000_000 /home/tezos/nodes/archive/node/data/context 
+#+end_src
+
+#+RESULTS:
+: Fatal error: exception Invalid_argument("String.sub / Bytes.sub")
+
+Could it be that the index has different sizes for key/values?

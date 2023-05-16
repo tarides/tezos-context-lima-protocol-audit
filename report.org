@@ -8,7 +8,7 @@
 * Introduction
 * Audits
 ** TODO Dict usage
-** TODO Index performance
+** Index performance
 
 At it's core Irmin is a content-addressable store. Store objects are referenced by their cryptographic hash. In ~irmin-pack~ objects are stored in an append-only pack file. The index is a persistent datastructure that maps the hash of an object to its offset in the append-only pack file.
 
@@ -92,7 +92,6 @@ With the currently implemented minimal indexing scheme no performance issues are
 
 ** TODO CPU boundness
 ** TODO Context Structure
-
 *** Content Size distribution
 
 #+tblname: context-content-size
