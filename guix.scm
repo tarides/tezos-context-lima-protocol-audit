@@ -7,6 +7,7 @@
 	     (gnu packages certs)
 	     (gnu packages ocaml)
 	     (gnu packages maths)
+	     (gnu packages benchmark)
 	     (tarides packages ocaml)
 	     (tarides packages tezos)
 	     (tarides packages irmin))
@@ -72,7 +73,7 @@ traces.  This is used to benchmark performance of changes to Irmin.")
 	   ocaml-tezos-context-trace
 
 	   ocaml-landmarks))
-    (native-inputs (list gnuplot))
+    (native-inputs (list gnuplot fio))
     (synopsis #f)
     (description #f)
     (license license:isc))
