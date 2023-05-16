@@ -242,7 +242,11 @@ end
 
 (* Replay logic *)
 
-module Ops = struct
+module Operation = struct
+  type t = Replay_actions.event
+
+  let is_split = function Replay_actions.Split -> true | _ -> false
+  let is_gc = function Replay_actions.Gc _ -> true | _ -> false
   let pp = Repr.pp Replay_actions.event_t
 
   let error m =
@@ -479,7 +483,7 @@ module Ops = struct
     let* () = Context.gc (Option.get state.index) hash in
     return state
 
-  let exec state op =
+  let exec op state =
     Replay_actions.(
       match op with
       | Init args -> exec_init state args
@@ -531,32 +535,37 @@ module Ops = struct
       | op -> error (fun m -> m "unhandled operation: %a" pp op))
 end
 
-type block = Replay_actions.row = {
-  level : int;
-  tzop_count : int;
-  tzop_count_tx : int;
-  tzop_count_contract : int;
-  tz_gas_used : int;
-  tz_storage_size : int;
-  tz_cycle_snapshot : int;
-  tz_time : int;
-  tz_solvetime : int;
-  ops : Replay_actions.event array;
-  uses_patch_context : bool;
-}
+module Block = struct
+  type t = Replay_actions.row = {
+    level : int;
+    tzop_count : int;
+    tzop_count_tx : int;
+    tzop_count_contract : int;
+    tz_gas_used : int;
+    tz_storage_size : int;
+    tz_cycle_snapshot : int;
+    tz_time : int;
+    tz_solvetime : int;
+    ops : Replay_actions.event array;
+    uses_patch_context : bool;
+  }
 
-let exec_block (row : Replay_actions.row) (state : State.t) =
-  (* execute all operations in block *)
-  Array.to_seq row.ops |> Lwt_seq.of_seq |> Lwt_seq.fold_left_s Ops.exec state
+  let exec (row : Replay_actions.row) (state : State.t) =
+    (* execute all operations in block *)
+    Array.to_seq row.ops |> Lwt_seq.of_seq
+    |> Lwt_seq.fold_left_s (Fun.flip Operation.exec) state
+end
 
 type block_level = int
 type hash = string
 
-type header = Replay_actions.header = {
-  initial_block : (block_level * hash) option;
-  last_block : block_level * hash;
-  block_count : int;
-}
+module Header = struct
+  type t = Replay_actions.header = {
+    initial_block : (block_level * hash) option;
+    last_block : block_level * hash;
+    block_count : int;
+  }
+end
 
 let read_blocks (config : Config.t) =
   let _version, header, actions =

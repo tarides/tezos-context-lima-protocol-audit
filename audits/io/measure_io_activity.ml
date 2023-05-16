@@ -123,7 +123,7 @@ let run (config : Replay.Config.t) =
   let* _final_state, activity_mapping =
     actions
     |> Lwt_seq.fold_left_s
-         (fun (state, activity_mapping) (block : Replay.block) ->
+         (fun (state, activity_mapping) (block : Replay.Block.t) ->
            let level = block.level in
 
            Log.info (fun m -> m "Replaying block level: %d" block.level);
@@ -133,7 +133,7 @@ let run (config : Replay.Config.t) =
            let pre_stats = Irmin_pack_unix.Stats.Io.export stats.io in
 
            (* Execute block operations *)
-           let* state' = Replay.exec_block block state in
+           let* state' = Replay.Block.exec block state in
 
            (* Get the IO stats after executing block operations *)
            let post_stats = Irmin_pack_unix.Stats.Io.export stats.io in
