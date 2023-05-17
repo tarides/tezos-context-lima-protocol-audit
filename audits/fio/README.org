@@ -1,0 +1,60 @@
+#+title: Use fio to simulate ~irmin-pack.unix~ load
+
+* Read performance
+
+** Baseline ~irmin-pack.unix~ reads
+
+#+begin_src ini :tangle baseline-reads.ini
+[global]
+rw=randread
+filename=/home/adatario/dev/tclpa/.git/annex/objects/gx/17/SHA256E-s3691765475--13300581f2404cc24774da8615a5a3d3f0adb7d68c4c8034c4fa69e727706000/SHA256E-s3691765475--13300581f2404cc24774da8615a5a3d3f0adb7d68c4c8034c4fa69e727706000
+
+[job1]
+ioengine=psync
+rw=randread
+blocksize_range=50-300
+size=20m
+loops=100
+#+end_src
+
+#+begin_src shell :exports both
+  fio baseline-reads.ini
+#+end_src
+
+#+RESULTS:
+| job1:    | (g=0):           | rw=randread,         | bs=(R)                        | 50B-300B,            | (W)               | 50B-300B,            | (T)                 | 50B-300B,            | ioengine=psync,     | iodepth=1       |
+| fio-3.33 |                  |                      |                               |                      |                   |                      |                     |                      |                     |                 |
+| Starting | 1                | process              |                               |                      |                   |                      |                     |                      |                     |                 |
+|          |                  |                      |                               |                      |                   |                      |                     |                      |                     |                 |
+| job1:    | (groupid=0,      | jobs=1):             | err=                          | 0:                   | pid=130871:       | Wed                  | May                 | 17                   | 12:00:15            | 2023            |
+| read:    | IOPS=191k,       | BW=24.8MiB/s         | (26.0MB/s)(2000MiB/80630msec) |                      |                   |                      |                     |                      |                     |                 |
+| clat     | (nsec):          | min=210,             | max=3602.8k,                  | avg=4971.84,         | stdev=26486.02    |                      |                     |                      |                     |                 |
+| lat      | (nsec):          | min=230,             | max=3603.3k,                  | avg=4999.32,         | stdev=26496.20    |                      |                     |                      |                     |                 |
+| clat     | percentiles      | (nsec):              |                               |                      |                   |                      |                     |                      |                     |                 |
+|          |                  | 1.00th=[             | 231],                         | 5.00th=[             | 241],             | 10.00th=[            | 282],               | 20.00th=[            | 330],               |                 |
+|          |                  | 30.00th=[            | 342],                         | 40.00th=[            | 342],             | 50.00th=[            | 350],               | 60.00th=[            | 362],               |                 |
+|          |                  | 70.00th=[            | 370],                         | 80.00th=[            | 430],             | 90.00th=[            | 580],               | 95.00th=[            | 1128],              |                 |
+|          |                  | 99.00th=[144384],    | 99.50th=[158720],             | 99.90th=[236544],    | 99.95th=[261120], |                      |                     |                      |                     |                 |
+|          |                  | 99.99th=[522240]     |                               |                      |                   |                      |                     |                      |                     |                 |
+| bw       | (                | KiB/s):              | min=                          | 1550,                | max=40236,        | per=99.46%,          | avg=25263.29,       | stdev=16319.75,      | samples=161         |                 |
+| iops     | :                | min=                 | 9196,                         | max=304062,          | avg=190110.32,    | stdev=126053.43,     | samples=161         |                      |                     |                 |
+| lat      | (nsec)           | :                    | 250=5.20%,                    | 500=80.99%,          | 750=6.40%,        | 1000=1.86%           |                     |                      |                     |                 |
+| lat      | (usec)           | :                    | 2=1.88%,                      | 4=0.29%,             | 10=0.12%,         | 20=0.01%,            | 50=0.01%            |                      |                     |                 |
+| lat      | (usec)           | :                    | 100=0.04%,                    | 250=3.14%,           | 500=0.06%,        | 750=0.01%,           | 1000=0.01%          |                      |                     |                 |
+| lat      | (msec)           | :                    | 2=0.01%,                      | 4=0.01%              |                   |                      |                     |                      |                     |                 |
+| cpu      | :                | usr=6.86%,           | sys=11.64%,                   | ctx=501775,          | majf=0,           | minf=11              |                     |                      |                     |                 |
+| IO       | depths           | :                    | 1=100.0%,                     | 2=0.0%,              | 4=0.0%,           | 8=0.0%,              | 16=0.0%,            | 32=0.0%,             | >=64=0.0%           |                 |
+| submit   | :                | 0=0.0%,              | 4=100.0%,                     | 8=0.0%,              | 16=0.0%,          | 32=0.0%,             | 64=0.0%,            | >=64=0.0%            |                     |                 |
+| complete | :                | 0=0.0%,              | 4=100.0%,                     | 8=0.0%,              | 16=0.0%,          | 32=0.0%,             | 64=0.0%,            | >=64=0.0%            |                     |                 |
+| issued   | rwts:            | total=15418800,0,0,0 | short=0,0,0,0                 | dropped=0,0,0,0      |                   |                      |                     |                      |                     |                 |
+| latency  | :                | target=0,            | window=0,                     | percentile=100.00%,  | depth=1           |                      |                     |                      |                     |                 |
+|          |                  |                      |                               |                      |                   |                      |                     |                      |                     |                 |
+| Run      | status           | group                | 0                             | (all                 | jobs):            |                      |                     |                      |                     |                 |
+| READ:    | bw=24.8MiB/s     | (26.0MB/s),          | 24.8MiB/s-24.8MiB/s           | (26.0MB/s-26.0MB/s), | io=2000MiB        | (2097MB),            | run=80630-80630msec |                      |                     |                 |
+|          |                  |                      |                               |                      |                   |                      |                     |                      |                     |                 |
+| Disk     | stats            | (read/write):        |                               |                      |                   |                      |                     |                      |                     |                 |
+| dm-1:    | ios=500047/3004, | merge=0/0,           | ticks=66312/244,              | in_queue=66556,      | util=92.84%,      | aggrios=501125/3015, | aggrmerge=0/0,      | aggrticks=65820/244, | aggrin_queue=66064, | aggrutil=92.77% |
+| dm-0:    | ios=501125/3015, | merge=0/0,           | ticks=65820/244,              | in_queue=66064,      | util=92.77%,      | aggrios=501125/1895, | aggrmerge=0/1125,   | aggrticks=54024/203, | aggrin_queue=54316, | aggrutil=92.76% |
+| nvme0n1: | ios=501125/1895, | merge=0/1125,        | ticks=54024/203,              | in_queue=54316,      | util=92.76%       |                      |                     |                      |                     |                 |
+
+This seems to match up with the read performance observed when replaying a Tezos trace.
