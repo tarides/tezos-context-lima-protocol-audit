@@ -19,17 +19,20 @@ let setup_logs () =
   Logs.(set_level @@ Some Info)
 
 (* IO stats helpers *)
+module Stats = Irmin_pack_unix.Stats
 
-let pp_io_stats =
-  let module ReprMap = Repr.Of_map (struct
-    include Irmin_pack_unix.Stats.Io.PathMap
+let pp_activity = Repr.pp Stats.Io.Activity.t
 
-    let key_t = Repr.string
-  end) in
-  Repr.pp @@ ReprMap.t Irmin_pack_unix.Stats.Io.Activity.t
+(* let pp_io_stats = *)
+(*   let module ReprMap = Repr.Of_map (struct *)
+(*     include Irmin_pack_unix.Stats.Io.PathMap *)
+
+(*     let key_t = Repr.string *)
+(*   end) in *)
+(*   Repr.pp @@ ReprMap.t Irmin_pack_unix.Stats.Io.Activity.t *)
 
 let diff_io_stats a b =
-  Irmin_pack_unix.Stats.Io.(
+  Stats.Io.(
     PathMap.merge
       (fun _path a b ->
         match (a, b) with
@@ -40,11 +43,11 @@ let diff_io_stats a b =
       a b)
 
 module ActivityCsv = struct
-  module PathMap = Irmin_pack_unix.Stats.Io.PathMap
+  module PathMap = Stats.Io.PathMap
   module IntMap = Map.Make (Int)
 
   module Mapping = struct
-    type path = Irmin_pack_unix.Stats.Io.path
+    type path = Stats.Io.path
     type t = { to_index : int PathMap.t; to_path : path IntMap.t }
 
     let empty = { to_index = PathMap.empty; to_path = IntMap.empty }
@@ -71,7 +74,7 @@ module ActivityCsv = struct
     IntMap.to_seq m.to_path
     |> Seq.flat_map (fun (_, path) ->
            match PathMap.find_opt path activity with
-           | Some (activity : Irmin_pack_unix.Stats.Io.Activity.t) ->
+           | Some (activity : Stats.Io.Activity.t) ->
                List.to_seq
                  [
                    activity.bytes_read;
@@ -130,14 +133,28 @@ let run (config : Replay.Config.t) =
 
            (* Get the IO stats before executing block operations *)
            let stats = Replay.State.stats state in
-           let pre_stats = Irmin_pack_unix.Stats.Io.export stats.io in
+           let pre_stats = Stats.Io.export stats.io in
+
+           (* Setup a counter *)
+           let counter = Mtime_clock.counter () in
 
            (* Execute block operations *)
            let* state' = Replay.Block.exec block state in
 
+           let time_s = Mtime_clock.count counter |> Mtime.Span.to_s in
+
            (* Get the IO stats after executing block operations *)
-           let post_stats = Irmin_pack_unix.Stats.Io.export stats.io in
+           let post_stats = Stats.Io.export stats.io in
            let activity = diff_io_stats post_stats pre_stats in
+
+           (* Compute the total IO activity *)
+           let total_activity =
+             Stats.Io.PathMap.fold
+               (fun _path total_activity path_activity ->
+                 Stats.Io.Activity.sum
+                   Seq.(return total_activity |> cons path_activity))
+               activity Stats.Io.Activity.zero
+           in
 
            (* Update mapping of activities to CSV indices *)
            let activity_mapping =
@@ -147,9 +164,20 @@ let run (config : Replay.Config.t) =
            (* Emit as line of CSV *)
            ActivityCsv.emit level activity_mapping activity;
 
-           Log.info (fun m ->
-               m "IO activity for block %d: %a" level pp_io_stats activity);
+           let read_bw =
+             float_of_int total_activity.bytes_read /. (time_s *. 1024. *. 1024.)
+           in
 
+           let write_bw =
+             float_of_int total_activity.bytes_written
+             /. (time_s *. 1024. *. 1024.)
+           in
+
+           Log.info (fun m ->
+               m
+                 "BLOCK - level: %d; time (s): %f; read_bw (MiB/s): %f; \
+                  write_bw (MiB/s): %f; total_activity: %a"
+                 level time_s read_bw write_bw pp_activity total_activity);
            return (state', activity_mapping))
          (state, ActivityCsv.Mapping.empty)
   in
@@ -163,12 +191,12 @@ let () =
   setup_logs ();
 
   let actions_trace_path = "/home/adatario/dev/tclpa/inputs/actions.trace" in
-  let store_path = "/home/adatario/dev/tclpa/inputs/store-level-2981990" in
 
-  (* let store_path = "/tmp/tezos-context-store-113038" in *)
+  (* let store_path = "/home/adatario/dev/tclpa/inputs/store-level-2981990" in *)
+  let store_path = "/tmp/tezos-context-store-117983" in
   let (config : Replay.Config.t) =
     { store_path; actions_trace_path }
-    |> Replay.Config.copy_store_to_temp_location
+    (* |> Replay.Config.copy_store_to_temp_location *)
   in
 
   Lwt_main.run @@ run config
