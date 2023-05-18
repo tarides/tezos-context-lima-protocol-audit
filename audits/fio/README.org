@@ -105,3 +105,22 @@ numjobs=10
   fio multiple-threads-pread.ini
 #+end_src
 
+
+** io_uring
+
+#+begin_src ini :tangle read-io_uring.ini
+[global]
+rw=randread
+filename=/home/adatario/dev/tclpa/.git/annex/objects/gx/17/SHA256E-s3691765475--13300581f2404cc24774da8615a5a3d3f0adb7d68c4c8034c4fa69e727706000/SHA256E-s3691765475--13300581f2404cc24774da8615a5a3d3f0adb7d68c4c8034c4fa69e727706000
+loops=100
+group_reporting
+thread
+
+[job1]
+ioengine=io_uring
+iodepth=16
+rw=randread
+blocksize=4096
+size=20MiB
+numjobs=32
+#+end_src
