@@ -27,4 +27,22 @@
 
 #+RESULTS:
 [[file:activity.png]]
+* Call graph using Landmarks
 
+With some [[https://github.com/LexiFi/landmarks][landmarks]] instrumentation in ~Irmin_pack_unix.Io~ we can observe how much time is spent doing IO:
+
+#+begin_src
+Call graph '_build/default/audits/io/measure_io_activity.exe':
+--------------------------------------------------------------
+[ 12793.98G cycles in    100004 calls ]     - 93.51% : Measure_io_activity.exec
+[ 2116.49G cycles in 964607340 calls ]     |   - 16.54% : Io.Util.really_read
+[   76.47G cycles in    406103 calls ]     |   -  0.60% : Io.Util.really_write
+
+Aggregated table:
+----------------
+                    Name;                             Filename;    Calls;     Time; Sys time
+                    ROOT;                      src/landmark.ml;        0; 13682.23G; 7089.676
+Measure_io_activity.exec; audits/io/measure_io_activity.ml:142;   100004; 12793.98G; 6677.005
+     Io.Util.really_read;         src/irmin-pack/unix/io.ml:38; 964607340; 2116.49G; 1054.516
+    Io.Util.really_write;         src/irmin-pack/unix/io.ml:27;   406103;   76.47G;   39.350
+#+end_src

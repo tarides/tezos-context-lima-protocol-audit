@@ -21,7 +21,7 @@ let run (config : Replay.Config.t) =
 
   Logs.info (fun m -> m "Blocks in replay: %d." header.block_count);
 
-  actions
+  actions |> Lwt_seq.of_seq
   |> Lwt_seq.iter (fun (block : Replay.Block.t) ->
          let has_split, has_gc = block_find_split_gc block in
          if has_split || has_gc then

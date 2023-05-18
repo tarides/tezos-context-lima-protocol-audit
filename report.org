@@ -8,6 +8,8 @@
 * Introduction
 * Audits
 ** TODO Dict usage
+** TODO IO analysis
+*** ~irmin-pack~ is write optimized but only 3% of IO time is spend doing writes.
 ** Index performance
 
 At it's core Irmin is a content-addressable store. Store objects are referenced by their cryptographic hash. In ~irmin-pack~ objects are stored in an append-only pack file. The index is a persistent datastructure that maps the hash of an object to its offset in the append-only pack file.

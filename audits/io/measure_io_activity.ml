@@ -125,11 +125,11 @@ let run (config : Replay.Config.t) =
 
   let* _final_state, activity_mapping =
     actions
+    (* |> Seq.take 1000 *)
+    |> Lwt_seq.of_seq
     |> Lwt_seq.fold_left_s
          (fun (state, activity_mapping) (block : Replay.Block.t) ->
            let level = block.level in
-
-           Log.info (fun m -> m "Replaying block level: %d" block.level);
 
            (* Get the IO stats before executing block operations *)
            let stats = Replay.State.stats state in
@@ -139,7 +139,9 @@ let run (config : Replay.Config.t) =
            let counter = Mtime_clock.counter () in
 
            (* Execute block operations *)
-           let* state' = Replay.Block.exec block state in
+           let[@landmark "exec"] state' = Replay.Block.exec block state in
+
+           let* state' = state' in
 
            let time_s = Mtime_clock.count counter |> Mtime.Span.to_s in
 
@@ -192,11 +194,11 @@ let () =
 
   let actions_trace_path = "/home/adatario/dev/tclpa/inputs/actions.trace" in
 
-  (* let store_path = "/home/adatario/dev/tclpa/inputs/store-level-2981990" in *)
-  let store_path = "/tmp/tezos-context-store-117983" in
+  let store_path = "/home/adatario/dev/tclpa/inputs/store-level-2981990" in
+  (* let store_path = "/tmp/tezos-context-store-19991" in *)
   let (config : Replay.Config.t) =
     { store_path; actions_trace_path }
-    (* |> Replay.Config.copy_store_to_temp_location *)
+    |> Replay.Config.copy_store_to_temp_location
   in
 
   Lwt_main.run @@ run config

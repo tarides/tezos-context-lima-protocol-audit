@@ -1,3 +1,4 @@
 (executables
  (names measure_io_activity find_split_and_gc)
- (libraries replay mtime mtime.clock.os))
+ (libraries replay mtime mtime.clock.os)
+ (instrumentation (backend landmarks)))

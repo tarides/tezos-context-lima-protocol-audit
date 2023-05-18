@@ -574,4 +574,4 @@ let read_blocks (config : Config.t) =
 
   let state = State.init config in
 
-  (header, state, Lwt_seq.of_seq actions)
+  (header, state, actions)

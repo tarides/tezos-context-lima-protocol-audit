@@ -16,8 +16,17 @@
 
 (define irmin-url "https://github.com/adatario/irmin")
 (define irmin-version "3.7.0-tclpa") ; this is only used for human readability
-(define irmin-commit "5e723be3bbe2205b1e5d8267d07c953f4b9ed321")
-(define irmin-sha256 "0rkixaa6pizf7wnw5dfjl77mfnwxfsfz9gvj29zf02ng3hcx90qd")
+(define irmin-commit "88d3aaae1ba0939c059af48fb1101fc0901b887b")
+(define irmin-sha256 "107l214xr169n0q657hw23np5cwac0fpnqxh5g5asnfammhxyhi4")
+
+(define add-landmarks-to-irmin-pack
+  (package-input-rewriting/spec
+   `(("ocaml-irmin-pack"
+      . ,(lambda (p) (package
+		      (inherit p)
+		      (propagated-inputs
+		       (modify-inputs (package-propagated-inputs p)
+				      (append ocaml-landmarks)))))))))
 
 (define ocaml-tezos-context-trace
   (let ((commit "856c361797cd2dea90f1af8925fe97e8010624df")
@@ -60,9 +69,10 @@
 traces.  This is used to benchmark performance of changes to Irmin.")
       (license license:isc))))
 
-(package-with-irmin-3.7
- (package-with-tezos-16
-  (package
+(add-landmarks-to-irmin-pack
+ (package-with-irmin-3.7
+  (package-with-tezos-16
+   (package
     (name "ocaml-tezos-lima-performance-audit")
     (version "2023.05.01-dev")
     (home-page "https://github.com/adatario/tezos-context-trace")
@@ -78,16 +88,16 @@ traces.  This is used to benchmark performance of changes to Irmin.")
     (description #f)
     (license license:isc))
 
-  ;; Apply patch that exposes Irmin stats to Tezos Context
-  #:patches (list
-	     (local-file "./patches/tezos-context-add-irmin-stats.patch")
-	     (local-file
-	      "./patches/tezos-context-expose-irmin-pack-unix-stats.patch")))
+   ;; Apply patch that exposes Irmin stats to Tezos Context
+   #:patches (list
+	      (local-file "./patches/tezos-context-add-irmin-stats.patch")
+	      (local-file
+	       "./patches/tezos-context-expose-irmin-pack-unix-stats.patch")))
  
- #:origin (origin
+  #:origin (origin
 	    (method git-fetch)
 	    (uri (git-reference
 		  (url irmin-url)
 		  (commit irmin-commit)))
 	    (sha256 (base32 irmin-sha256)))
- #:version irmin-version)
+  #:version irmin-version))

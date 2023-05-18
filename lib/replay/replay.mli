@@ -65,4 +65,4 @@ block plus some metadata. *)
   (** [exec block state] executes the operations in [block] and returns the state after operations are executed. *)
 end
 
-val read_blocks : Config.t -> Header.t * State.t * Block.t Lwt_seq.t
+val read_blocks : Config.t -> Header.t * State.t * Block.t Seq.t
