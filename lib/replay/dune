@@ -1,3 +1,4 @@
 (library
  (name replay)
- (libraries irmin irmin-pack.unix tezos-context tezos-context-trace logs))
+ (libraries irmin irmin-pack.unix tezos-context tezos-context-trace logs)
+ (preprocess (pps landmarks-ppx)))

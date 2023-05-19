@@ -31,18 +31,62 @@
 
 With some [[https://github.com/LexiFi/landmarks][landmarks]] instrumentation in ~Irmin_pack_unix.Io~ we can observe how much time is spent doing IO:
 
-#+begin_src
+#+begin_src shell :results output code
+  OCAML_LANDMARKS="on,time,threshold=0,output=stdout" dune exec --instrument-with landmarks ./measure_io_activity.exe
+#+end_src
+
+#+RESULTS:
+#+begin_src shell
 Call graph '_build/default/audits/io/measure_io_activity.exe':
 --------------------------------------------------------------
-[ 12793.98G cycles in    100004 calls ]     - 93.51% : Measure_io_activity.exec
-[ 2116.49G cycles in 964607340 calls ]     |   - 16.54% : Io.Util.really_read
-[   76.47G cycles in    406103 calls ]     |   -  0.60% : Io.Util.really_write
+[   21.08G cycles in     100 calls ]     - 77.55% : [0;33mMeasure_io_activity.exec[0m
+[   20.31G cycles in 1299508 calls ]     |   - 96.34% : [0;31mReplay.Operation.exec[0m
+[    7.29G cycles in     100 calls ]     |   |   - 35.89% : [1;31mReplay.Operation.exec_commit[0m
+[  107.13M cycles in     588 calls ]     |   |   |   -  1.47% : Io.Util.really_write
+[   30.39M cycles in   28809 calls ]     |   |   |   -  0.42% : Io.Util.really_read
+[    5.05G cycles in  344566 calls ]     |   |   - 24.85% : [1;31mReplay.Operation.exec_mem[0m
+[    1.80G cycles in 1553274 calls ]     |   |   |   - 35.58% : [0;31mIo.Util.really_read[0m
+[    5.01G cycles in  578529 calls ]     |   |   - 24.65% : [1;31mReplay.Operation.exec_find[0m
+[    1.28G cycles in 1084853 calls ]     |   |   |   - 25.52% : [0;31mIo.Util.really_read[0m
+[    1.59G cycles in  374094 calls ]     |   |   -  7.85% : [0;31mReplay.Operation.exec_add[0m
+[  227.51K cycles in     215 calls ]     |   |   |   -  0.01% : Io.Util.really_read
+[   84.12M cycles in       1 calls ]     |   |   -  0.41% : Replay.Operation.exec_init
+[    2.60M cycles in       1 calls ]     |   |   |   -  3.09% : Io.Util.really_read
+[    8.04M cycles in    1044 calls ]     |   |   -  0.04% : Replay.Operation.exec_remove
+[  190.02K cycles in     163 calls ]     |   |   |   -  2.36% : Io.Util.really_read
+[    4.68M cycles in      37 calls ]     |   |   -  0.02% : Replay.Operation.exec_add_tree
+[    2.17M cycles in    1440 calls ]     |   |   |   - 46.36% : Io.Util.really_read
+[    3.61M cycles in     200 calls ]     |   |   -  0.02% : Replay.Operation.exec_checkout
+[  294.52K cycles in     200 calls ]     |   |   |   -  8.16% : Replay.Operation.of_commit_hash_lhs
+[    9.46K cycles in       3 calls ]     |   |   |   -  0.26% : Io.Util.really_read
+[    3.54M cycles in     500 calls ]     |   |   -  0.02% : Replay.Operation.exec_get_protocol
+[   12.41K cycles in       7 calls ]     |   |   |   -  0.35% : Io.Util.really_read
+[    2.51M cycles in     200 calls ]     |   |   -  0.01% : Replay.Operation.exec_get_test_chain
+[    1.37K cycles in       1 calls ]     |   |   |   -  0.05% : Io.Util.really_read
+[    1.05M cycles in     100 calls ]     |   |   -  0.01% : Replay.Operation.exec_add_predecessor_block_metadata_hash
+[  472.47K cycles in     100 calls ]     |   |   -  0.00% : Replay.Operation.exec_add_predecessor_ops_metadata_hash
+[   72.52K cycles in      37 calls ]     |   |   -  0.00% : Replay.Operation.exec_find_tree
 
 Aggregated table:
 ----------------
-                    Name;                             Filename;    Calls;     Time; Sys time
-                    ROOT;                      src/landmark.ml;        0; 13682.23G; 7089.676
-Measure_io_activity.exec; audits/io/measure_io_activity.ml:142;   100004; 12793.98G; 6677.005
-     Io.Util.really_read;         src/irmin-pack/unix/io.ml:38; 964607340; 2116.49G; 1054.516
-    Io.Util.really_write;         src/irmin-pack/unix/io.ml:27;   406103;   76.47G;   39.350
+                                                     Name;                             Filename;    Calls;     Time; Sys time
+                                                     ROOT;                      src/landmark.ml;        0;   27.18G;   11.221
+                                 Measure_io_activity.exec; audits/io/measure_io_activity.ml:140;      100;   21.08G;   10.306
+                                    Replay.Operation.exec;             lib/replay/replay.ml:488;  1299508;   20.31G;    9.900
+                             Replay.Operation.exec_commit;             lib/replay/replay.ml:453;      100;    7.29G;    3.033
+                                Replay.Operation.exec_mem;             lib/replay/replay.ml:309;   344566;    5.05G;    2.665
+                               Replay.Operation.exec_find;             lib/replay/replay.ml:288;   578529;    5.01G;    2.648
+                                      Io.Util.really_read;         src/irmin-pack/unix/io.ml:38;  2668766;    3.11G;    1.625
+                                Replay.Operation.exec_add;             lib/replay/replay.ml:315;   374094;    1.59G;    0.848
+                                     Io.Util.really_write;         src/irmin-pack/unix/io.ml:27;      588;  107.13M;    0.056
+                               Replay.Operation.exec_init;             lib/replay/replay.ml:262;        1;   84.12M;    0.044
+                             Replay.Operation.exec_remove;             lib/replay/replay.ml:320;     1044;    8.04M;    0.004
+                           Replay.Operation.exec_add_tree;             lib/replay/replay.ml:303;       37;    4.68M;    0.002
+                           Replay.Operation.exec_checkout;             lib/replay/replay.ml:269;      200;    3.61M;    0.002
+                       Replay.Operation.exec_get_protocol;             lib/replay/replay.ml:278;      500;    3.54M;    0.002
+                     Replay.Operation.exec_get_test_chain;             lib/replay/replay.ml:283;      200;    2.51M;    0.001
+Replay.Operation.exec_add_predecessor_block_metadata_hash;             lib/replay/replay.ml:459;      100;    1.05M;    0.001
+  Replay.Operation.exec_add_predecessor_ops_metadata_hash;             lib/replay/replay.ml:468;      100;  472.47K;    0.000
+                      Replay.Operation.of_commit_hash_lhs;             lib/replay/replay.ml:266;      200;  294.52K;    0.000
+                          Replay.Operation.exec_find_tree;             lib/replay/replay.ml:294;       37;   72.52K;    0.000
 #+end_src

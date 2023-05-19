@@ -243,6 +243,8 @@ end
 (* Replay logic *)
 
 module Operation = struct
+  [@@@landmark "auto"]
+
   type t = Replay_actions.event
 
   let is_split = function Replay_actions.Split -> true | _ -> false
