@@ -31,7 +31,7 @@
 
 With some [[https://github.com/LexiFi/landmarks][landmarks]] instrumentation in ~Irmin_pack_unix.Io~ we can observe how much time is spent doing IO:
 
-#+begin_src shell :results output code
+#+begin_src shell :results output code :exports both
   OCAML_LANDMARKS="on,time,threshold=0,output=stdout" dune exec --instrument-with landmarks ./measure_io_activity.exe
 #+end_src
 
