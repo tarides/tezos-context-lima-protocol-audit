@@ -149,7 +149,7 @@ Disk stats (read/write):
 
 ** io_uring
 
-Just for fun...
+Just to see how fast one can go on modern hardware using asynchronous system APIs.
 
 #+begin_src ini :tangle read-io_uring.ini
 [global]
@@ -163,9 +163,9 @@ thread
 ioengine=io_uring
 iodepth=16
 rw=randread
-blocksize=4096
-size=20MiB
-numjobs=32
+blocksize=64KiB
+size=100MiB
+numjobs=8
 #+end_src
 
 #+begin_src shell :exports both :results output code
@@ -174,41 +174,40 @@ numjobs=32
 
 #+RESULTS:
 #+begin_src shell
-job1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=io_uring, iodepth=16
+job1: (g=0): rw=randread, bs=(R) 62.5KiB-62.5KiB, (W) 62.5KiB-62.5KiB, (T) 62.5KiB-62.5KiB, ioengine=io_uring, iodepth=16
 ...
 fio-3.33
-Starting 32 threads
+Starting 8 threads
 
-job1: (groupid=0, jobs=32): err= 0: pid=42550: Fri May 19 14:20:48 2023
-  read: IOPS=841k, BW=3287MiB/s (3446MB/s)(59.6GiB/18567msec)
-    slat (nsec): min=330, max=12306k, avg=7989.38, stdev=38654.63
-    clat (nsec): min=90, max=17003k, avg=583783.16, stdev=805140.55
-     lat (nsec): min=1253, max=17004k, avg=591772.54, stdev=804599.96
-    clat percentiles (nsec):
-     |  1.00th=[    382],  5.00th=[   4896], 10.00th=[   7328],
-     | 20.00th=[  14784], 30.00th=[  33536], 40.00th=[  98816],
-     | 50.00th=[ 244736], 60.00th=[ 428032], 70.00th=[ 675840],
-     | 80.00th=[1028096], 90.00th=[1695744], 95.00th=[2408448],
-     | 99.00th=[3424256], 99.50th=[3784704], 99.90th=[4685824],
-     | 99.95th=[5275648], 99.99th=[7569408]
-   bw (  MiB/s): min= 2895, max= 3929, per=100.00%, avg=3298.97, stdev= 6.77, samples=1156
-   iops        : min=741334, max=1005869, avg=844535.36, stdev=1733.23, samples=1156
-  lat (nsec)   : 100=0.01%, 250=0.57%, 500=0.46%, 750=0.01%, 1000=0.01%
-  lat (usec)   : 2=0.39%, 4=2.25%, 10=10.51%, 20=9.86%, 50=10.76%
-  lat (usec)   : 100=5.28%, 250=10.30%, 500=12.83%, 750=9.16%, 1000=6.89%
-  lat (msec)   : 2=13.16%, 4=7.24%, 10=0.32%, 20=0.01%
-  cpu          : usr=3.30%, sys=8.71%, ctx=11065870, majf=0, minf=0
-  IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.2%, 16=99.7%, 32=0.0%, >=64=0.0%
+job1: (groupid=0, jobs=8): err= 0: pid=44365: Fri May 19 14:25:25 2023
+  read: IOPS=147k, BW=8955MiB/s (9390MB/s)(74.5GiB/8517msec)
+    slat (nsec): min=290, max=9700.4k, avg=9392.25, stdev=73806.67
+    clat (nsec): min=130, max=23784k, avg=767189.99, stdev=1005905.48
+     lat (usec): min=4, max=23786, avg=776.58, stdev=1007.13
+    clat percentiles (usec):
+     |  1.00th=[   17],  5.00th=[   30], 10.00th=[   43], 20.00th=[   62],
+     | 30.00th=[   83], 40.00th=[  125], 50.00th=[  215], 60.00th=[  400],
+     | 70.00th=[  914], 80.00th=[ 1795], 90.00th=[ 2278], 95.00th=[ 2606],
+     | 99.00th=[ 3884], 99.50th=[ 4490], 99.90th=[ 6390], 99.95th=[ 7439],
+     | 99.99th=[10028]
+   bw (  MiB/s): min= 7688, max=10172, per=100.00%, avg=9047.06, stdev=83.12, samples=129
+   iops        : min=125968, max=166674, avg=148226.72, stdev=1361.83, samples=129
+  lat (nsec)   : 250=0.01%, 500=0.01%, 750=0.01%, 1000=0.01%
+  lat (usec)   : 2=0.01%, 4=0.02%, 10=0.10%, 20=1.72%, 50=11.80%
+  lat (usec)   : 100=21.71%, 250=17.36%, 500=10.21%, 750=4.71%, 1000=3.36%
+  lat (msec)   : 2=12.41%, 4=15.67%, 10=0.88%, 20=0.01%, 50=0.01%
+  cpu          : usr=2.68%, sys=14.62%, ctx=559563, majf=0, minf=0
+  IO depths    : 1=0.1%, 2=0.1%, 4=0.3%, 8=0.5%, 16=99.0%, 32=0.0%, >=64=0.0%
      submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.1%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued rwts: total=15622400,0,0,0 short=0,0,0,0 dropped=0,0,0,0
+     complete  : 0=0.0%, 4=99.9%, 8=0.0%, 16=0.1%, 32=0.0%, 64=0.0%, >=64=0.0%
+     issued rwts: total=1249600,0,0,0 short=0,0,0,0 dropped=0,0,0,0
      latency   : target=0, window=0, percentile=100.00%, depth=16
 
 Run status group 0 (all jobs):
-   READ: bw=3287MiB/s (3446MB/s), 3287MiB/s-3287MiB/s (3446MB/s-3446MB/s), io=59.6GiB (64.0GB), run=18567-18567msec
+   READ: bw=8955MiB/s (9390MB/s), 8955MiB/s-8955MiB/s (9390MB/s-9390MB/s), io=74.5GiB (80.0GB), run=8517-8517msec
 
 Disk stats (read/write):
-    dm-1: ios=6104388/130, merge=0/0, ticks=6916752/76, in_queue=6916828, util=99.52%, aggrios=6151264/130, aggrmerge=0/0, aggrticks=6938576/76, aggrin_queue=6938652, aggrutil=99.44%
-    dm-0: ios=6151264/130, merge=0/0, ticks=6938576/76, in_queue=6938652, util=99.44%, aggrios=6151264/118, aggrmerge=0/12, aggrticks=6465424/40, aggrin_queue=6465475, aggrutil=99.42%
-  nvme0n1: ios=6151264/118, merge=0/12, ticks=6465424/40, in_queue=6465475, util=99.42%
+    dm-1: ios=345735/95, merge=0/0, ticks=597292/4, in_queue=597296, util=98.72%, aggrios=349972/95, aggrmerge=0/0, aggrticks=599656/4, aggrin_queue=599660, aggrutil=98.56%
+    dm-0: ios=349972/95, merge=0/0, ticks=599656/4, in_queue=599660, util=98.56%, aggrios=349972/87, aggrmerge=0/8, aggrticks=542294/6, aggrin_queue=542303, aggrutil=97.77%
+  nvme0n1: ios=349972/87, merge=0/8, ticks=542294/6, in_queue=542303, util=97.77%
 #+end_src
