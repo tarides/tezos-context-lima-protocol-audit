@@ -16,12 +16,15 @@
 
 (define irmin-url "https://github.com/adatario/irmin")
 (define irmin-version "3.7.0-tclpa") ; this is only used for human readability
-(define irmin-commit "88d3aaae1ba0939c059af48fb1101fc0901b887b")
-(define irmin-sha256 "107l214xr169n0q657hw23np5cwac0fpnqxh5g5asnfammhxyhi4")
+(define irmin-commit "789761f7ce2e8d28a64d41eed8e533f292a1476b")
+(define irmin-sha256 "06081k28nbxxcprxh90p0n1lkjqig8ria4bcrrygxbx0z9lgp6xi")
 
-(define add-landmarks-to-irmin-pack
+;; Use a local checkout for applying hacks to Irmin faster
+(define irmin-use-local-checkout #f)
+
+(define add-landmarks-to-irmin
   (package-input-rewriting/spec
-   `(("ocaml-irmin-pack"
+   `(("ocaml-irmin"
       . ,(lambda (p) (package
 		      (inherit p)
 		      (propagated-inputs
@@ -69,7 +72,7 @@
 traces.  This is used to benchmark performance of changes to Irmin.")
       (license license:isc))))
 
-(add-landmarks-to-irmin-pack
+(add-landmarks-to-irmin
  (package-with-irmin-3.7
   (package-with-tezos-16
    (package
@@ -94,10 +97,12 @@ traces.  This is used to benchmark performance of changes to Irmin.")
 	      (local-file
 	       "./patches/tezos-context-expose-irmin-pack-unix-stats.patch")))
  
-  #:origin (origin
-	    (method git-fetch)
-	    (uri (git-reference
-		  (url irmin-url)
-		  (commit irmin-commit)))
-	    (sha256 (base32 irmin-sha256)))
+  #:origin (if irmin-use-local-checkout
+	       (git-checkout (url "/home/adatario/dev/irmin/worktrees/tclpa"))
+	       (origin
+		(method git-fetch)
+		(uri (git-reference
+		      (url irmin-url)
+		      (commit irmin-commit)))
+		(sha256 (base32 irmin-sha256))))
   #:version irmin-version))

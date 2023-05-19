@@ -124,7 +124,9 @@ let run (config : Replay.Config.t) =
   Log.info (fun m -> m "Blocks in replay: %d." header.block_count);
 
   let* _final_state, activity_mapping =
-    actions |> Seq.take 100 |> Lwt_seq.of_seq
+    actions
+    (* |> Seq.take 100 *)
+    |> Lwt_seq.of_seq
     |> Lwt_seq.fold_left_s
          (fun (state, activity_mapping) (block : Replay.Block.t) ->
            let level = block.level in

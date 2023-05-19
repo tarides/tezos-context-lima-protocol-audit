@@ -37,56 +37,73 @@ With some [[https://github.com/LexiFi/landmarks][landmarks]] instrumentation in 
 
 #+RESULTS:
 #+begin_src shell
-Call graph '_build/default/audits/io/measure_io_activity.exe':
---------------------------------------------------------------
-[   21.08G cycles in     100 calls ]     - 77.55% : [0;33mMeasure_io_activity.exec[0m
-[   20.31G cycles in 1299508 calls ]     |   - 96.34% : [0;31mReplay.Operation.exec[0m
-[    7.29G cycles in     100 calls ]     |   |   - 35.89% : [1;31mReplay.Operation.exec_commit[0m
-[  107.13M cycles in     588 calls ]     |   |   |   -  1.47% : Io.Util.really_write
-[   30.39M cycles in   28809 calls ]     |   |   |   -  0.42% : Io.Util.really_read
-[    5.05G cycles in  344566 calls ]     |   |   - 24.85% : [1;31mReplay.Operation.exec_mem[0m
-[    1.80G cycles in 1553274 calls ]     |   |   |   - 35.58% : [0;31mIo.Util.really_read[0m
-[    5.01G cycles in  578529 calls ]     |   |   - 24.65% : [1;31mReplay.Operation.exec_find[0m
-[    1.28G cycles in 1084853 calls ]     |   |   |   - 25.52% : [0;31mIo.Util.really_read[0m
-[    1.59G cycles in  374094 calls ]     |   |   -  7.85% : [0;31mReplay.Operation.exec_add[0m
-[  227.51K cycles in     215 calls ]     |   |   |   -  0.01% : Io.Util.really_read
-[   84.12M cycles in       1 calls ]     |   |   -  0.41% : Replay.Operation.exec_init
-[    2.60M cycles in       1 calls ]     |   |   |   -  3.09% : Io.Util.really_read
-[    8.04M cycles in    1044 calls ]     |   |   -  0.04% : Replay.Operation.exec_remove
-[  190.02K cycles in     163 calls ]     |   |   |   -  2.36% : Io.Util.really_read
-[    4.68M cycles in      37 calls ]     |   |   -  0.02% : Replay.Operation.exec_add_tree
-[    2.17M cycles in    1440 calls ]     |   |   |   - 46.36% : Io.Util.really_read
-[    3.61M cycles in     200 calls ]     |   |   -  0.02% : Replay.Operation.exec_checkout
-[  294.52K cycles in     200 calls ]     |   |   |   -  8.16% : Replay.Operation.of_commit_hash_lhs
-[    9.46K cycles in       3 calls ]     |   |   |   -  0.26% : Io.Util.really_read
-[    3.54M cycles in     500 calls ]     |   |   -  0.02% : Replay.Operation.exec_get_protocol
-[   12.41K cycles in       7 calls ]     |   |   |   -  0.35% : Io.Util.really_read
-[    2.51M cycles in     200 calls ]     |   |   -  0.01% : Replay.Operation.exec_get_test_chain
-[    1.37K cycles in       1 calls ]     |   |   |   -  0.05% : Io.Util.really_read
-[    1.05M cycles in     100 calls ]     |   |   -  0.01% : Replay.Operation.exec_add_predecessor_block_metadata_hash
-[  472.47K cycles in     100 calls ]     |   |   -  0.00% : Replay.Operation.exec_add_predecessor_ops_metadata_hash
-[   72.52K cycles in      37 calls ]     |   |   -  0.00% : Replay.Operation.exec_find_tree
+      [ 17540.60G cycles in    100004 calls ]     - 94.54% : Measure_io_activity.exec
+      [ 17014.95G cycles in 423228165 calls ]     |   - 97.00% : Replay.Operation.exec
+      [ 5788.38G cycles in 220756931 calls ]     |   |   - 34.02% : Replay.Operation.exec_find
+      [ 4866.89G cycles in 220756931 calls ]     |   |   |   - 84.08% : Tree.Make.find_tree
+      [ 1107.21G cycles in 420131874 calls ]     |   |   |   |   - 22.75% : Io.Util.really_read
+      [   19.68G cycles in   8603546 calls ]     |   |   |   -  0.34% : Io.Util.really_read
+      [ 5089.65G cycles in    100004 calls ]     |   |   - 29.91% : Replay.Operation.exec_commit
+      [  133.54G cycles in    100004 calls ]     |   |   |   -  2.62% : Store.Make.Commit.v
+      [    4.80G cycles in    200008 calls ]     |   |   |   |   -  3.60% : Io.Util.really_write
+      [  421.42M cycles in    300012 calls ]     |   |   |   |   -  0.32% : Pack_store.Make.cast
+      [   25.71K cycles in         2 calls ]     |   |   |   |   -  0.00% : Io.Util.really_read
+      [   87.31G cycles in    206047 calls ]     |   |   |   -  1.72% : Io.Util.really_write
+      [   75.02G cycles in  31255051 calls ]     |   |   |   -  1.47% : Io.Util.really_read
+      [    1.34G cycles in    100004 calls ]     |   |   |   -  0.03% : Tree.Make.list
+      [  313.67M cycles in    300012 calls ]     |   |   |   -  0.01% : Pack_store.Make.cast
+      [  249.11M cycles in    100004 calls ]     |   |   |   -  0.00% : Store.Make.Commit.hash
+      [  223.77M cycles in    100004 calls ]     |   |   |   -  0.00% : Tree.Make.find_tree
+      [  108.76M cycles in    100004 calls ]     |   |   |   -  0.00% : Store.Make.Commit.key
+      [ 4584.18G cycles in 111687614 calls ]     |   |   - 26.94% : Replay.Operation.exec_mem
+      [ 4190.93G cycles in 111687614 calls ]     |   |   |   - 91.42% : Tree.Make.find_tree
+      [ 1300.52G cycles in 496412885 calls ]     |   |   |   |   - 31.03% : Io.Util.really_read
+      [   13.54G cycles in   6059630 calls ]     |   |   |   -  0.30% : Io.Util.really_read
+      [  706.23G cycles in  88222332 calls ]     |   |   -  4.15% : Replay.Operation.exec_add
+      [    1.45G cycles in    476610 calls ]     |   |   |   -  0.21% : Io.Util.really_read
+      [   18.37G cycles in   1149441 calls ]     |   |   -  0.11% : Replay.Operation.exec_remove
+      [    1.14G cycles in    330407 calls ]     |   |   |   -  6.23% : Io.Util.really_read
+      [   12.26G cycles in     34640 calls ]     |   |   -  0.07% : Replay.Operation.exec_add_tree
+      [    4.17G cycles in   1258262 calls ]     |   |   |   - 34.00% : Io.Util.really_read
+      [   36.26M cycles in        36 calls ]     |   |   |   -  0.30% : Io.Util.really_write
+      [   24.76K cycles in        21 calls ]     |   |   |   -  0.00% : Pack_store.Make.cast
+      [    9.18G cycles in    200009 calls ]     |   |   -  0.05% : Replay.Operation.exec_checkout
+      [    5.10G cycles in    200009 calls ]     |   |   |   - 55.54% : Store.Make.Commit.of_hash
+      [    1.73G cycles in    200009 calls ]     |   |   |   |   - 34.00% : Store.Make.Commit.of_key
+      [   10.28K cycles in         3 calls ]     |   |   |   |   |   -  0.00% : Io.Util.really_read
+      [    1.09G cycles in    200009 calls ]     |   |   |   - 11.86% : Store.Make.Commit.tree
+      [  298.77M cycles in    200009 calls ]     |   |   |   |   - 27.44% : Store.Make.Commit.node
+      [  529.36M cycles in    200009 calls ]     |   |   |   -  5.77% : Replay.Operation.of_commit_hash_lhs
 
-Aggregated table:
-----------------
-                                                     Name;                             Filename;    Calls;     Time; Sys time
-                                                     ROOT;                      src/landmark.ml;        0;   27.18G;   11.221
-                                 Measure_io_activity.exec; audits/io/measure_io_activity.ml:140;      100;   21.08G;   10.306
-                                    Replay.Operation.exec;             lib/replay/replay.ml:488;  1299508;   20.31G;    9.900
-                             Replay.Operation.exec_commit;             lib/replay/replay.ml:453;      100;    7.29G;    3.033
-                                Replay.Operation.exec_mem;             lib/replay/replay.ml:309;   344566;    5.05G;    2.665
-                               Replay.Operation.exec_find;             lib/replay/replay.ml:288;   578529;    5.01G;    2.648
-                                      Io.Util.really_read;         src/irmin-pack/unix/io.ml:38;  2668766;    3.11G;    1.625
-                                Replay.Operation.exec_add;             lib/replay/replay.ml:315;   374094;    1.59G;    0.848
-                                     Io.Util.really_write;         src/irmin-pack/unix/io.ml:27;      588;  107.13M;    0.056
-                               Replay.Operation.exec_init;             lib/replay/replay.ml:262;        1;   84.12M;    0.044
-                             Replay.Operation.exec_remove;             lib/replay/replay.ml:320;     1044;    8.04M;    0.004
-                           Replay.Operation.exec_add_tree;             lib/replay/replay.ml:303;       37;    4.68M;    0.002
-                           Replay.Operation.exec_checkout;             lib/replay/replay.ml:269;      200;    3.61M;    0.002
-                       Replay.Operation.exec_get_protocol;             lib/replay/replay.ml:278;      500;    3.54M;    0.002
-                     Replay.Operation.exec_get_test_chain;             lib/replay/replay.ml:283;      200;    2.51M;    0.001
-Replay.Operation.exec_add_predecessor_block_metadata_hash;             lib/replay/replay.ml:459;      100;    1.05M;    0.001
-  Replay.Operation.exec_add_predecessor_ops_metadata_hash;             lib/replay/replay.ml:468;      100;  472.47K;    0.000
-                      Replay.Operation.of_commit_hash_lhs;             lib/replay/replay.ml:266;      200;  294.52K;    0.000
-                          Replay.Operation.exec_find_tree;             lib/replay/replay.ml:294;       37;   72.52K;    0.000
+    [...]
+
+
+  Aggregated table:
+  ----------------
+                                                       Name;                              Filename;    Calls;     Time; Sys time
+                                                       ROOT;                       src/landmark.ml;        0; 18554.44G; 9638.602
+                                   Measure_io_activity.exec;  audits/io/measure_io_activity.ml:142;   100004; 17540.60G; 9161.721
+                                      Replay.Operation.exec;              lib/replay/replay.ml:488; 423228165; 17014.95G; 8884.692
+                                        Tree.Make.find_tree;                src/irmin/tree.ml:1689; 333284026; 9063.56G; 4737.740
+                                 Replay.Operation.exec_find;              lib/replay/replay.ml:288; 220756931; 5788.38G; 3044.202
+                               Replay.Operation.exec_commit;              lib/replay/replay.ml:453;   100004; 5089.65G; 2645.542
+                                  Replay.Operation.exec_mem;              lib/replay/replay.ml:309; 111687614; 4584.18G; 2379.356
+                                        Io.Util.really_read;          src/irmin-pack/unix/io.ml:38; 964610035; 2522.83G; 1259.393
+                                  Replay.Operation.exec_add;              lib/replay/replay.ml:315; 88222332;  706.23G;  375.796
+                                        Store.Make.Commit.v;                src/irmin/store.ml:171;   100004;  133.54G;   31.034
+                                       Io.Util.really_write;          src/irmin-pack/unix/io.ml:27;   406103;   92.15G;   48.436
+                               Replay.Operation.exec_remove;              lib/replay/replay.ml:320;  1149441;   18.37G;    9.597
+                             Replay.Operation.exec_add_tree;              lib/replay/replay.ml:303;    34640;   12.26G;    6.139
+                             Replay.Operation.exec_checkout;              lib/replay/replay.ml:269;   200009;    9.18G;    4.800
+
+[...]
+
 #+end_src
+
+See [[./landmarks-call-graph.out]] for the full output.
+
+Some insights:
+
+- Most time is spend doing a `Context.find` operation.
+- `Tree.find_tree` is an expensive operation not too much time spent doing IO
+
