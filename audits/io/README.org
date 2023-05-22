@@ -1,6 +1,8 @@
 #+title: IO measurements
 #+STARTUP: inlineimages
 
+* IO Activity
+
 #+begin_src gnuplot :exports code :file activity.png
   reset
 
@@ -107,3 +109,7 @@ Some insights:
 - Most time is spend doing a `Context.find` operation.
 - `Tree.find_tree` is an expensive operation not too much time spent doing IO
 
+
+* blktrace
+
+Tracing with the [[https://linux.die.net/man/8/blktrace][~blktrace~]] utility does not seem to provide much insight. It seems to be a bit too low-level. But we tried...
