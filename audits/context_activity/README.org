@@ -8,7 +8,7 @@ What paths of the store are accessed most commonly?
 Measures (coarsley) how many times a path is accessed with a ~Context.find_tree~, ~Context.mem~, or ~Context.find~ operation within the first 1000 blocks of the trace.
 
 
-#+begin_src shell
+#+begin_src shell :exports both
   dune exec ./context_activity.exe | tee context_activity.out
 #+end_src
 
