@@ -85,7 +85,9 @@ traces.  This is used to benchmark performance of changes to Irmin.")
      (list ocaml-tezos-context
 	   ocaml-tezos-context-trace
 
-	   ocaml-landmarks))
+	   ;; extra deps for analysis
+	   ocaml-landmarks
+	   ocaml-art))
     (native-inputs (list gnuplot fio))
     (synopsis #f)
     (description #f)

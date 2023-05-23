@@ -1,0 +1,3 @@
+(executables
+ (names context_activity)
+ (libraries irmin irmin-pack.unix tezos-context logs replay binning art))

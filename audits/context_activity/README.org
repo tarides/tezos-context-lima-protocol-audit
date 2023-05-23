@@ -1,0 +1,42 @@
+#+title: Context Activity
+
+What paths of the store are accessed most commonly?
+
+
+* context_activity.ml
+
+Measures (coarsley) how many times a path is accessed with a ~Context.find_tree~, ~Context.mem~, or ~Context.find~ operation within the first 1000 blocks of the trace.
+
+
+#+begin_src shell
+  dune exec ./context_activity.exe | tee context_activity.out
+#+end_src
+
+#+RESULTS:
+#+begin_src shell
+  555351: {contracts/global_counter}
+  175853: {big_maps/index/347453/total_bytes;
+           big_maps/index/347455/total_bytes;
+           big_maps/index/347456/total_bytes}
+  6661: {big_maps/index/103258/total_bytes}
+  4000: {endorsement_branch; grand_parent_branch; v1/constants; v1/cycle_eras;
+         version}
+  2131: {big_maps/index/103260/total_bytes}
+  2000: {contracts/index/000055749b1e5abb75aa93506da6a12798bd2efc6667/missed_endorsements;
+         contracts/index/0000afa0344c0cdaeb29b7ad3e0dd58584c39b00dbd7/missed_endorsements;
+         contracts/index/0000efb51d1f51071e76780ae54912ec8fa16a612c37/missed_endorsements;
+         cycle/558/random_seed; cycle/558/selected_stake_distribution;
+         first_level_of_protocol; votes/current_period}
+  1998: {contracts/index/00029ce4a27db8ce7d59d60a44ad3ed3d0be78589eff/missed_endorsements}
+  1966: {contracts/index/00001d7524dc473ba4227d1b21855579e62013193e04/missed_endorsements}
+  1960: {contracts/index/0000fb6286a095458cc7a449592b321a5ef0fb2d6fc6/missed_endorsements}
+  1934: {contracts/index/00003f4b38ba5d728395574a38a1d7aa90e1c77c98f6/missed_endorsements
+
+[...]
+#+end_src
+
+Most reads access very few paths.
+
+See [[./context_activity.out]] for full output.
+
+What are the significances of these paths? Would it make sense to have specialized indices for these hot paths?
