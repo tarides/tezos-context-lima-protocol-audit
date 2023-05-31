@@ -40,3 +40,5 @@ Most reads access very few paths.
 See [[./context_activity.out]] for full output.
 
 What are the significances of these paths? Would it make sense to have specialized indices for these hot paths?
+
+Seems like the way stuff is stored in the context is defined by ~storage_functors.ml~ in the ~tezos-protocol-015-PtLimaPt.environment~ library.

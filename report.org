@@ -2,19 +2,26 @@
 #+author: Irmin Team
 #+STARTUP: inlineimages
 
-#+BEGIN_abstract
-#+END_abstract
-
 * Introduction
-* Audits
-** TODO Dict usage
-** TODO IO analysis
 
-See [[./audits/io/README.org]].
+The Octez ~tezos-context~ package maintains an on-disk representation of Tezos blocks. It is implemented using [[https://irmin.org/][Irmin]] and the purpose-built Irmin backend [[https://mirage.github.io/irmin/irmin-pack/index.html][~irmin-pack~]].
 
-** Index performance
+Performance of ~tezos-context~ is important for overall performance of Octez and previous improvments in ~irmin-pack~ have led to [[https://tarides.com/blog/2022-04-26-lightning-fast-with-irmin-tezos-storage-is-6x-faster-with-1000-tps-surpassed/][major performance improvements in Octez]].
 
-At it's core Irmin is a content-addressable store. Store objects are referenced by their cryptographic hash. In ~irmin-pack~ objects are stored in an append-only pack file. The index is a persistent datastructure that maps the hash of an object to its offset in the append-only pack file.
+This report contains an audit of the ~irmin-pack~ storage backend used by Tezos Octez. We investigate the performance of individual sub-components as well as access patterns used by Tezos.
+
+** Overview of ~irmin-pack~
+
+Irmin is a content-addressable data store similar to Git. Data is stored in trees where nodes and leaves of the trees are identified by their cryptographic hash. At it's core Irmin is a store of content-addressed objects (nodes and leaves).
+
+~irmin-pack~ is a space-optimized Irmin backend inspired by Git packfiles that is currently used in Octez.
+
+Conceptually ~irmin-pack~ stores content-addressed objects to an append-only file. A persistent datastructure called the index is used to map hashes to positions in the append-only file.
+
+* Sub-components
+** Index
+
+The index is a persistent datastructure that maps the hash of an object to its offset in the append-only pack file.
 
 Since Irmin version 3.0.0 objects in the pack file hold direct references to other objects in the pack file [[[https://github.com/mirage/irmin/pull/1659][irmin #1659]]] this removes the necessity to always query the index when traversing objects. This also allows a smaller index as now only top-level objects (i.e. commits) need to be in the index [[[https://github.com/mirage/irmin/pull/1664][irmin #1664]]]. This is called ~minimal~ indexing and has allowed [[https://tarides.com/blog/2022-04-26-lightning-fast-with-irmin-tezos-storage-is-6x-faster-with-1000-tps-surpassed][considerable performance improvements for the Octez storage layer]].
 
@@ -99,9 +106,13 @@ With the currently implemented minimal indexing scheme no performance issues are
 
 Archive nodes that were bootstrapped using non-minimal indexing have a very large index structure. For better disk-usage it is recommended to re-bootstrap these nodes using minimal indexing.
 
-** TODO CPU boundness
-** TODO Context Structure
-*** Content Size distribution
+** TODO Dict
+* TODO IO access
+
+See [[./audits/io/README.org]].
+
+* Context structure and access patterns
+** Content Size distribution
 
 #+tblname: context-content-size
 | Exponent |    Count |
@@ -138,4 +149,6 @@ Archive nodes that were bootstrapped using non-minimal indexing have a very larg
 #+RESULTS:
 [[file:context-content-size.png]]
 
+* Modern hardware and asynchronous APIs
+** TODO CPU boundness
 * Conclusion
