@@ -158,6 +158,11 @@ let run (config : Replay.Config.t) =
                activity Stats.Io.Activity.zero
            in
 
+           (* Add the total activity to the logged activity *)
+           let activity =
+             Stats.Io.PathMap.add "total" total_activity activity
+           in
+
            (* Update mapping of activities to CSV indices *)
            let activity_mapping =
              ActivityCsv.Mapping.ensure_mapped activity activity_mapping
@@ -187,6 +192,18 @@ let run (config : Replay.Config.t) =
 
   (* Emit a header on last line *)
   print_endline @@ ActivityCsv.header config.store_path activity_mapping;
+
+  (* Get a grand total stats *)
+  let stats = Replay.State.stats state in
+  let total_path_activity = Stats.Io.export stats.io in
+  let total_activity =
+    Stats.Io.PathMap.fold
+      (fun _path total path_activity ->
+        Stats.Io.Activity.sum Seq.(cons total @@ return path_activity))
+      total_path_activity Stats.Io.Activity.zero
+  in
+
+  Log.info (fun m -> m "Total activity: %a" pp_activity total_activity);
 
   return_unit
 

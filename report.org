@@ -107,7 +107,14 @@ With the currently implemented minimal indexing scheme no performance issues are
 Archive nodes that were bootstrapped using non-minimal indexing have a very large index structure. For better disk-usage it is recommended to re-bootstrap these nodes using minimal indexing.
 
 ** TODO Dict
-* TODO IO access
+* TODO IO Activity
+
+In order to measure real disk IO accesses we add some [[https://github.com/mirage/irmin/pull/2250][instrumentation to irmin-pack]] that allows us to measure how many bytes are read/written to individual files in how many system calls.
+
+When replaying a trace of 100_000 Tezos blocks we observe a total disk activity of:
+
+- 55GiB of data read with 46_354_744_574 system calls (average size of read is 61 bytes).
+- 43GiB of data written with 406_103 system calls (average size of write is 111 KiB).
 
 See [[./audits/io/README.org]].
 
