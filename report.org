@@ -157,5 +157,13 @@ See [[./audits/io/README.org]].
 [[file:context-content-size.png]]
 
 * Modern hardware and asynchronous APIs
+** TODO Example with using io_uring via fio
 ** TODO CPU boundness
+
+| CPU Frequency           | 3.40GHz  | 2.5GHz        | 1.5GHz        |
+| CPU time elapsed        | 73m27s   | 103m26s 141%  | 194m37s 265%  |
+| Wall time elapsed       | 76m08s   | 103m24s 136%  | 194m28s 255%  |
+| TZ-transactions per sec | 1043.919 | 741.288  71%  | 393.969  38%  |
+| TZ-operations per sec   | 6818.645 | 4841.928  71% | 2573.316  38% |
+
 * Conclusion
