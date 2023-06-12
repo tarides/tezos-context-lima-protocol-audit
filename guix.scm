@@ -72,6 +72,20 @@
 traces.  This is used to benchmark performance of changes to Irmin.")
       (license license:isc))))
 
+(define fio-latest
+  (package
+   (inherit fio)
+   (version "3.35")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+	   (url "https://github.com/axboe/fio.git")
+	   (commit "fio-3.35")))
+     (sha256
+      (base32
+       "0hpndmn6lq0a27r6zqwb51sngaxawml645s3dz3yc1dimj0jkczh"))))))
+
 (add-landmarks-to-irmin
  (package-with-irmin-3.7
   (package-with-tezos-16
@@ -88,7 +102,7 @@ traces.  This is used to benchmark performance of changes to Irmin.")
 	   ;; extra deps for analysis
 	   ocaml-landmarks
 	   ocaml-art))
-    (native-inputs (list gnuplot fio))
+    (native-inputs (list gnuplot fio-latest))
     (synopsis #f)
     (description #f)
     (license license:isc))

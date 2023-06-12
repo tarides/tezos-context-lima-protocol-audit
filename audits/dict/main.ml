@@ -74,7 +74,7 @@ let main root =
 
   let* hits, misses =
     Store.Tree.fold
-      ~pre:(fun _path steps hm ->
+      ~contents:(fun path _content hm ->
         List.fold_left
           (fun (hits, misses) step ->
             Log.app (fun m ->
@@ -83,7 +83,7 @@ let main root =
 
             if Option.is_some @@ Dict.index dict step then (hits + 1, misses)
             else (hits, misses + 1))
-          hm steps
+          hm path
         |> return)
       tree (0, 0)
   in
