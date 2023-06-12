@@ -125,6 +125,8 @@ Use radare2 or other tools to measure entropy of files on-disk. This is an indic
 * Context structure and access patterns
 ** TODO Content Size distribution
 
+- This might be a motivation for inlining small objects (see https://github.com/mirage/irmin/issues/884)
+
 #+tblname: context-content-size
 | Exponent |    Count |
 |----------+----------|
@@ -277,7 +279,13 @@ We observe following read bandwidth:
 
 Increasing the number of threads/CPU cores utilized seems to lead to considerable performance improvements.
 
-** TODO CPU boundness
+** CPU boundness
+
+We run a replay of 100_000 Tezos blocks with three different CPU frequencies:
+
+- 3.40GHz: Run on an Equinix Metal `c3.small.x86` machine with an Intel® Xeon® E-2278G CPU with 8 cores running at 3.40 GHz.
+- 2.5GHz: Run on an Equinix Metal `m3.large.x86` machine with an AMD EPYC 7502P CPU with 32 cores running at 2.5 GHz.
+- 1.5GHz: Run on an Equinix Metal `m3.large.x86` machine with an AMD EPYC 7502P CPU with 32 cores at 1.5 GHz. The CPU frequency was set using `cpupower frequency-set 1.5GHz`.
 
 | CPU Frequency           | 3.40GHz  | 2.5GHz        | 1.5GHz        |
 | CPU time elapsed        | 73m27s   | 103m26s 141%  | 194m37s 265%  |
@@ -285,7 +293,9 @@ Increasing the number of threads/CPU cores utilized seems to lead to considerabl
 | TZ-transactions per sec | 1043.919 | 741.288  71%  | 393.969  38%  |
 | TZ-operations per sec   | 6818.645 | 4841.928  71% | 2573.316  38% |
 
-** Reducing CPU load by disabling OS buffering
+This seems to indicate that ~irmin-pack~ is CPU-bound. Improving CPU efficiency of the code should result in a direct overall performance improvement.
+
+** Disable OS page cache
 
 Operating systems implement their own cache mechanism for disk access. This [[https://db.in.tum.de/~leis/papers/leanstore.pdf][can cause additional CPU cycles]] which are unnecessary as ~irmin-pack.unix~ implements it's own cache.
 
@@ -421,3 +431,12 @@ Disk stats (read/write):
 We observe a read bandwidth of about 9GiB/s which illustrates the capabilities of modern hardware.
 
 * Conclusion
+
+| Description                                                     | Estimated improvement | Effort    |
+|-----------------------------------------------------------------+-----------------------+-----------|
+| [[Disable OS page cache]]                                           |                   10% | Low       |
+| Use multiple read threads (see [[Multicore]])                       |                  700% | High      |
+| Improve CPU efficiency (see [[CPU boundness]])                      |               unknown | Medium    |
+| Asynchrounous I/O with larger block size (see [[Asynchronous I/O]]) |                38000% | Very high |
+
+
