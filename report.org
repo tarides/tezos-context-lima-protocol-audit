@@ -434,9 +434,11 @@ We observe a read bandwidth of about 9GiB/s which illustrates the capabilities o
 
 | Description                                                     | Estimated improvement | Effort    |
 |-----------------------------------------------------------------+-----------------------+-----------|
-| [[Disable OS page cache]]                                           |                   10% | Low       |
-| Use multiple read threads (see [[Multicore]])                       |                  700% | High      |
-| Improve CPU efficiency (see [[CPU boundness]])                      |               unknown | Medium    |
-| Asynchrounous I/O with larger block size (see [[Asynchronous I/O]]) |                38000% | Very high |
+| [[Disable OS page cache]]                                           | 10%                   | Low       |
+| Use multiple read threads (see [[Multicore]])                       | 700%                  | High      |
+| Improve CPU efficiency (see [[CPU boundness]])                      | unknown               | Medium    |
+| TODO Inline small objects                                       | unknown               | High      |
+| TODO Optimize Tezos usage patterns                              | unknown               | High      |
+| Asynchrounous I/O with larger block size (see [[Asynchronous I/O]]) | 30000%                | Very high |
 
 
