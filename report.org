@@ -18,6 +18,12 @@ Irmin is a content-addressable data store similar to Git. Data is stored in tree
 
 Conceptually ~irmin-pack~ stores content-addressed objects to an append-only file. A persistent datastructure called the index is used to map hashes to positions in the append-only file.
 
+** Methodology
+
+If not noted all tests were run on StarLabs Starbook Mk VI with a AMD Ryzen 7 5800U and a PCIe-3 connected 960GiB SSD.
+
+For replays a recording of 100_000 blocks starting at block level 2_981_990 was used.
+
 * Sub-components
 ** Index
 
@@ -106,7 +112,46 @@ With the currently implemented minimal indexing scheme no performance issues are
 
 Archive nodes that were bootstrapped using non-minimal indexing have a very large index structure. For better disk-usage it is recommended to re-bootstrap these nodes using minimal indexing.
 
-** TODO Dict
+** Dict
+
+Irmin stores values in a tree where paths are sequences of strings. In order to de-duplicate commonly occuring path segments, some path segments are stored in an auxilary persistent structure called the ~Dict~.
+
+The ~Dict~ maintains a mapping from path segments (strings) to integer identifiers. In the Irmin tree the integer identifiers can be used instead of the string path segment. As integer identifiers are in general smaller than the string path segments this results in a more compact on-disk representation.
+
+In ~irmin-pack~ the ~Dict~ is limited to 100_000 entries that were added on a first-come-first-serve basis. The ~Dict~ is currently full.
+
+*** Occurrences of Dict elements in store
+
+We count the number of occurrences of path segments that appear in the ~Dict~ in the store of the Tezos block 3_081_990.
+
+It seems like the some common path segments are de-duplicated a considerable amount of times:
+
+| Path segment                                                     | Occurrences in store |
+|------------------------------------------------------------------+----------------------|
+| 4a1cf11667fa0165eac9963333b883a80bcfdfebde09b79bfc740680e986bab6 |               108903 |
+| 053f610929e2b6ea458c54dfd8b29716d379c13f5c8fd82d5c793a9e31271743 |                90893 |
+| 00d0158265571a474bc6ed02547db51416ab2228327e66332117ea7b587aca94 |                13912 |
+| 1ffdaf1cd7574b72f933a9d5e102143f3e4d761a6e51b4019ed821b7b99b097a |                 2313 |
+| 04034e4a6228fdb92e8978fb85d9c2d1f79501b0c509f24b0f1eede3ca7cb234 |                 1611 |
+| 10f21b2eacdf858cf9824d29e9c0d09bf666d3d900fbc54b6438f67e63831d4d |                 1157 |
+| 2966fdb0cb953d94e959dcee2b2c3238c42bf0d1e0991a5a51609059aaa04080 |                  890 |
+| 1f33bf814d191cc602888479ef371d13082f19718f63737e685cc76110e323d9 |                  813 |
+| 02e5f95f2c3a3ccfa5ce71d0f11ad70f4746b8e0f3fe7bcecc63dbc8cfba71d1 |                  731 |
+| 438c52065d4605460b12d1b9446876a1c922b416103a20d44e994a9fd2b8ed07 |                  477 |
+| 00642bcad8681caf0f45f195cc1483f8366f155d83e272c9ff93fe3840a61dcb |                  396 |
+| 4001852857ca1c5dad1c1275f766fc5208e63c48ba0289127591ffef3c440d53 |                  388 |
+| 27e1640238d07d569852b3e4fe784f5adce0e6649673ea587aa7389d72b855af |                  381 |
+
+However we also note that most entries in the ~Dict~ do not occur in the store. We count 96_394 ~Dict~ entries that do not occur in the store.
+
+Furthermore, we observe that most entries in the ~Dict~ are hashes. Commonly used short keywords like ~total_bytes~, ~missed_endorsement~ or ~index~ are not ~Dict~ entries.
+
+*** Conclussion
+
+We conclude that the ~Dict~ is underused. This observation has [[https://github.com/mirage/irmin/issues/1807][been previously made]]. A more efficient use of the ~Dict~ could lead to a considerably more compact on-disk representation and potential performance improvements. Note that existing ~Dict~ entries can not be removed and it might be tricky to get a performant ~Dict~ that is considerably larger. Furthermore, potential performance improvements seem hard to quanitfy.
+
+We can not recommend any concrete measures for optimizing overall performance with improvements to the ~Dict~.
+
 * TODO IO Activity
 
 In order to measure real disk IO accesses we add some [[https://github.com/mirage/irmin/pull/2250][instrumentation to irmin-pack]] that allows us to measure how many bytes are read/written to individual files in how many system calls.
@@ -168,7 +213,7 @@ Use radare2 or other tools to measure entropy of files on-disk. This is an indic
 Modern PCIe-attached solid-state drives (SSDs) offer high throughput and
 large capacity at low cost. They are exposed to the system using the same block-based APIs as traditional disks or SSDs attached via serial buses. However, in order to utilize the full performance of such modern hardware, the way I/O operations are performed requires rethinking.
 
-We do some explorations on how performance could be improved using modern hardware and APIs using the [[https://fio.readthedocs.io/en/latest/fio_doc.html][fio]] tool. All tests were run on a StarLabs Starbook Mk VI with an AMD Ryzen 7 8-core 5800U processor and a PCIe3-connected 960GiB SSD.
+We do some explorations on how performance could be improved using modern hardware and APIs using the [[https://fio.readthedocs.io/en/latest/fio_doc.html][fio]] tool.
 
 ** Baseline ~irmin-pack.unix~ reads
 

@@ -1,0 +1,9 @@
+#+title: Dict
+
+* Occurrences
+
+Measures how often entries in the Dict appear in the store.
+
+#+begin_src shell :exports both
+  dune exec ./occurrences.exe | tee occurrences.csv
+#+end_src
