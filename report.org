@@ -487,7 +487,7 @@ Disk stats (read/write):
 
 We observe a read bandwidth of about 9GiB/s which illustrates the capabilities of modern hardware.
 
-* TODO Improvements
+* TODO Conclusion
 
 Based on the audits performed we can propose following improvements and changes to the Octez storage backend:
 
@@ -500,7 +500,4 @@ Based on the audits performed we can propose following improvements and changes 
 | TODO Inline small objects                                       | unknown               | High      |
 | TODO Optimize Tezos usage patterns                              | unknown               | High      |
 | Asynchrounous I/O with larger block size (see [[Asynchronous I/O]]) | 30000%                | Very high |
-
-* TODO Conclusion
-
 
