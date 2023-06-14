@@ -173,27 +173,27 @@ Use radare2 or other tools to measure entropy of files on-disk. This is an indic
 - This might be a motivation for inlining small objects (see https://github.com/mirage/irmin/issues/884)
 
 #+tblname: context-content-size
-| Exponent |    Count |
-|----------+----------|
-|        0 |   596661 |
-|        1 | 23722650 |
-|        2 | 38698770 |
-|        3 |  1125580 |
-|        4 |  3131048 |
-|        5 |  4194650 |
-|        6 |  7477058 |
-|        7 |   532486 |
-|        8 |   194262 |
-|        9 |    35410 |
-|       10 |    35600 |
-|       11 |    71535 |
-|       12 |     4289 |
-|       13 |     2583 |
-|       14 |      260 |
-|       15 |        9 |
-|       16 |        1 |
-|       17 |        3 |
-|       18 |        7 |
+| Exponent (base 2) |    Count |
+|-------------------+----------|
+|                 0 |   596661 |
+|                 1 | 23722650 |
+|                 2 | 38698770 |
+|                 3 |  1125580 |
+|                 4 |  3131048 |
+|                 5 |  4194650 |
+|                 6 |  7477058 |
+|                 7 |   532486 |
+|                 8 |   194262 |
+|                 9 |    35410 |
+|                10 |    35600 |
+|                11 |    71535 |
+|                12 |     4289 |
+|                13 |     2583 |
+|                14 |      260 |
+|                15 |        9 |
+|                16 |        1 |
+|                17 |        3 |
+|                18 |        7 |
 
 #+begin_src gnuplot :var data=context-content-size :exports results :file context-content-size.png
   reset

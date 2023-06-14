@@ -1,0 +1,74 @@
+#+titel: Entropy Analysis
+
+How compact is the on-disk representation of ~irmin-pack~?
+
+* Store of block level 2981990
+
+We create a tar archive of the store:
+
+#+begin_src shell
+tar cfh store-level-2981990.tar ../../inputs/store-level-2981990/ 
+#+end_src
+
+#+RESULTS:
+
+#+begin_src shell
+  zstd store-level-2981990.tar -o store-level-2981990.tar.zstd
+#+end_src
+
+* Store of block level 3081990
+
+#+begin_src shell
+tar cfh store-level-3081990.tar ../../inputs/store-level-3081990/ 
+#+end_src
+
+#+begin_src shell
+  zstd store-level-3081990.tar -o store-level-3081990.tar.zstd
+#+end_src
+
+* A single suffix from 3081990
+
+#+begin_src shell
+  tar cfh store.0.suffix.tar ../../inputs/store-level-2981990/store.0.suffix
+#+end_src
+
+#+begin_src shell
+  zstd store.0.suffix.tar -o store.0.suffix.tar.zstd
+#+end_src
+
+* A single suffix from 3081990
+
+#+begin_src shell
+  tar cfh store.7.suffix.tar ../../inputs/store-level-3081990/store.7.suffix
+#+end_src
+
+#+begin_src shell
+  zstd store.7.suffix.tar -o store.7.suffix.tar.zstd
+#+end_src
+
+* Compression rates
+
+#+begin_src shell
+  ls -l
+#+end_src
+
+#+RESULTS:
+| total      | 62262892 |          |          |             |     |    |       |                              |
+| -rw-r--r-- |        1 | adatario | adatario |        2803 | Jun | 14 | 10:46 | README.org                   |
+| -rw-r--r-- |        1 | adatario | adatario |  5101987840 | Jun | 14 | 10:32 | store.0.suffix.tar           |
+| -rw-r--r-- |        1 | adatario | adatario |  3261700639 | Jun | 14 | 10:32 | store.0.suffix.tar.zstd      |
+| -rw-r--r-- |        1 | adatario | adatario |  3633868800 | Jun | 14 | 10:29 | store.7.suffix.tar           |
+| -rw-r--r-- |        1 | adatario | adatario |   940228651 | Jun | 14 | 10:29 | store.7.suffix.tar.zstd      |
+| -rw-r--r-- |        1 | adatario | adatario |  5108531200 | Jun | 14 | 10:05 | store-level-2981990.tar      |
+| -rw-r--r-- |        1 | adatario | adatario |  3265930512 | Jun | 14 | 10:05 | store-level-2981990.tar.zstd |
+| -rw-r--r-- |        1 | adatario | adatario | 32111902720 | Jun | 14 | 10:13 | store-level-3081990.tar      |
+| -rw-r--r-- |        1 | adatario | adatario | 10332988078 | Jun | 14 | 10:13 | store-level-3081990.tar.zstd |
+
+
+| Store                              | Uncompressed |  Compressed | Compression Ratio (in %) |
+|------------------------------------+--------------+-------------+--------------------------|
+| Level 2_981_990                    |   5108531200 |  3265930512 |                63.930911 |
+| Level 3_081_990                    |  32111902720 | 10332988078 |                32.178062 |
+| Single suffix from level 2_981_990 |   5101987840 |  3261700639 |                63.929996 |
+| Single suffix from level 3_081_990 |   3633868800 |   940228651 |                25.874040 |
+#+TBLFM: $4=($3/$2)*100
