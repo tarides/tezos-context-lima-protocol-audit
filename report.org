@@ -24,6 +24,8 @@ If not noted all tests were run on StarLabs Starbook Mk VI with a AMD Ryzen 7 58
 
 For replays a recording of 100_000 blocks starting at block level 2_981_990 was used.
 
+We use the [[https://fio.readthedocs.io/][Fio]] tool to simulate disk access patterns and measure performance. A baseline, based on observed access patterns of ~irmin-pack~ is provided in section [[*Baseline ~fio~ job]]
+
 * Sub-components
 ** Index
 
@@ -163,73 +165,7 @@ When replaying a trace of 100_000 Tezos blocks we observe a total disk activity 
 
 See [[./audits/io/README.org]].
 
-* TODO Compactness of on-disk representation
-
-Having a compact on-disk representation is not only good for disk usage but can also improve overall performance as data can be loaded into memory closer to the processor faster if it is smaller.
-
-We analyze the compactness of the on-disk representation of ~irmin-pack~ by compressing with the Zstandard compression algorithm. Compact representation have a low compression ratio, whereas less compact representations may admit a more compact representation (for example by compressing with Zstandard).
-
-| Store                              | Uncompressed |  Compressed | Compression Ratio |
-|------------------------------------+--------------+-------------+-------------------|
-| Level 2_981_990                    |   5108531200 |  3265930512 |         1.5641886 |
-| Level 3_081_990                    |  32111902720 | 10332988078 |         3.1077073 |
-| Single suffix from level 2_981_990 |   5101987840 |  3261700639 |         1.5642109 |
-| Single suffix from level 3_081_990 |   3633868800 |   940228651 |         3.8648778 |
-#+TBLFM: $4=($2/$3)
-
-** TODO Why is there such a difference between store of level 2_981_990 and 3_081_990
-
-* Context structure and access patterns
-** TODO Content Size distribution
-
-- This might be a motivation for inlining small objects (see https://github.com/mirage/irmin/issues/884)
-
-#+tblname: context-content-size
-| Exponent (base 2) |    Count |
-|-------------------+----------|
-|                 0 |   596661 |
-|                 1 | 23722650 |
-|                 2 | 38698770 |
-|                 3 |  1125580 |
-|                 4 |  3131048 |
-|                 5 |  4194650 |
-|                 6 |  7477058 |
-|                 7 |   532486 |
-|                 8 |   194262 |
-|                 9 |    35410 |
-|                10 |    35600 |
-|                11 |    71535 |
-|                12 |     4289 |
-|                13 |     2583 |
-|                14 |      260 |
-|                15 |        9 |
-|                16 |        1 |
-|                17 |        3 |
-|                18 |        7 |
-
-#+begin_src gnuplot :var data=context-content-size :exports results :file context-content-size.png
-  reset
-
-  set title "Context Content Size"
-  set style data histogram
-
-  plot data using 2:xticlabels(1)
-#+end_src
-
-#+RESULTS:
-[[file:context-content-size.png]]
-
-** TODO Access Patterns
-* Modern hardware and asynchronous APIs
-
-Modern PCIe-attached solid-state drives (SSDs) offer high throughput and
-large capacity at low cost. They are exposed to the system using the same block-based APIs as traditional disks or SSDs attached via serial buses. However, in order to utilize the full performance of such modern hardware, the way I/O operations are performed requires rethinking.
-
-We do some explorations on how performance could be improved using modern hardware and APIs using the [[https://fio.readthedocs.io/en/latest/fio_doc.html][fio]] tool.
-
-** Baseline ~irmin-pack.unix~ reads
-
-We attempt to simulate a similar behaviour as is currently implemented by ~irmin-pack.unix~.
+** Baseline ~fio~ job
 
 From observations we have that:
 
@@ -296,47 +232,64 @@ Disk stats (read/write):
 
 We observe a read bandwidth of about 30MiB/s. This seems to match up with the read performance observed when replaying a Tezos trace.
 
-** Multicore
+* TODO Compactness of on-disk representation
 
-We simulate the usage of multiple CPU cores with following ~fio~ job description:
+Having a compact on-disk representation is not only good for disk usage but can also improve overall performance as data can be loaded into memory closer to the processor faster if it is smaller.
 
-#+begin_src ini :tangle multiple-threads-pread.ini
-[global]
-rw=randread
-filename=/home/adatario/dev/tclpa/.git/annex/objects/gx/17/SHA256E-s3691765475--13300581f2404cc24774da8615a5a3d3f0adb7d68c4c8034c4fa69e727706000/SHA256E-s3691765475--13300581f2404cc24774da8615a5a3d3f0adb7d68c4c8034c4fa69e727706000
-loops=100
-group_reporting
-thread
+We analyze the compactness of the on-disk representation of ~irmin-pack~ by compressing with the Zstandard compression algorithm. Compact representation have a low compression ratio, whereas less compact representations may admit a more compact representation (for example by compressing with Zstandard).
 
-[job1]
-ioengine=psync
-rw=randread
-blocksize_range=50-300
-size=3500000 / N
-numjobs= N
+| Store                              | Uncompressed |  Compressed | Compression Ratio |
+|------------------------------------+--------------+-------------+-------------------|
+| Level 2_981_990                    |   5108531200 |  3265930512 |         1.5641886 |
+| Level 3_081_990                    |  32111902720 | 10332988078 |         3.1077073 |
+| Single suffix from level 2_981_990 |   5101987840 |  3261700639 |         1.5642109 |
+| Single suffix from level 3_081_990 |   3633868800 |   940228651 |         3.8648778 |
+#+TBLFM: $4=($2/$3)
+
+** TODO Why is there such a difference between store of level 2_981_990 and 3_081_990
+
+* Context structure and access patterns
+** TODO Content Size distribution
+
+- This might be a motivation for inlining small objects (see https://github.com/mirage/irmin/issues/884)
+
+#+tblname: context-content-size
+| Exponent (base 2) |    Count |
+|-------------------+----------|
+|                 0 |   596661 |
+|                 1 | 23722650 |
+|                 2 | 38698770 |
+|                 3 |  1125580 |
+|                 4 |  3131048 |
+|                 5 |  4194650 |
+|                 6 |  7477058 |
+|                 7 |   532486 |
+|                 8 |   194262 |
+|                 9 |    35410 |
+|                10 |    35600 |
+|                11 |    71535 |
+|                12 |     4289 |
+|                13 |     2583 |
+|                14 |      260 |
+|                15 |        9 |
+|                16 |        1 |
+|                17 |        3 |
+|                18 |        7 |
+
+#+begin_src gnuplot :var data=context-content-size :exports results :file context-content-size.png
+  reset
+
+  set title "Context Content Size"
+  set style data histogram
+
+  plot data using 2:xticlabels(1)
 #+end_src
 
-Where ~N~ is the number of threads used.
+#+RESULTS:
+[[file:context-content-size.png]]
 
-We observe following read bandwidth:
-
-| Number of Threads | Read bandwidth (MiB/s) |
-|-------------------+------------------------|
-|                 1 |                   23.4 |
-|                 2 |                   72.8 |
-|                 3 |                    102 |
-|                 4 |                    127 |
-|                 5 |                    147 |
-|                 6 |                    163 |
-|                 7 |                    175 |
-|                 8 |                    167 |
-|                 9 |                    175 |
-|                10 |                    172 |
-
-
-Increasing the number of threads/CPU cores utilized seems to lead to considerable performance improvements.
-
-** CPU boundness
+** TODO Access Patterns
+* CPU boundness
 
 We run a replay of 100_000 Tezos blocks with three different CPU frequencies:
 
@@ -350,7 +303,7 @@ We run a replay of 100_000 Tezos blocks with three different CPU frequencies:
 | TZ-transactions per sec | 1043.919 | 741.288  71%  | 393.969  38%  |
 | TZ-operations per sec   | 6818.645 | 4841.928  71% | 2573.316  38% |
 
-This seems to indicate that ~irmin-pack~ is CPU-bound. Improving CPU efficiency of the code should result in a direct overall performance improvement.
+This seems to indicate that ~irmin-pack~ is CPU-bound. Improving CPU efficiency should directly improve overall performance.
 
 ** Disable OS page cache
 
@@ -417,6 +370,53 @@ Disk stats (read/write):
 #+end_src
 
 We observe a read bandwidth of 33.4MiB/s. This seems to be a considerable performance improvement (more than 10%) that can be implemented fairly easily.
+
+* Multicore
+
+We simulate the usage of multiple CPU cores with following ~fio~ job description:
+
+#+begin_src ini :tangle multiple-threads-pread.ini
+[global]
+rw=randread
+filename=/home/adatario/dev/tclpa/.git/annex/objects/gx/17/SHA256E-s3691765475--13300581f2404cc24774da8615a5a3d3f0adb7d68c4c8034c4fa69e727706000/SHA256E-s3691765475--13300581f2404cc24774da8615a5a3d3f0adb7d68c4c8034c4fa69e727706000
+loops=100
+group_reporting
+thread
+
+[job1]
+ioengine=psync
+rw=randread
+blocksize_range=50-300
+size=3500000 / N
+numjobs= N
+#+end_src
+
+Where ~N~ is the number of threads used.
+
+We observe following read bandwidth:
+
+| Number of Threads | Read bandwidth (MiB/s) |
+|-------------------+------------------------|
+|                 1 |                   23.4 |
+|                 2 |                   72.8 |
+|                 3 |                    102 |
+|                 4 |                    127 |
+|                 5 |                    147 |
+|                 6 |                    163 |
+|                 7 |                    175 |
+|                 8 |                    167 |
+|                 9 |                    175 |
+|                10 |                    172 |
+
+
+Increasing the number of threads/CPU cores utilized seems to lead to considerable performance improvements.
+
+* Modern hardware and asynchronous APIs
+
+Modern PCIe-attached solid-state drives (SSDs) offer high throughput and
+large capacity at low cost. They are exposed to the system using the same block-based APIs as traditional disks or SSDs attached via serial buses. However, in order to utilize the full performance of such modern hardware, the way I/O operations are performed requires rethinking.
+
+We do some explorations on how performance could be improved using modern hardware and APIs using the [[https://fio.readthedocs.io/en/latest/fio_doc.html][fio]] tool.
 
 ** Asynchronous I/O
 
@@ -491,23 +491,16 @@ We observe a read bandwidth of about 9GiB/s which illustrates the capabilities o
 
 Based on the audits performed we can propose following improvements and changes to the Octez storage backend:
 
-** Disable OS page cache
-** Path flattening
-** More compact on-disk representation
-** General CPU efficiency
-** Inline small objects
-** Optimize Tezos storage functors
-** Multicore
-** Asynchronous I/O
-* Conclusion
-
 | Description                                                     | Estimated improvement | Effort    |
 |-----------------------------------------------------------------+-----------------------+-----------|
-| [[Disable OS page cache]]                                           | 10%                   | Low       |
-| Use multiple read threads (see [[Multicore]])                       | 700%                  | High      |
-| Improve CPU efficiency (see [[CPU boundness]])                      | unknown               | Medium    |
+| [[*Disable OS page cache]]                                          | 10%                   | Low       |
+| Use multiple read threads (see [[*Multicore]])                      | 700%                  | High      |
+| General CPU efficiency improvements (see [[*CPU boundness]]         | unknown               | Medium    |
+| More compact on-disk representation                             | unknown               | High      |
 | TODO Inline small objects                                       | unknown               | High      |
 | TODO Optimize Tezos usage patterns                              | unknown               | High      |
 | Asynchrounous I/O with larger block size (see [[Asynchronous I/O]]) | 30000%                | Very high |
+
+* TODO Conclusion
 
 
