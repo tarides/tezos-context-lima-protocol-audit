@@ -163,9 +163,21 @@ When replaying a trace of 100_000 Tezos blocks we observe a total disk activity 
 
 See [[./audits/io/README.org]].
 
-* TODO Entropy Analysis
+* TODO Compactness of on-disk representation
 
-Use radare2 or other tools to measure entropy of files on-disk. This is an indication of how well compressed the pack files are.
+Having a compact on-disk representation is not only good for disk usage but can also improve overall performance as data can be loaded into memory closer to the processor faster if it is smaller.
+
+We analyze the compactness of the on-disk representation of ~irmin-pack~ by compressing with the Zstandard compression algorithm. Compact representation have a low compression ratio, whereas less compact representations may admit a more compact representation (for example by compressing with Zstandard).
+
+| Store                              | Uncompressed |  Compressed | Compression Ratio |
+|------------------------------------+--------------+-------------+-------------------|
+| Level 2_981_990                    |   5108531200 |  3265930512 |         1.5641886 |
+| Level 3_081_990                    |  32111902720 | 10332988078 |         3.1077073 |
+| Single suffix from level 2_981_990 |   5101987840 |  3261700639 |         1.5642109 |
+| Single suffix from level 3_081_990 |   3633868800 |   940228651 |         3.8648778 |
+#+TBLFM: $4=($2/$3)
+
+** TODO Why is there such a difference between store of level 2_981_990 and 3_081_990
 
 * Context structure and access patterns
 ** TODO Content Size distribution
@@ -475,6 +487,18 @@ Disk stats (read/write):
 
 We observe a read bandwidth of about 9GiB/s which illustrates the capabilities of modern hardware.
 
+* TODO Improvements
+
+Based on the audits performed we can propose following improvements and changes to the Octez storage backend:
+
+** Disable OS page cache
+** Path flattening
+** More compact on-disk representation
+** General CPU efficiency
+** Inline small objects
+** Optimize Tezos storage functors
+** Multicore
+** Asynchronous I/O
 * Conclusion
 
 | Description                                                     | Estimated improvement | Effort    |
