@@ -8,6 +8,7 @@
 	     (gnu packages ocaml)
 	     (gnu packages maths)
 	     (gnu packages benchmark)
+	     (gnu packages wireservice)
 	     (tarides packages ocaml)
 	     (tarides packages tezos)
 	     (tarides packages irmin))
@@ -102,7 +103,7 @@ traces.  This is used to benchmark performance of changes to Irmin.")
 	   ;; extra deps for analysis
 	   ocaml-landmarks
 	   ocaml-art))
-    (native-inputs (list gnuplot fio-latest))
+    (native-inputs (list gnuplot fio-latest csvkit))
     (synopsis #f)
     (description #f)
     (license license:isc))

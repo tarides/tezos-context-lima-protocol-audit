@@ -24,7 +24,7 @@ If not noted all tests were run on StarLabs Starbook Mk VI with a AMD Ryzen 7 58
 
 For replays a recording of 100_000 blocks starting at block level 2_981_990 was used.
 
-We use the [[https://fio.readthedocs.io/][Fio]] tool to simulate disk access patterns and measure performance. A baseline, based on observed access patterns of ~irmin-pack~ is provided in section [[*Baseline ~fio~ job]]
+We use the [[https://fio.readthedocs.io/][fio]] tool to simulate disk access patterns and measure performance. A baseline, based on observed access patterns of ~irmin-pack~ is provided in section [[*Baseline ~fio~ job]]
 
 * Sub-components
 ** Index
@@ -154,26 +154,28 @@ We conclude that the ~Dict~ is underused. This observation has [[https://github.
 
 We can not recommend any concrete measures for optimizing overall performance with improvements to the ~Dict~.
 
-* TODO IO Activity
+* IO Activity
 
-In order to measure real disk IO accesses we add some [[https://github.com/mirage/irmin/pull/2250][instrumentation to irmin-pack]] that allows us to measure how many bytes are read/written to individual files in how many system calls.
+In order to measure real disk IO accesses we add some [[https://github.com/mirage/irmin/pull/2250][instrumentation to irmin-pack]] that allows us to measure how many bytes are read/written to individual files in how many system calls. In addition we also trace calls to IO reads and writes using the [[https://github.com/LexiFi/landmarks][landmarks]] library.
 
-When replaying a trace of 100_000 Tezos blocks we observe a total disk activity of:
+|                                         |              Read |             Write |
+|-----------------------------------------+-------------------+-------------------|
+| Bytes in 100_000 blocks                 | 59141777410 (56%) | 46354750320 (44%) |
+| Bytes per block (mean)                  |        591394.118 |        463528.962 |
+| Number of system calls per block (mean) |          9645.864 |             4.061 |
+| Bytes per system call (mean)            |         61.310642 |         114141.58 |
+| I/O time                                |             96.5% |              3.5% |
 
-- 55GiB of data read with 46_354_744_574 system calls (average size of read is 61 bytes).
-- 43GiB of data written with 406_103 system calls (average size of write is 111 KiB).
+We observe:
 
-See [[./audits/io/README.org]].
+- Total I/O activity in bytes consists of about 56% reads and 44% writes. However, reads take 96.5% of the time [fn:: We measure this by tracing the ~Irmin_pack_unix.Io.Util.really_read~ and ~Irmin_pack_unix.Io.Util.really_write~ functions].
+- Reads are performed in many very small chunks (61 bytes per system call).
+
+As read performance dominates the overall performance we concentrate on it in the following.
 
 ** Baseline ~fio~ job
 
-From observations we have that:
-
-- During the processing of a single Tezos Block about 3.5 MiB is read from disk
-- Average access size is between 50-100 bytes
-- ~irmin-pack.unix~ uses the `pread` system calls from a single thread
-
-A ~fio~ job description that simulates such an access pattern:
+Based on the observations we can create a baseline ~fio~ job description that simulates the read access pattern of ~irmin-pack~:
 
 #+begin_src ini :tangle baseline-reads.ini
 [global]
@@ -183,8 +185,8 @@ filename=/home/adatario/dev/tclpa/.git/annex/objects/gx/17/SHA256E-s3691765475--
 [job1]
 ioengine=psync
 rw=randread
-blocksize_range=50-300
-size=3500000B
+blocksize_range=50-100
+size=591394B
 loops=100
 #+end_src
 
@@ -194,43 +196,43 @@ loops=100
 
 #+RESULTS:
 #+begin_src shell
-job1: (g=0): rw=randread, bs=(R) 50B-300B, (W) 50B-300B, (T) 50B-300B, ioengine=psync, iodepth=1
-fio-3.33
+job1: (g=0): rw=randread, bs=(R) 50B-100B, (W) 50B-100B, (T) 50B-100B, ioengine=psync, iodepth=1
+fio-3.35
 Starting 1 process
 
-job1: (groupid=0, jobs=1): err= 0: pid=42484: Fri May 19 14:18:35 2023
-  read: IOPS=230k, BW=29.8MiB/s (31.2MB/s)(334MiB/11209msec)
-    clat (nsec): min=210, max=4069.4k, avg=4129.23, stdev=21131.34
-     lat (nsec): min=230, max=4070.1k, avg=4154.08, stdev=21135.27
+job1: (groupid=0, jobs=1): err= 0: pid=153129: Thu Jun 15 10:14:00 2023
+  read: IOPS=328k, BW=21.0MiB/s (22.1MB/s)(56.4MiB/2681msec)
+    clat (nsec): min=210, max=3742.4k, avg=2833.00, stdev=20598.76
+     lat (nsec): min=230, max=3743.1k, avg=2858.85, stdev=20605.58
     clat percentiles (nsec):
-     |  1.00th=[   221],  5.00th=[   231], 10.00th=[   231], 20.00th=[   231],
-     | 30.00th=[   241], 40.00th=[   241], 50.00th=[   241], 60.00th=[   251],
-     | 70.00th=[   310], 80.00th=[   330], 90.00th=[   362], 95.00th=[   612],
-     | 99.00th=[123392], 99.50th=[130560], 99.90th=[136192], 99.95th=[136192],
-     | 99.99th=[148480]
-   bw (  KiB/s): min=27526, max=33845, per=99.84%, avg=30444.41, stdev=2900.78, samples=22
-   iops        : min=207124, max=255516, avg=229381.59, stdev=22386.75, samples=22
-  lat (nsec)   : 250=55.59%, 500=37.79%, 750=2.44%, 1000=0.65%
-  lat (usec)   : 2=0.13%, 4=0.13%, 10=0.01%, 20=0.01%, 100=0.05%
-  lat (usec)   : 250=3.23%, 500=0.01%, 750=0.01%
-  lat (msec)   : 10=0.01%
-  cpu          : usr=7.52%, sys=8.17%, ctx=84419, majf=0, minf=12
+     |  1.00th=[   211],  5.00th=[   221], 10.00th=[   221], 20.00th=[   221],
+     | 30.00th=[   231], 40.00th=[   231], 50.00th=[   231], 60.00th=[   231],
+     | 70.00th=[   241], 80.00th=[   402], 90.00th=[   410], 95.00th=[   676],
+     | 99.00th=[150528], 99.50th=[158720], 99.90th=[191488], 99.95th=[230400],
+     | 99.99th=[329728]
+   bw (  KiB/s): min=20846, max=21922, per=99.73%, avg=21483.80, stdev=449.08, samples=5
+   iops        : min=317386, max=333862, avg=327161.20, stdev=6851.62, samples=5
+  lat (nsec)   : 250=70.87%, 500=23.40%, 750=1.39%, 1000=1.64%
+  lat (usec)   : 2=0.93%, 4=0.08%, 10=0.06%, 20=0.01%, 50=0.01%
+  lat (usec)   : 250=1.59%, 500=0.03%, 750=0.01%, 1000=0.01%
+  lat (msec)   : 4=0.01%
+  cpu          : usr=12.13%, sys=9.74%, ctx=14307, majf=0, minf=10
   IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
      submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
      complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued rwts: total=2575300,0,0,0 short=0,0,0,0 dropped=0,0,0,0
+     issued rwts: total=879400,0,0,0 short=0,0,0,0 dropped=0,0,0,0
      latency   : target=0, window=0, percentile=100.00%, depth=1
 
 Run status group 0 (all jobs):
-   READ: bw=29.8MiB/s (31.2MB/s), 29.8MiB/s-29.8MiB/s (31.2MB/s-31.2MB/s), io=334MiB (350MB), run=11209-11209msec
+   READ: bw=21.0MiB/s (22.1MB/s), 21.0MiB/s-21.0MiB/s (22.1MB/s-22.1MB/s), io=56.4MiB (59.1MB), run=2681-2681msec
 
 Disk stats (read/write):
-    dm-1: ios=84008/120, merge=0/0, ticks=9396/0, in_queue=9396, util=94.84%, aggrios=84402/120, aggrmerge=0/0, aggrticks=9400/0, aggrin_queue=9400, aggrutil=94.70%
-    dm-0: ios=84402/120, merge=0/0, ticks=9400/0, in_queue=9400, util=94.70%, aggrios=84402/99, aggrmerge=0/21, aggrticks=8827/5, aggrin_queue=8833, aggrutil=94.70%
-  nvme0n1: ios=84402/99, merge=0/21, ticks=8827/5, in_queue=8833, util=94.70%
+    dm-1: ios=14145/0, merge=0/0, ticks=2116/0, in_queue=2116, util=96.36%, aggrios=14301/0, aggrmerge=0/0, aggrticks=2132/0, aggrin_queue=2132, aggrutil=95.57%
+    dm-0: ios=14301/0, merge=0/0, ticks=2132/0, in_queue=2132, util=95.57%, aggrios=14301/0, aggrmerge=0/0, aggrticks=1539/0, aggrin_queue=1539, aggrutil=95.57%
+  nvme0n1: ios=14301/0, merge=0/0, ticks=1539/0, in_queue=1539, util=95.57%
 #+end_src
 
-We observe a read bandwidth of about 30MiB/s. This seems to match up with the read performance observed when replaying a Tezos trace.
+We observe a read band-width of 21.0MiB/s which seems to match our observations.
 
 * TODO Compactness of on-disk representation
 
@@ -282,7 +284,10 @@ We analyze the compactness of the on-disk representation of ~irmin-pack~ by comp
   set title "Context Content Size"
   set style data histogram
 
-  plot data using 2:xticlabels(1)
+  set xlabel "Logarithm of size (base 2)"
+  set ylabel "Count"
+
+  plot data using 2:xticlabels(1) notitle
 #+end_src
 
 #+RESULTS:
@@ -321,8 +326,8 @@ filename=/home/adatario/dev/tclpa/.git/annex/objects/gx/17/SHA256E-s3691765475--
 [job1]
 ioengine=psync
 rw=randread
-blocksize_range=50-300
-size=3500000B
+blocksize_range=50-100
+size=591394B
 loops=100
 fadvise_hint=noreuse
 #+end_src
@@ -333,47 +338,47 @@ fadvise_hint=noreuse
 
 #+RESULTS:
 #+begin_src shell
-job1: (g=0): rw=randread, bs=(R) 50B-300B, (W) 50B-300B, (T) 50B-300B, ioengine=psync, iodepth=1
+job1: (g=0): rw=randread, bs=(R) 50B-100B, (W) 50B-100B, (T) 50B-100B, ioengine=psync, iodepth=1
 fio-3.35
 Starting 1 process
 
-job1: (groupid=0, jobs=1): err= 0: pid=14322: Mon Jun 12 10:50:49 2023
-  read: IOPS=257k, BW=33.4MiB/s (35.0MB/s)(334MiB/9997msec)
-    clat (nsec): min=200, max=3591.8k, avg=3673.08, stdev=23641.70
-     lat (nsec): min=220, max=3592.6k, avg=3697.97, stdev=23651.94
+job1: (groupid=0, jobs=1): err= 0: pid=156889: Thu Jun 15 10:55:44 2023
+  read: IOPS=432k, BW=27.7MiB/s (29.1MB/s)(56.4MiB/2035msec)
+    clat (nsec): min=210, max=3652.8k, avg=2107.02, stdev=18068.27
+     lat (nsec): min=230, max=3653.4k, avg=2131.96, stdev=18076.02
     clat percentiles (nsec):
-     |  1.00th=[   221],  5.00th=[   221], 10.00th=[   221], 20.00th=[   231],
-     | 30.00th=[   241], 40.00th=[   282], 50.00th=[   322], 60.00th=[   330],
-     | 70.00th=[   342], 80.00th=[   370], 90.00th=[   422], 95.00th=[   470],
-     | 99.00th=[142336], 99.50th=[158720], 99.90th=[240640], 99.95th=[268288],
-     | 99.99th=[468992]
-   bw (  KiB/s): min=27551, max=39379, per=99.97%, avg=34181.32, stdev=2417.77, samples=19
-   iops        : min=206942, max=294650, avg=257133.05, stdev=18535.04, samples=19
-  lat (nsec)   : 250=36.52%, 500=58.76%, 750=1.43%, 1000=0.39%
-  lat (usec)   : 2=0.43%, 4=0.11%, 10=0.09%, 20=0.03%, 50=0.01%
-  lat (usec)   : 100=0.03%, 250=2.13%, 500=0.07%, 750=0.01%, 1000=0.01%
-  lat (msec)   : 2=0.01%, 4=0.01%
-  cpu          : usr=7.68%, sys=12.06%, ctx=57526, majf=0, minf=10
+     |  1.00th=[   211],  5.00th=[   221], 10.00th=[   221], 20.00th=[   221],
+     | 30.00th=[   231], 40.00th=[   231], 50.00th=[   231], 60.00th=[   231],
+     | 70.00th=[   241], 80.00th=[   402], 90.00th=[   410], 95.00th=[   442],
+     | 99.00th=[121344], 99.50th=[152576], 99.90th=[224256], 99.95th=[254976],
+     | 99.99th=[346112]
+   bw (  KiB/s): min=27723, max=28868, per=99.72%, avg=28298.25, stdev=476.32, samples=4
+   iops        : min=422174, max=439618, avg=430933.00, stdev=7326.27, samples=4
+  lat (nsec)   : 250=71.97%, 500=24.01%, 750=1.26%, 1000=0.95%
+  lat (usec)   : 2=0.51%, 4=0.07%, 10=0.06%, 20=0.01%, 50=0.02%
+  lat (usec)   : 100=0.02%, 250=1.06%, 500=0.05%, 750=0.01%, 1000=0.01%
+  lat (msec)   : 4=0.01%
+  cpu          : usr=12.00%, sys=15.34%, ctx=10101, majf=0, minf=11
   IO depths    : 1=100.0%, 2=0.0%, 4=0.0%, 8=0.0%, 16=0.0%, 32=0.0%, >=64=0.0%
      submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
      complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
-     issued rwts: total=2571200,0,0,0 short=0,0,0,0 dropped=0,0,0,0
+     issued rwts: total=879400,0,0,0 short=0,0,0,0 dropped=0,0,0,0
      latency   : target=0, window=0, percentile=100.00%, depth=1
 
 Run status group 0 (all jobs):
-   READ: bw=33.4MiB/s (35.0MB/s), 33.4MiB/s-33.4MiB/s (35.0MB/s-35.0MB/s), io=334MiB (350MB), run=9997-9997msec
+   READ: bw=27.7MiB/s (29.1MB/s), 27.7MiB/s-27.7MiB/s (29.1MB/s-29.1MB/s), io=56.4MiB (59.1MB), run=2035-2035msec
 
 Disk stats (read/write):
-    dm-1: ios=71901/52, merge=0/0, ticks=11476/4, in_queue=11480, util=91.44%, aggrios=72600/52, aggrmerge=0/0, aggrticks=11528/4, aggrin_queue=11532, aggrutil=91.27%
-    dm-0: ios=72600/52, merge=0/0, ticks=11528/4, in_queue=11532, util=91.27%, aggrios=72600/33, aggrmerge=0/19, aggrticks=9739/8, aggrin_queue=9752, aggrutil=91.27%
-  nvme0n1: ios=72600/33, merge=0/19, ticks=9739/8, in_queue=9752, util=91.27%
+    dm-1: ios=11489/0, merge=0/0, ticks=1868/0, in_queue=1868, util=94.89%, aggrios=12303/0, aggrmerge=0/0, aggrticks=2016/0, aggrin_queue=2016, aggrutil=94.15%
+    dm-0: ios=12303/0, merge=0/0, ticks=2016/0, in_queue=2016, util=94.15%, aggrios=12303/0, aggrmerge=0/0, aggrticks=1629/0, aggrin_queue=1628, aggrutil=94.15%
+  nvme0n1: ios=12303/0, merge=0/0, ticks=1629/0, in_queue=1628, util=94.15%
 #+end_src
 
-We observe a read bandwidth of 33.4MiB/s. This seems to be a considerable performance improvement (more than 10%) that can be implemented fairly easily.
+We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable performance improvement (around 30%) that can be implemented fairly easily.
 
 * Multicore
 
-We simulate the usage of multiple CPU cores with following ~fio~ job description:
+In order to simulate the potential performance improvement of using multiple cores we use a ~fio~ job similar to the baseline but instead use ~N~ cores that in total read the same amount of bytes:
 
 #+begin_src ini :tangle multiple-threads-pread.ini
 [global]
@@ -386,30 +391,53 @@ thread
 [job1]
 ioengine=psync
 rw=randread
-blocksize_range=50-300
-size=3500000 / N
-numjobs= N
+blocksize_range=50-100
+size=591394 / N
+numjobs=N
 #+end_src
 
-Where ~N~ is the number of threads used.
+Using the options ~thread~ and ~numjobs~ we create ~N~ threads that randomly read from the file.
 
-We observe following read bandwidth:
+We observe following read bandwidths:
 
+#+tblname: multicore-read-bandwidth
 | Number of Threads | Read bandwidth (MiB/s) |
 |-------------------+------------------------|
-|                 1 |                   23.4 |
-|                 2 |                   72.8 |
-|                 3 |                    102 |
-|                 4 |                    127 |
-|                 5 |                    147 |
-|                 6 |                    163 |
-|                 7 |                    175 |
-|                 8 |                    167 |
-|                 9 |                    175 |
-|                10 |                    172 |
+|                 1 |                     21 |
+|                 2 |                   58.8 |
+|                 3 |                   89.4 |
+|                 4 |                    109 |
+|                 5 |                    120 |
+|                 6 |                    141 |
+|                 7 |                    148 |
+|                 8 |                    162 |
+|                 9 |                    168 |
+|                10 |                    185 |
+|                11 |                    196 |
+|                12 |                    201 |
+|                13 |                    213 |
+|                14 |                    219 |
+|                15 |                    228 |
+|                16 |                    234 |
 
+#+begin_src gnuplot :var data=multicore-read-bandwidth :exports results :file multicore-read-bandwidth.png
+
+  reset
+
+  set title "Multicore read bandwidth"
+  set xlabel "Number of threads"
+  set ylabel "Read bandwidth (MiB/s)"
+
+  plot data with linespoints notitle
+
+#+end_src
+
+#+RESULTS:
+[[file:multicore-read-bandwidth.png]]
 
 Increasing the number of threads/CPU cores utilized seems to lead to considerable performance improvements.
+
+Note however, that the we simulate ~N~ independent threads. In ~irmin-pack~, and Irmin in general, reads may need to be sequential as they descend a tree by de-referencing nodes individually.
 
 * Modern hardware and asynchronous APIs
 
@@ -493,7 +521,7 @@ Based on the audits performed we can propose following improvements and changes 
 
 | Description                                                     | Estimated improvement | Effort    |
 |-----------------------------------------------------------------+-----------------------+-----------|
-| [[*Disable OS page cache]]                                          | 10%                   | Low       |
+| [[*Disable OS page cache]]                                          | 30%                   | Low       |
 | Use multiple read threads (see [[*Multicore]])                      | 700%                  | High      |
 | General CPU efficiency improvements (see [[*CPU boundness]]         | unknown               | Medium    |
 | More compact on-disk representation                             | unknown               | High      |

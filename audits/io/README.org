@@ -6,13 +6,1811 @@
 ** Total Activity
 
 #+begin_src shell :results output code :exports both
-dune exec ./measure_io_activity.exe
+dune exec ./measure_io_activity.exe | tee activity.csv
 #+end_src
 
 #+RESULTS:
 #+begin_src shell
-measure_io_activity.exe: [INFO] Total activity: {"bytes_read":59140523035,"nb_reads":964603817,"bytes_written":46354744574,"nb_writes":406103}
+  measure_io_activity.exe: [INFO] Total activity: {"bytes_read":59140523035,"nb_reads":964603817,"bytes_written":46354744574,"nb_writes":406103}
 #+end_src
+
+** csvstat
+
+#+begin_src shell :results output code :exports both
+  csvstat activity.csv
+#+end_src
+
+#+RESULTS:
+#+begin_src shell
+  1. "level"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         100000
+	Smallest value:        2,981,991
+	Largest value:         3,081,990
+	Sum:                   303,211,088,417
+	Mean:                  3,031,989.605
+	Median:                3,031,988.5
+	StDev:                 28,867.619
+	Most common values:    2,991,606 (2x)
+	                       2,994,697 (2x)
+	                       3,022,952 (2x)
+	                       3,029,162 (2x)
+	                       2,981,991 (1x)
+
+  2. "/store.0.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         56411
+	Smallest value:        0
+	Largest value:         9,540,236
+	Sum:                   19,993,449,749
+	Mean:                  199,926.5
+	Median:                101,839.5
+	StDev:                 382,405.887
+	Most common values:    0 (39273x)
+	                       120,417 (5x)
+	                       189,703 (4x)
+	                       155,540 (4x)
+	                       158,176 (4x)
+
+  3. "/store.0.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         14800
+	Smallest value:        0
+	Largest value:         175,599
+	Sum:                   351,799,393
+	Mean:                  3,517.853
+	Median:                2,086
+	StDev:                 6,094.07
+	Most common values:    0 (39273x)
+	                       2,352 (30x)
+	                       2,513 (30x)
+	                       3,491 (26x)
+	                       2,482 (26x)
+
+  4. "/store.0.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         8044
+	Smallest value:        0
+	Largest value:         2,358,112
+	Sum:                   5,858,021,682
+	Mean:                  58,577.874
+	Median:                0
+	StDev:                 219,952.472
+	Most common values:    0 (91913x)
+	                       1,096,069 (2x)
+	                       1,049,733 (2x)
+	                       1,115,224 (2x)
+	                       1,043,437 (2x)
+
+  5. "/store.0.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         4
+	Smallest value:        0
+	Largest value:         4
+	Sum:                   18,460
+	Mean:                  0.185
+	Median:                0
+	StDev:                 0.635
+	Most common values:    0 (91913x)
+	                       2 (5818x)
+	                       3 (2268x)
+	                       4 (5x)
+
+  6. "/store.control (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         2
+	Smallest value:        0
+	Largest value:         4,096
+	Sum:                   4,096
+	Mean:                  0.041
+	Median:                0
+	StDev:                 12.952
+	Most common values:    0 (100003x)
+	                       4,096 (1x)
+
+  7. "/store.control (nb_reads)"
+
+	Type of data:          Boolean
+	Contains null values:  False
+	Unique values:         1
+	Most common values:    False (100004x)
+
+  8. "/store.control (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  False
+	Unique values:         1
+	Most common values:    False (100004x)
+
+  9. "/store.control (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  False
+	Unique values:         1
+	Most common values:    False (100004x)
+
+ 10. "/store.control.tmp (bytes_read)"
+
+	Type of data:          Boolean
+	Contains null values:  False
+	Unique values:         1
+	Most common values:    False (100004x)
+
+ 11. "/store.control.tmp (nb_reads)"
+
+	Type of data:          Boolean
+	Contains null values:  False
+	Unique values:         1
+	Most common values:    False (100004x)
+
+ 12. "/store.control.tmp (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         11
+	Smallest value:        76
+	Largest value:         360
+	Sum:                   10,397,996
+	Mean:                  103.976
+	Median:                76
+	StDev:                 33.556
+	Most common values:    76 (58044x)
+	                       144 (38962x)
+	                       114 (2663x)
+	                       216 (293x)
+	                       152 (20x)
+
+ 13. "/store.control.tmp (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         6
+	Smallest value:        2
+	Largest value:         7
+	Sum:                   203,060
+	Mean:                  2.031
+	Median:                2
+	StDev:                 0.176
+	Most common values:    2 (97006x)
+	                       3 (2957x)
+	                       4 (31x)
+	                       5 (8x)
+	                       6 (1x)
+
+ 14. "/store.dict (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         2
+	Smallest value:        0
+	Largest value:         6,535,350
+	Sum:                   6,535,350
+	Mean:                  65.351
+	Median:                0
+	StDev:                 20,666.178
+	Most common values:    0 (100003x)
+	                       6,535,350 (1x)
+
+ 15. "/store.dict (nb_reads)"
+
+	Type of data:          Boolean
+	Contains null values:  False
+	Unique values:         2
+	Most common values:    False (100003x)
+	                       True (1x)
+
+ 16. "/store.dict (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  False
+	Unique values:         1
+	Most common values:    False (100004x)
+
+ 17. "/store.dict (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  False
+	Unique values:         1
+	Most common values:    False (100004x)
+
+ 18. "total (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         94394
+	Smallest value:        33
+	Largest value:         12,471,839
+	Sum:                   59,141,777,410
+	Mean:                  591,394.118
+	Median:                464,255
+	StDev:                 491,353.145
+	Most common values:    280,849 (4x)
+	                       528,622 (4x)
+	                       279,070 (4x)
+	                       482,857 (4x)
+	                       262,459 (4x)
+
+ 19. "total (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         22037
+	Smallest value:        1
+	Largest value:         214,891
+	Sum:                   964,625,009
+	Mean:                  9,645.864
+	Median:                7,689
+	StDev:                 7,896.654
+	Most common values:    5,983 (26x)
+	                       5,394 (26x)
+	                       5,699 (24x)
+	                       4,391 (23x)
+	                       6,910 (23x)
+
+ 20. "total (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         84732
+	Smallest value:        248,565
+	Largest value:         3,648,680
+	Sum:                   46,354,750,320
+	Mean:                  463,528.962
+	Median:                418,527
+	StDev:                 174,920.704
+	Most common values:    375,309 (6x)
+	                       433,054 (6x)
+	                       442,499 (6x)
+	                       454,549 (5x)
+	                       386,170 (5x)
+
+ 21. "total (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  False
+	Unique values:         7
+	Smallest value:        4
+	Largest value:         13
+	Sum:                   406,103
+	Mean:                  4.061
+	Median:                4
+	StDev:                 0.351
+	Most common values:    4 (97006x)
+	                       6 (2942x)
+	                       8 (31x)
+	                       5 (15x)
+	                       10 (8x)
+
+ 22. "/store.1.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         35393
+	Smallest value:        0
+	Largest value:         5,048,276
+	Sum:                   3,213,161,777
+	Mean:                  34,958.73
+	Median:                5,941
+	StDev:                 94,722.709
+	Most common values:    0 (31065x)
+	                       None (8091x)
+	                       1,848 (71x)
+	                       1,512 (71x)
+	                       1,428 (69x)
+
+ 23. "/store.1.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5688
+	Smallest value:        0
+	Largest value:         68,228
+	Sum:                   47,401,396
+	Mean:                  515.72
+	Median:                111
+	StDev:                 1,291.133
+	Most common values:    0 (31065x)
+	                       None (8091x)
+	                       100 (212x)
+	                       72 (208x)
+	                       64 (200x)
+
+ 24. "/store.1.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8078
+	Smallest value:        0
+	Largest value:         2,993,787
+	Sum:                   3,768,705,076
+	Mean:                  41,002.96
+	Median:                0
+	StDev:                 137,237.049
+	Most common values:    0 (83719x)
+	                       None (8091x)
+	                       352,469 (3x)
+	                       373,625 (3x)
+	                       445,363 (2x)
+
+ 25. "/store.1.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5
+	Smallest value:        0
+	Largest value:         4
+	Sum:                   16,478
+	Mean:                  0.179
+	Median:                0
+	StDev:                 0.574
+	Most common values:    0 (83719x)
+	                       2 (8107x)
+	                       None (8091x)
+	                       3 (84x)
+	                       4 (3x)
+
+ 26. "/store.2.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         30967
+	Smallest value:        0
+	Largest value:         5,195,603
+	Sum:                   2,486,724,817
+	Mean:                  29,703.231
+	Median:                5,175
+	StDev:                 80,130.985
+	Most common values:    0 (22914x)
+	                       None (16285x)
+	                       1,512 (121x)
+	                       1,596 (116x)
+	                       1,974 (113x)
+
+ 27. "/store.2.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         4905
+	Smallest value:        0
+	Largest value:         72,957
+	Sum:                   37,207,764
+	Mean:                  444.436
+	Median:                98
+	StDev:                 1,120.746
+	Most common values:    0 (22914x)
+	                       None (16285x)
+	                       65 (306x)
+	                       47 (301x)
+	                       70 (291x)
+
+ 28. "/store.2.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8042
+	Smallest value:        0
+	Largest value:         3,029,053
+	Sum:                   3,404,732,547
+	Mean:                  40,668.576
+	Median:                0
+	StDev:                 128,193.713
+	Most common values:    0 (75527x)
+	                       None (16285x)
+	                       328,456 (3x)
+	                       351,074 (3x)
+	                       368,094 (3x)
+
+ 29. "/store.2.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6
+	Smallest value:        0
+	Largest value:         5
+	Sum:                   16,427
+	Mean:                  0.196
+	Median:                0
+	StDev:                 0.596
+	Most common values:    0 (75527x)
+	                       None (16285x)
+	                       2 (8152x)
+	                       3 (38x)
+	                       5 (1x)
+
+ 30. "/store.3.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         31214
+	Smallest value:        0
+	Largest value:         4,335,783
+	Sum:                   2,547,161,276
+	Mean:                  33,725.175
+	Median:                6,773
+	StDev:                 84,661.767
+	Most common values:    None (24477x)
+	                       0 (14630x)
+	                       1,344 (111x)
+	                       2,184 (106x)
+	                       1,512 (99x)
+
+ 31. "/store.3.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5028
+	Smallest value:        0
+	Largest value:         60,477
+	Sum:                   38,528,687
+	Mean:                  510.131
+	Median:                128
+	StDev:                 1,193.439
+	Most common values:    None (24477x)
+	                       0 (14630x)
+	                       59 (280x)
+	                       58 (277x)
+	                       86 (274x)
+
+ 32. "/store.3.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8040
+	Smallest value:        0
+	Largest value:         3,255,398
+	Sum:                   3,370,854,844
+	Mean:                  44,631.123
+	Median:                0
+	StDev:                 133,284.274
+	Most common values:    0 (67335x)
+	                       None (24477x)
+	                       345,171 (3x)
+	                       348,359 (3x)
+	                       396,903 (3x)
+
+ 33. "/store.3.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6
+	Smallest value:        0
+	Largest value:         5
+	Sum:                   16,411
+	Mean:                  0.217
+	Median:                0
+	StDev:                 0.623
+	Most common values:    0 (67335x)
+	                       None (24477x)
+	                       2 (8171x)
+	                       3 (17x)
+	                       5 (2x)
+
+ 34. "/store.4.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         30806
+	Smallest value:        0
+	Largest value:         5,203,890
+	Sum:                   2,502,765,626
+	Mean:                  37,168.867
+	Median:                7,633
+	StDev:                 91,413.693
+	Most common values:    None (32669x)
+	                       0 (6795x)
+	                       1,680 (110x)
+	                       1,470 (102x)
+	                       1,344 (96x)
+
+ 35. "/store.4.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         4873
+	Smallest value:        0
+	Largest value:         67,780
+	Sum:                   37,472,791
+	Mean:                  556.513
+	Median:                141
+	StDev:                 1,274.739
+	Most common values:    None (32669x)
+	                       0 (6795x)
+	                       78 (291x)
+	                       75 (290x)
+	                       65 (285x)
+
+ 36. "/store.4.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8041
+	Smallest value:        0
+	Largest value:         2,568,267
+	Sum:                   3,386,094,010
+	Mean:                  50,287.28
+	Median:                0
+	StDev:                 141,874.398
+	Most common values:    0 (59143x)
+	                       None (32669x)
+	                       399,814 (3x)
+	                       491,743 (2x)
+	                       460,482 (2x)
+
+ 37. "/store.4.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5
+	Smallest value:        0
+	Largest value:         4
+	Sum:                   16,458
+	Mean:                  0.244
+	Median:                0
+	StDev:                 0.658
+	Most common values:    0 (59143x)
+	                       None (32669x)
+	                       2 (8123x)
+	                       3 (64x)
+	                       4 (5x)
+
+ 38. "/store.5.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         33896
+	Smallest value:        0
+	Largest value:         4,170,133
+	Sum:                   2,875,170,893
+	Mean:                  48,613.883
+	Median:                12,273
+	StDev:                 98,887.56
+	Most common values:    None (40861x)
+	                       1,596 (72x)
+	                       1,806 (63x)
+	                       1,932 (62x)
+	                       2,100 (61x)
+
+ 39. "/store.5.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5304
+	Smallest value:        0
+	Largest value:         58,362
+	Sum:                   43,034,161
+	Mean:                  727.629
+	Median:                212
+	StDev:                 1,370.624
+	Most common values:    None (40861x)
+	                       79 (241x)
+	                       86 (231x)
+	                       96 (217x)
+	                       87 (212x)
+
+ 40. "/store.5.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8080
+	Smallest value:        0
+	Largest value:         3,234,941
+	Sum:                   3,521,420,453
+	Mean:                  59,540.782
+	Median:                0
+	StDev:                 155,788.309
+	Most common values:    0 (50949x)
+	                       None (40861x)
+	                       372,314 (3x)
+	                       443,045 (2x)
+	                       479,724 (2x)
+
+ 41. "/store.5.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6
+	Smallest value:        0
+	Largest value:         5
+	Sum:                   16,461
+	Mean:                  0.278
+	Median:                0
+	StDev:                 0.695
+	Most common values:    0 (50949x)
+	                       None (40861x)
+	                       2 (8124x)
+	                       3 (68x)
+	                       5 (1x)
+
+ 42. "/store.6.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         33087
+	Smallest value:        0
+	Largest value:         6,249,837
+	Sum:                   2,983,556,165
+	Mean:                  58,559.661
+	Median:                16,557
+	StDev:                 111,380.472
+	Most common values:    None (49055x)
+	                       3,486 (44x)
+	                       3,570 (39x)
+	                       3,864 (36x)
+	                       3,780 (36x)
+
+ 43. "/store.6.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5346
+	Smallest value:        0
+	Largest value:         86,376
+	Sum:                   45,888,581
+	Mean:                  900.677
+	Median:                314
+	StDev:                 1,547.473
+	Most common values:    None (49055x)
+	                       152 (145x)
+	                       134 (145x)
+	                       124 (142x)
+	                       144 (142x)
+
+ 44. "/store.6.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8078
+	Smallest value:        0
+	Largest value:         2,489,904
+	Sum:                   3,609,072,795
+	Mean:                  70,836.97
+	Median:                0
+	StDev:                 169,989.497
+	Most common values:    None (49055x)
+	                       0 (42757x)
+	                       394,644 (3x)
+	                       385,496 (3x)
+	                       465,023 (2x)
+
+ 45. "/store.6.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5
+	Smallest value:        0
+	Largest value:         4
+	Sum:                   16,452
+	Mean:                  0.323
+	Median:                0
+	StDev:                 0.739
+	Most common values:    None (49055x)
+	                       0 (42757x)
+	                       2 (8126x)
+	                       3 (64x)
+	                       4 (2x)
+
+ 46. "/store.7.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         31908
+	Smallest value:        126
+	Largest value:         5,324,083
+	Sum:                   2,995,853,565
+	Mean:                  70,066.973
+	Median:                20,937
+	StDev:                 122,838.474
+	Most common values:    None (57247x)
+	                       1,512 (23x)
+	                       2,016 (19x)
+	                       2,940 (18x)
+	                       1,554 (17x)
+
+ 47. "/store.7.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5635
+	Smallest value:        3
+	Largest value:         72,136
+	Sum:                   44,202,867
+	Mean:                  1,033.816
+	Median:                359
+	StDev:                 1,694.984
+	Most common values:    None (57247x)
+	                       170 (110x)
+	                       174 (108x)
+	                       171 (102x)
+	                       124 (101x)
+
+ 48. "/store.7.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8057
+	Smallest value:        0
+	Largest value:         3,595,762
+	Sum:                   3,633,860,918
+	Mean:                  84,988.678
+	Median:                0
+	StDev:                 183,221.234
+	Most common values:    None (57247x)
+	                       0 (34565x)
+	                       407,557 (3x)
+	                       394,020 (3x)
+	                       522,589 (2x)
+
+ 49. "/store.7.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6
+	Smallest value:        0
+	Largest value:         6
+	Sum:                   16,460
+	Mean:                  0.385
+	Median:                0
+	StDev:                 0.792
+	Most common values:    None (57247x)
+	                       0 (34565x)
+	                       2 (8121x)
+	                       3 (68x)
+	                       4 (2x)
+
+ 50. "/store.1.out (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Smallest value:        0
+	Largest value:         7,487
+	Sum:                   7,487
+	Mean:                  0.191
+	Median:                0
+	StDev:                 37.78
+	Most common values:    None (60732x)
+	                       0 (39271x)
+	                       7,487 (1x)
+
+ 51. "/store.1.out (nb_reads)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Most common values:    None (60732x)
+	                       False (39271x)
+	                       True (1x)
+
+ 52. "/store.1.out (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (60732x)
+	                       False (39272x)
+
+ 53. "/store.1.out (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (60732x)
+	                       False (39272x)
+
+ 54. "/store.1.mapping (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         53
+	Smallest value:        0
+	Largest value:         9,829,920
+	Sum:                   27,684,384
+	Mean:                  704.957
+	Median:                0
+	StDev:                 52,403.82
+	Most common values:    None (60733x)
+	                       0 (38929x)
+	                       4,096 (107x)
+	                       8,192 (65x)
+	                       12,288 (31x)
+
+ 55. "/store.1.mapping (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         53
+	Smallest value:        0
+	Largest value:         2,400
+	Sum:                   6,759
+	Mean:                  0.172
+	Median:                0
+	StDev:                 12.794
+	Most common values:    None (60733x)
+	                       0 (38929x)
+	                       1 (107x)
+	                       2 (65x)
+	                       3 (31x)
+
+ 56. "/store.1.mapping (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (60733x)
+	                       False (39271x)
+
+ 57. "/store.1.mapping (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (60733x)
+	                       False (39271x)
+
+ 58. "/store.1.prefix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8088
+	Smallest value:        0
+	Largest value:         5,158,446
+	Sum:                   1,521,048,955
+	Mean:                  38,732.117
+	Median:                0
+	StDev:                 105,675.703
+	Most common values:    None (60733x)
+	                       0 (31063x)
+	                       87,284 (3x)
+	                       165,047 (3x)
+	                       127,967 (2x)
+
+ 59. "/store.1.prefix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         4318
+	Smallest value:        0
+	Largest value:         106,912
+	Sum:                   29,944,998
+	Mean:                  762.522
+	Median:                0
+	StDev:                 2,157.179
+	Most common values:    None (60733x)
+	                       0 (31063x)
+	                       2,006 (8x)
+	                       3,668 (8x)
+	                       2,740 (8x)
+
+ 60. "/store.1.prefix (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (60733x)
+	                       False (39271x)
+
+ 61. "/store.1.prefix (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (60733x)
+	                       False (39271x)
+
+ 62. "/store.8.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         28340
+	Smallest value:        0
+	Largest value:         5,930,384
+	Sum:                   3,036,929,491
+	Mean:                  87,861.406
+	Median:                26,482
+	StDev:                 139,214.782
+	Most common values:    None (65439x)
+	                       2,562 (13x)
+	                       1,764 (11x)
+	                       3,066 (10x)
+	                       2,604 (10x)
+
+ 63. "/store.8.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5841
+	Smallest value:        0
+	Largest value:         78,678
+	Sum:                   44,989,356
+	Mean:                  1,301.587
+	Median:                471
+	StDev:                 1,919.199
+	Most common values:    None (65439x)
+	                       215 (72x)
+	                       161 (72x)
+	                       206 (70x)
+	                       160 (65x)
+
+ 64. "/store.8.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8044
+	Smallest value:        0
+	Largest value:         3,182,561
+	Sum:                   3,691,765,475
+	Mean:                  106,806.465
+	Median:                0
+	StDev:                 201,072.49
+	Most common values:    None (65439x)
+	                       0 (26373x)
+	                       416,905 (3x)
+	                       370,787 (3x)
+	                       399,345 (3x)
+
+ 65. "/store.8.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6
+	Smallest value:        0
+	Largest value:         5
+	Sum:                   16,457
+	Mean:                  0.476
+	Median:                0
+	StDev:                 0.856
+	Most common values:    None (65439x)
+	                       0 (26373x)
+	                       2 (8122x)
+	                       3 (68x)
+	                       5 (1x)
+
+ 66. "/store.2.mapping (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         66
+	Smallest value:        0
+	Largest value:         7,331,840
+	Sum:                   38,154,168
+	Mean:                  1,228.244
+	Median:                0
+	StDev:                 52,780.192
+	Most common values:    None (68940x)
+	                       0 (30612x)
+	                       4,096 (178x)
+	                       8,192 (75x)
+	                       12,288 (45x)
+
+ 67. "/store.2.mapping (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         66
+	Smallest value:        0
+	Largest value:         1,790
+	Sum:                   9,315
+	Mean:                  0.3
+	Median:                0
+	StDev:                 12.886
+	Most common values:    None (68940x)
+	                       0 (30612x)
+	                       1 (178x)
+	                       2 (75x)
+	                       3 (45x)
+
+ 68. "/store.2.mapping (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (68940x)
+	                       False (31064x)
+
+ 69. "/store.2.mapping (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (68940x)
+	                       False (31064x)
+
+ 70. "/store.2.out (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Smallest value:        0
+	Largest value:         7,508
+	Sum:                   7,508
+	Mean:                  0.242
+	Median:                0
+	StDev:                 42.599
+	Most common values:    None (68940x)
+	                       0 (31063x)
+	                       7,508 (1x)
+
+ 71. "/store.2.out (nb_reads)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Most common values:    None (68940x)
+	                       False (31063x)
+	                       True (1x)
+
+ 72. "/store.2.out (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (68940x)
+	                       False (31064x)
+
+ 73. "/store.2.out (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (68940x)
+	                       False (31064x)
+
+ 74. "/store.2.prefix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8048
+	Smallest value:        0
+	Largest value:         5,184,521
+	Sum:                   1,675,471,536
+	Mean:                  53,936.117
+	Median:                0
+	StDev:                 127,285.784
+	Most common values:    None (68940x)
+	                       0 (22912x)
+	                       116,666 (3x)
+	                       188,345 (2x)
+	                       251,635 (2x)
+
+ 75. "/store.2.prefix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         4442
+	Smallest value:        0
+	Largest value:         122,695
+	Sum:                   32,535,681
+	Mean:                  1,047.376
+	Median:                0
+	StDev:                 2,549.723
+	Most common values:    None (68940x)
+	                       0 (22912x)
+	                       3,177 (8x)
+	                       2,477 (8x)
+	                       1,731 (8x)
+
+ 76. "/store.2.prefix (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (68940x)
+	                       False (31064x)
+
+ 77. "/store.2.prefix (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (68940x)
+	                       False (31064x)
+
+ 78. "/store.9.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         23731
+	Smallest value:        0
+	Largest value:         5,722,583
+	Sum:                   2,813,598,563
+	Mean:                  106,684.813
+	Median:                39,216
+	StDev:                 145,290.953
+	Most common values:    None (73631x)
+	                       1,806 (7x)
+	                       4,410 (5x)
+	                       4,788 (5x)
+	                       2,688 (5x)
+
+ 79. "/store.9.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5627
+	Smallest value:        0
+	Largest value:         75,805
+	Sum:                   41,120,644
+	Mean:                  1,559.195
+	Median:                703
+	StDev:                 1,985.325
+	Most common values:    None (73631x)
+	                       290 (44x)
+	                       224 (39x)
+	                       260 (38x)
+	                       256 (38x)
+
+ 80. "/store.9.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8050
+	Smallest value:        0
+	Largest value:         3,648,320
+	Sum:                   3,707,053,129
+	Mean:                  140,562.436
+	Median:                0
+	StDev:                 220,699.281
+	Most common values:    None (73631x)
+	                       0 (18181x)
+	                       383,665 (4x)
+	                       414,356 (3x)
+	                       469,838 (3x)
+
+ 81. "/store.9.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6
+	Smallest value:        0
+	Largest value:         5
+	Sum:                   16,457
+	Mean:                  0.624
+	Median:                0
+	StDev:                 0.931
+	Most common values:    None (73631x)
+	                       0 (18181x)
+	                       2 (8125x)
+	                       3 (63x)
+	                       5 (2x)
+
+ 82. "/store.3.mapping (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         66
+	Smallest value:        0
+	Largest value:         11,325,440
+	Sum:                   44,324,136
+	Mean:                  1,934.454
+	Median:                0
+	StDev:                 84,815.172
+	Most common values:    None (77091x)
+	                       0 (22396x)
+	                       4,096 (196x)
+	                       8,192 (91x)
+	                       12,288 (48x)
+
+ 83. "/store.3.mapping (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         66
+	Smallest value:        0
+	Largest value:         2,765
+	Sum:                   10,822
+	Mean:                  0.472
+	Median:                0
+	StDev:                 20.707
+	Most common values:    None (77091x)
+	                       0 (22396x)
+	                       1 (196x)
+	                       2 (91x)
+	                       3 (48x)
+
+ 84. "/store.3.mapping (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (77091x)
+	                       False (22913x)
+
+ 85. "/store.3.mapping (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (77091x)
+	                       False (22913x)
+
+ 86. "/store.3.out (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Smallest value:        0
+	Largest value:         7,510
+	Sum:                   7,510
+	Mean:                  0.328
+	Median:                0
+	StDev:                 49.613
+	Most common values:    None (77091x)
+	                       0 (22912x)
+	                       7,510 (1x)
+
+ 87. "/store.3.out (nb_reads)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Most common values:    None (77091x)
+	                       False (22912x)
+	                       True (1x)
+
+ 88. "/store.3.out (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (77091x)
+	                       False (22913x)
+
+ 89. "/store.3.out (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (77091x)
+	                       False (22913x)
+
+ 90. "/store.3.prefix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8164
+	Smallest value:        0
+	Largest value:         5,067,881
+	Sum:                   1,569,066,420
+	Mean:                  68,479.31
+	Median:                0
+	StDev:                 133,092.732
+	Most common values:    None (77091x)
+	                       0 (14627x)
+	                       73,200 (2x)
+	                       177,316 (2x)
+	                       112,465 (2x)
+
+ 91. "/store.3.prefix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         4333
+	Smallest value:        0
+	Largest value:         119,416
+	Sum:                   30,990,800
+	Mean:                  1,352.542
+	Median:                0
+	StDev:                 2,711.546
+	Most common values:    None (77091x)
+	                       0 (14627x)
+	                       3,246 (8x)
+	                       2,165 (8x)
+	                       2,135 (8x)
+
+ 92. "/store.3.prefix (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (77091x)
+	                       False (22913x)
+
+ 93. "/store.3.prefix (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (77091x)
+	                       False (22913x)
+
+ 94. "/store.10.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         17504
+	Smallest value:        0
+	Largest value:         5,677,560
+	Sum:                   2,895,504,693
+	Mean:                  159,259.925
+	Median:                92,662
+	StDev:                 183,672.957
+	Most common values:    None (81823x)
+	                       203,413 (3x)
+	                       209,904 (3x)
+	                       40,289 (3x)
+	                       55,443 (3x)
+
+ 95. "/store.10.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5983
+	Smallest value:        0
+	Largest value:         75,749
+	Sum:                   42,122,680
+	Mean:                  2,316.852
+	Median:                1,515
+	StDev:                 2,506.617
+	Most common values:    None (81823x)
+	                       576 (19x)
+	                       523 (19x)
+	                       370 (18x)
+	                       326 (17x)
+
+ 96. "/store.10.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8074
+	Smallest value:        0
+	Largest value:         3,543,504
+	Sum:                   3,789,289,586
+	Mean:                  208,420.306
+	Median:                0
+	StDev:                 247,175.2
+	Most common values:    None (81823x)
+	                       0 (9989x)
+	                       439,984 (3x)
+	                       397,707 (3x)
+	                       413,026 (3x)
+
+ 97. "/store.10.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6
+	Smallest value:        0
+	Largest value:         5
+	Sum:                   16,442
+	Mean:                  0.904
+	Median:                0
+	StDev:                 1.001
+	Most common values:    None (81823x)
+	                       0 (9989x)
+	                       2 (8138x)
+	                       3 (51x)
+	                       4 (2x)
+
+ 98. "/store.4.mapping (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         76
+	Smallest value:        0
+	Largest value:         9,453,568
+	Sum:                   50,602,904
+	Mean:                  3,459.318
+	Median:                0
+	StDev:                 101,216.067
+	Most common values:    None (85376x)
+	                       0 (13969x)
+	                       4,096 (259x)
+	                       8,192 (99x)
+	                       12,288 (58x)
+
+ 99. "/store.4.mapping (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         76
+	Smallest value:        0
+	Largest value:         2,308
+	Sum:                   12,355
+	Mean:                  0.845
+	Median:                0
+	StDev:                 24.712
+	Most common values:    None (85376x)
+	                       0 (13969x)
+	                       1 (259x)
+	                       2 (99x)
+	                       3 (58x)
+
+100. "/store.4.mapping (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (85376x)
+	                       False (14628x)
+
+101. "/store.4.mapping (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (85376x)
+	                       False (14628x)
+
+102. "/store.4.out (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Smallest value:        0
+	Largest value:         7,455
+	Sum:                   7,455
+	Mean:                  0.51
+	Median:                0
+	StDev:                 61.639
+	Most common values:    None (85376x)
+	                       0 (14627x)
+	                       7,455 (1x)
+
+103. "/store.4.out (nb_reads)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Most common values:    None (85376x)
+	                       False (14627x)
+	                       True (1x)
+
+104. "/store.4.out (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (85376x)
+	                       False (14628x)
+
+105. "/store.4.out (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (85376x)
+	                       False (14628x)
+
+106. "/store.4.prefix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         7749
+	Smallest value:        0
+	Largest value:         5,167,933
+	Sum:                   1,677,385,362
+	Mean:                  114,669.494
+	Median:                73,413
+	StDev:                 169,572.207
+	Most common values:    None (85376x)
+	                       0 (6793x)
+	                       210,902 (3x)
+	                       163,549 (2x)
+	                       97,850 (2x)
+
+107. "/store.4.prefix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         4526
+	Smallest value:        0
+	Largest value:         117,731
+	Sum:                   32,643,768
+	Mean:                  2,231.595
+	Median:                1,575
+	StDev:                 3,421.435
+	Most common values:    None (85376x)
+	                       0 (6793x)
+	                       2,944 (9x)
+	                       2,970 (8x)
+	                       3,398 (8x)
+
+108. "/store.4.prefix (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (85376x)
+	                       False (14628x)
+
+109. "/store.4.prefix (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (85376x)
+	                       False (14628x)
+
+110. "/store.11.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         9888
+	Smallest value:        0
+	Largest value:         4,702,846
+	Sum:                   2,491,315,582
+	Mean:                  249,405.905
+	Median:                222,835
+	StDev:                 180,832.243
+	Most common values:    None (90015x)
+	                       0 (2x)
+	                       130,385 (2x)
+	                       106,716 (2x)
+	                       196,336 (2x)
+
+111. "/store.11.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         5313
+	Smallest value:        0
+	Largest value:         67,813
+	Sum:                   35,129,559
+	Mean:                  3,516.824
+	Median:                3,141
+	StDev:                 2,528.882
+	Most common values:    None (90015x)
+	                       3,310 (9x)
+	                       2,612 (8x)
+	                       2,712 (8x)
+	                       1,937 (7x)
+
+112. "/store.11.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         8101
+	Smallest value:        0
+	Largest value:         3,507,985
+	Sum:                   3,766,470,123
+	Mean:                  377,061.78
+	Median:                415,231
+	StDev:                 210,308.587
+	Most common values:    None (90015x)
+	                       0 (1797x)
+	                       415,391 (3x)
+	                       443,969 (2x)
+	                       418,572 (2x)
+
+113. "/store.11.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6
+	Smallest value:        0
+	Largest value:         5
+	Sum:                   16,425
+	Mean:                  1.644
+	Median:                2
+	StDev:                 0.773
+	Most common values:    None (90015x)
+	                       2 (8155x)
+	                       0 (1797x)
+	                       3 (34x)
+	                       4 (2x)
+
+114. "/store.5.mapping (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         76
+	Smallest value:        0
+	Largest value:         9,904,128
+	Sum:                   56,287,176
+	Mean:                  8,284.836
+	Median:                0
+	StDev:                 161,726.422
+	Most common values:    None (93210x)
+	                       0 (6251x)
+	                       4,096 (199x)
+	                       8,192 (81x)
+	                       12,288 (44x)
+
+115. "/store.5.mapping (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         76
+	Smallest value:        0
+	Largest value:         2,418
+	Sum:                   13,742
+	Mean:                  2.023
+	Median:                0
+	StDev:                 39.484
+	Most common values:    None (93210x)
+	                       0 (6251x)
+	                       1 (199x)
+	                       2 (81x)
+	                       3 (44x)
+
+116. "/store.5.mapping (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (93210x)
+	                       False (6794x)
+
+117. "/store.5.mapping (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (93210x)
+	                       False (6794x)
+
+118. "/store.5.out (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Smallest value:        0
+	Largest value:         7,497
+	Sum:                   7,497
+	Mean:                  1.103
+	Median:                0
+	StDev:                 90.955
+	Most common values:    None (93210x)
+	                       0 (6793x)
+	                       7,497 (1x)
+
+119. "/store.5.out (nb_reads)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3
+	Most common values:    None (93210x)
+	                       False (6793x)
+	                       True (1x)
+
+120. "/store.5.out (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (93210x)
+	                       False (6794x)
+
+121. "/store.5.out (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (93210x)
+	                       False (6794x)
+
+122. "/store.5.prefix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         6720
+	Smallest value:        13,848
+	Largest value:         5,091,643
+	Sum:                   1,249,525,481
+	Mean:                  183,916.026
+	Median:                141,548
+	StDev:                 179,183.933
+	Most common values:    None (93210x)
+	                       86,956 (3x)
+	                       147,028 (2x)
+	                       128,424 (2x)
+	                       200,077 (2x)
+
+123. "/store.5.prefix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         3913
+	Smallest value:        269
+	Largest value:         105,775
+	Sum:                   24,445,678
+	Mean:                  3,598.127
+	Median:                2,809
+	StDev:                 3,772.322
+	Most common values:    None (93210x)
+	                       2,319 (8x)
+	                       2,768 (7x)
+	                       1,824 (7x)
+	                       2,749 (6x)
+
+124. "/store.5.prefix (bytes_written)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (93210x)
+	                       False (6794x)
+
+125. "/store.5.prefix (nb_writees)"
+
+	Type of data:          Boolean
+	Contains null values:  True (excluded from calculations)
+	Unique values:         2
+	Most common values:    None (93210x)
+	                       False (6794x)
+
+126. "/store.12.suffix (bytes_read)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         1794
+	Smallest value:        0
+	Largest value:         1,083,218
+	Sum:                   390,457,788
+	Mean:                  217,283.132
+	Median:                161,297
+	StDev:                 179,063.575
+	Most common values:    None (98207x)
+	                       153,031 (2x)
+	                       201,735 (2x)
+	                       144,551 (2x)
+	                       102,991 (2x)
+
+127. "/store.12.suffix (nb_reads)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         1402
+	Smallest value:        0
+	Largest value:         14,908
+	Sum:                   5,113,206
+	Mean:                  2,845.412
+	Median:                2,051
+	StDev:                 2,425.497
+	Most common values:    None (98207x)
+	                       1,990 (4x)
+	                       1,677 (4x)
+	                       1,954 (4x)
+	                       1,575 (4x)
+
+128. "/store.12.suffix (bytes_written)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         1792
+	Smallest value:        271,481
+	Largest value:         3,000,200
+	Sum:                   837,011,686
+	Mean:                  465,782.797
+	Median:                407,315
+	StDev:                 199,219.064
+	Most common values:    None (98207x)
+	                       430,951 (2x)
+	                       382,739 (2x)
+	                       385,484 (2x)
+	                       342,238 (2x)
+
+129. "/store.12.suffix (nb_writees)"
+
+	Type of data:          Number
+	Contains null values:  True (excluded from calculations)
+	Unique values:         4
+	Smallest value:        2
+	Largest value:         4
+	Sum:                   3,655
+	Mean:                  2.034
+	Median:                2
+	StDev:                 0.19
+	Most common values:    None (98207x)
+	                       2 (1739x)
+	                       3 (55x)
+	                       4 (3x)
+
+Row count: 100004
+#+end_src
+
 
 ** Per file
 
