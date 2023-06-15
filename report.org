@@ -234,7 +234,7 @@ Disk stats (read/write):
 
 We observe a read band-width of 21.0MiB/s which seems to match our observations.
 
-* TODO Compactness of on-disk representation
+* Compactness of on-disk representation
 
 Having a compact on-disk representation is not only good for disk usage but can also improve overall performance as data can be loaded into memory closer to the processor faster if it is smaller.
 
@@ -248,7 +248,9 @@ We analyze the compactness of the on-disk representation of ~irmin-pack~ by comp
 | Single suffix from level 3081990 |   3633868800 |   940228651 |         3.8648778 |
 #+TBLFM: $4=($2/$3)
 
-** TODO Why is there such a difference between store of level 2981990 and 3081990
+There seems to be room to improve the compactness of the on-disk representation.
+
+We can not explain the difference in compression rates between the stores of level 2981990 and 3081990.
 
 * Context structure and access patterns
 ** TODO Content Size distribution
@@ -441,16 +443,9 @@ Note however, that the we simulate ~N~ independent threads. In ~irmin-pack~, and
 
 * Modern hardware and asynchronous APIs
 
-Modern PCIe-attached solid-state drives (SSDs) offer high throughput and
-large capacity at low cost. They are exposed to the system using the same block-based APIs as traditional disks or SSDs attached via serial buses. However, in order to utilize the full performance of such modern hardware, the way I/O operations are performed requires rethinking.
+Modern PCIe-attached solid-state drives (SSDs) offer high throughput and large capacity at low cost. They are exposed to the system using the same block-based APIs as traditional disks or SSDs attached via serial buses. However, in order to utilize the full performance of modern hardware, the way I/O operations are performed needs to be changed.
 
-We do some explorations on how performance could be improved using modern hardware and APIs using the [[https://fio.readthedocs.io/en/latest/fio_doc.html][fio]] tool.
-
-** Asynchronous I/O
-
-In order to illustrate the capabilities of modern hardware we run ~fio~ using the Linux [[https://en.wikipedia.org/wiki/Io_uring][io_uring]] API. This allows asynchronous I/O operations.
-
-We also increase size of the blocks read from a few bytes to 64KiB. This increases latency for individual reads, but allows much higher bandwidth.
+In order to illustrate the capabilities of modern hardware we run ~fio~ using the Linux [[https://en.wikipedia.org/wiki/Io_uring][io_uring]] API. This allows asynchronous I/O operations. We also increase size of the blocks read from a few bytes to 64KiB. This increases latency for individual reads, but allows much higher bandwidth.
 
 #+begin_src ini :tangle read-io_uring.ini
 [global]
@@ -513,7 +508,9 @@ Disk stats (read/write):
   nvme0n1: ios=349972/87, merge=0/8, ticks=542294/6, in_queue=542303, util=97.77%
 #+end_src
 
-We observe a read bandwidth of about 9GiB/s which illustrates the capabilities of modern hardware.
+We observe a read bandwidth of about 8955MiB/s this is an improvement of more than 40000% compared to the baseline. Note that this is pure I/O read bandwidth without any data management.
+
+On-going research is investigating how the performance of such hardware can be used in database systems (see [[https://db.in.tum.de/~leis/papers/leanstore.pdf][LeanStore: In-Memory Data Management Beyond Main Memory]]). We note that the main ingredients for doing this in the OCaml ecosystem are present or are being actively worked on: OCaml 5 with Multicore support and Algebraic Effects as well as the [[https://github.com/ocaml-multicore/eio][eio]] library. The question seems to be: [[https://db.in.tum.de/~fent/papers/coroutines.pdf][What Are You Waiting For? Use Coroutines for Asynchronous I/O to Hide I/O Latencies and Maximize the Read Bandwidth!]]
 
 * TODO Conclusion
 
