@@ -235,6 +235,9 @@ Disk stats (read/write):
 We observe a read band-width of 21.0MiB/s which seems to match our observations.
 
 * Compactness of on-disk representation
+:PROPERTIES:
+:CUSTOM_ID: compactness
+:END:
 
 Having a compact on-disk representation is not only good for disk usage but can also improve overall performance as data can be loaded into memory closer to the processor faster if it is smaller.
 
@@ -297,6 +300,9 @@ We can not explain the difference in compression rates between the stores of lev
 
 ** TODO Access Patterns
 * CPU boundness
+:PROPERTIES:
+:CUSTOM_ID: cpu-boundness
+:END:
 
 We run a replay of 100000 Tezos blocks with three different CPU frequencies:
 
@@ -313,6 +319,9 @@ We run a replay of 100000 Tezos blocks with three different CPU frequencies:
 This seems to indicate that ~irmin-pack~ is CPU-bound. Improving CPU efficiency should directly improve overall performance.
 
 ** Disable OS page cache
+:PROPERTIES:
+:CUSTOM_ID: disable-os-page-cache
+:END:
 
 Operating systems implement their own cache mechanism for disk access. This [[https://db.in.tum.de/~leis/papers/leanstore.pdf][can cause additional CPU cycles]] which are unnecessary as ~irmin-pack.unix~ implements it's own cache.
 
@@ -379,6 +388,9 @@ Disk stats (read/write):
 We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable performance improvement (around 30%) that can be implemented fairly easily.
 
 * Multicore
+:PROPERTIES:
+:CUSTOM_ID: multicore
+:END:
 
 In order to simulate the potential performance improvement of using multiple cores we use a ~fio~ job similar to the baseline but instead use ~N~ cores that in total read the same amount of bytes:
 
@@ -442,6 +454,9 @@ Increasing the number of threads/CPU cores utilized seems to lead to considerabl
 Note however, that the we simulate ~N~ independent threads. In ~irmin-pack~, and Irmin in general, reads may need to be sequential as they descend a tree by de-referencing nodes individually.
 
 * Modern hardware and asynchronous APIs
+  :PROPERTIES:
+  :CUSTOM_ID: async-io
+  :END:
 
 Modern PCIe-attached solid-state drives (SSDs) offer high throughput and large capacity at low cost. They are exposed to the system using the same block-based APIs as traditional disks or SSDs attached via serial buses. However, in order to utilize the full performance of modern hardware, the way I/O operations are performed needs to be changed.
 
@@ -516,13 +531,13 @@ On-going research is investigating how the performance of such hardware can be u
 
 Based on the audits performed we can propose following improvements and changes to the Octez storage backend:
 
-| Description                                                     | Estimated improvement | Effort    |
-|-----------------------------------------------------------------+-----------------------+-----------|
-| [[*Disable OS page cache]]                                          | 30%                   | Low       |
-| Use multiple read threads (see [[*Multicore]])                      | 700%                  | High      |
-| General CPU efficiency improvements (see [[*CPU boundness]]         | unknown               | Medium    |
-| More compact on-disk representation                             | unknown               | High      |
-| TODO Inline small objects                                       | unknown               | High      |
-| TODO Optimize Tezos usage patterns                              | unknown               | High      |
-| Asynchrounous I/O with larger block size (see [[Asynchronous I/O]]) | 30000%                | Very high |
+| Description                         | Potential improvement [fn:: On raw I/O bandwidth] | Effort    |
+|-------------------------------------+---------------------------------------------------+-----------|
+| [[#disable-os-page-cache][Disable OS page cache]]               | 30%                                               | Low       |
+| [[#multicore][Multicore]]                           | 700%                                              | High      |
+| [[#cpu-boundness][General CPU efficiency improvments]]  | unknown                                           | Medium    |
+| [[#compactness][More compact on-disk representation]] | unknown                                           | High      |
+| TODO Inline small objects           | unknown                                           | High      |
+| TODO Optimize Tezos usage patterns  | unknown                                           | High      |
+| [[#async-io][Asynchronous I/O]]                    | 40000%                                            | Very high |
 
