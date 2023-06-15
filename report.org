@@ -257,32 +257,30 @@ There seems to be room to improve the compactness of the on-disk representation.
 We can not explain the difference in compression rates between the stores of level 2981990 and 3081990.
 
 ** Context structure and access patterns
-*** TODO Content Size distribution
-
-- This might be a motivation for inlining small objects (see https://github.com/mirage/irmin/issues/884)
+*** Content Size distribution
 
 #+tblname: context-content-size
-| Exponent (base 2) |    Count |
-|-------------------+----------|
-|                 0 |   596661 |
-|                 1 | 23722650 |
-|                 2 | 38698770 |
-|                 3 |  1125580 |
-|                 4 |  3131048 |
-|                 5 |  4194650 |
-|                 6 |  7477058 |
-|                 7 |   532486 |
-|                 8 |   194262 |
-|                 9 |    35410 |
-|                10 |    35600 |
-|                11 |    71535 |
-|                12 |     4289 |
-|                13 |     2583 |
-|                14 |      260 |
-|                15 |        9 |
-|                16 |        1 |
-|                17 |        3 |
-|                18 |        7 |
+| Content Size (logarithmic with base 2) |    Count |
+|----------------------------------------+----------|
+|                                      0 |   596661 |
+|                                      1 | 23722650 |
+|                                      2 | 38698770 |
+|                                      3 |  1125580 |
+|                                      4 |  3131048 |
+|                                      5 |  4194650 |
+|                                      6 |  7477058 |
+|                                      7 |   532486 |
+|                                      8 |   194262 |
+|                                      9 |    35410 |
+|                                     10 |    35600 |
+|                                     11 |    71535 |
+|                                     12 |     4289 |
+|                                     13 |     2583 |
+|                                     14 |      260 |
+|                                     15 |        9 |
+|                                     16 |        1 |
+|                                     17 |        3 |
+|                                     18 |        7 |
 
 #+begin_src gnuplot :var data=context-content-size :exports results :file context-content-size.png
   reset
@@ -298,6 +296,8 @@ We can not explain the difference in compression rates between the stores of lev
 
 #+RESULTS:
 [[file:context-content-size.png]]
+
+We observe that the size of content in the Tezos store is very small.
 
 *** TODO Access Patterns
 ** CPU boundness
