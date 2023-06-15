@@ -154,7 +154,8 @@ We conclude that the ~Dict~ is underused. This observation has [[https://github.
 
 We can not recommend any concrete measures for optimizing overall performance with improvements to the ~Dict~.
 
-* IO Activity
+* Audits
+** IO Activity
 
 In order to measure real disk IO accesses we add some [[https://github.com/mirage/irmin/pull/2250][instrumentation to irmin-pack]] that allows us to measure how many bytes are read/written to individual files in how many system calls. In addition we also trace calls to IO reads and writes using the [[https://github.com/LexiFi/landmarks][landmarks]] library.
 
@@ -173,7 +174,7 @@ We observe:
 
 As read performance dominates the overall performance we concentrate on it in the following.
 
-** Baseline ~fio~ job
+*** Baseline ~fio~ job
 
 Based on the observations we can create a baseline ~fio~ job description that simulates the read access pattern of ~irmin-pack~:
 
@@ -234,7 +235,7 @@ Disk stats (read/write):
 
 We observe a read band-width of 21.0MiB/s which seems to match our observations.
 
-* Compactness of on-disk representation
+** Compactness of on-disk representation
 :PROPERTIES:
 :CUSTOM_ID: compactness
 :END:
@@ -255,8 +256,8 @@ There seems to be room to improve the compactness of the on-disk representation.
 
 We can not explain the difference in compression rates between the stores of level 2981990 and 3081990.
 
-* Context structure and access patterns
-** TODO Content Size distribution
+** Context structure and access patterns
+*** TODO Content Size distribution
 
 - This might be a motivation for inlining small objects (see https://github.com/mirage/irmin/issues/884)
 
@@ -298,8 +299,8 @@ We can not explain the difference in compression rates between the stores of lev
 #+RESULTS:
 [[file:context-content-size.png]]
 
-** TODO Access Patterns
-* CPU boundness
+*** TODO Access Patterns
+** CPU boundness
 :PROPERTIES:
 :CUSTOM_ID: cpu-boundness
 :END:
@@ -318,9 +319,11 @@ We run a replay of 100000 Tezos blocks with three different CPU frequencies:
 
 This seems to indicate that ~irmin-pack~ is CPU-bound. Improving CPU efficiency should directly improve overall performance.
 
+* Potential Improvements
 ** Disable OS page cache
 :PROPERTIES:
 :CUSTOM_ID: disable-os-page-cache
+:Effort:   Low
 :END:
 
 Operating systems implement their own cache mechanism for disk access. This [[https://db.in.tum.de/~leis/papers/leanstore.pdf][can cause additional CPU cycles]] which are unnecessary as ~irmin-pack.unix~ implements it's own cache.
@@ -387,7 +390,27 @@ Disk stats (read/write):
 
 We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable performance improvement (around 30%) that can be implemented fairly easily.
 
-* Multicore
+** TODO Inline small objects
+:PROPERTIES:
+:CUSTOM_ID: inline
+:END:
+
+https://github.com/mirage/irmin/issues/884
+
+** TODO Optimize tree descent
+*** TODO Flatten Path
+
+- Use Irmin as a key-value store
+
+*** TODO Path Cache
+
+Maintain a cache from ~path -> node~
+
+** TODO Optimize Tezos Storage Functors
+:PROPERTIES:
+:CUSTOM_ID: tezos-storage-functors
+:END:
+** Multicore
 :PROPERTIES:
 :CUSTOM_ID: multicore
 :END:
@@ -453,7 +476,7 @@ Increasing the number of threads/CPU cores utilized seems to lead to considerabl
 
 Note however, that the we simulate ~N~ independent threads. In ~irmin-pack~, and Irmin in general, reads may need to be sequential as they descend a tree by de-referencing nodes individually.
 
-* Modern hardware and asynchronous APIs
+** Modern hardware and asynchronous APIs
   :PROPERTIES:
   :CUSTOM_ID: async-io
   :END:
@@ -537,7 +560,7 @@ Based on the audits performed we can propose following improvements and changes 
 | [[#multicore][Multicore]]                           | 700%                                              | High      |
 | [[#cpu-boundness][General CPU efficiency improvments]]  | unknown                                           | Medium    |
 | [[#compactness][More compact on-disk representation]] | unknown                                           | High      |
-| TODO Inline small objects           | unknown                                           | High      |
-| TODO Optimize Tezos usage patterns  | unknown                                           | High      |
+| [[#inline][Inline small objects]]                | unknown                                           | High      |
+| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | unknown                                           | High      |
 | [[#async-io][Asynchronous I/O]]                    | 40000%                                            | Very high |
 
