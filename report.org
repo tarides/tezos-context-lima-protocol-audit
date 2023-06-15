@@ -290,7 +290,7 @@ We can not explain the difference in compression rates between the stores of lev
   set title "Context Content Size"
   set style data histogram
 
-  set xlabel "Logarithm of size (base 2)"
+  set xlabel "Content Size (logarithmic with base 2)"
   set ylabel "Count"
 
   plot data using 2:xticlabels(1) notitle
