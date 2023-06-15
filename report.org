@@ -1,4 +1,5 @@
 #+title: Tezos Context Lima Performance Audit
+#+date: June 2023
 #+author: Irmin Team
 #+STARTUP: inlineimages
 
@@ -22,7 +23,7 @@ Conceptually ~irmin-pack~ stores content-addressed objects to an append-only fil
 
 If not noted all tests were run on StarLabs Starbook Mk VI with a AMD Ryzen 7 5800U and a PCIe-3 connected 960GiB SSD.
 
-For replays a recording of 100_000 blocks starting at block level 2_981_990 was used.
+For replays a recording of 100000 blocks starting at block level 2981990 was used.
 
 We use the [[https://fio.readthedocs.io/][fio]] tool to simulate disk access patterns and measure performance. A baseline, based on observed access patterns of ~irmin-pack~ is provided in section [[*Baseline ~fio~ job]]
 
@@ -35,11 +36,11 @@ Since Irmin version 3.0.0 objects in the pack file hold direct references to oth
 
 The index datastructure is split into two major parts: the log and the data. The log is a small and bounded structure that holds recently-added bindings. The log is kept in memory after initialization. The data part holds older bindings. When a certain number of bindings are added to the log, the bindings are merged with the bindings in the data part. The datastructure is similar to a two-level [[https://en.wikipedia.org/wiki/Log-structured_merge-tree][Log-structured merge-tree]].
 
-The default number of bindings to keep in the log before moving them to the data part [[https://gitlab.com/tezos/tezos/-/blob/master/src/lib_context/helpers/env.ml#L41-45][in Octez]] and [[https://github.com/mirage/irmin/blob/main/src/irmin-pack/conf.mli#L93-L94][in ~irmin-pack~]] is set to 2_500_000.
+The default number of bindings to keep in the log before moving them to the data part [[https://gitlab.com/tezos/tezos/-/blob/master/src/lib_context/helpers/env.ml#L41-45][in Octez]] and [[https://github.com/mirage/irmin/blob/main/src/irmin-pack/conf.mli#L93-L94][in ~irmin-pack~]] is set to 2500000.
 
 *** Rolling and full node
 
-We observe that rolling and full nodes [[https://tezos.gitlab.io/user/history_modes.html#history-mode-additional-cycles][keep a default of 6 cycles]] which corresponds to about 98_304 blocks ([[https://tezos.gitlab.io/active/proof_of_stake.html#ps-constants][16_834 blocks per cycle]]) or, in Irmin terminology, to about 98_304 commits. Rolling and full nodes will by default never create a data part and every index lookup performed is an in-memory operation.
+We observe that rolling and full nodes [[https://tezos.gitlab.io/user/history_modes.html#history-mode-additional-cycles][keep a default of 6 cycles]] which corresponds to about 98304 blocks ([[https://tezos.gitlab.io/active/proof_of_stake.html#ps-constants][16_834 blocks per cycle]]) or, in Irmin terminology, to about 98304 commits. Rolling and full nodes will by default never create a data part and every index lookup performed is an in-memory operation.
 
 A quick check confirms this:
 
@@ -50,11 +51,11 @@ A quick check confirms this:
 #+RESULTS:
 : Number of bindings in Index: 100005
 
-Note that the number of bindings in the index is slightly higher than 98_304 as the store also contains orphaned commits.
+Note that the number of bindings in the index is slightly higher than 98304 as the store also contains orphaned commits.
 
 *** Archive node
 
-Tezos archive nodes hold the full history since genesis. When using minimal indexing references to at most 2_500_000 commits/blocks are kept in the log of the index. In July 2022 the Tezos block chain reached that block height. So since at least July 2022 the index of archive nodes will also have a ~data~ part.
+Tezos archive nodes hold the full history since genesis. When using minimal indexing references to at most 2500000 commits/blocks are kept in the log of the index. In July 2022 the Tezos block chain reached that block height. So since at least July 2022 the index of archive nodes will also have a ~data~ part.
 
 Archive nodes that were bootstrapped before the new minimal indexing strategy was adopted have many more entries in the index:
 
@@ -70,23 +71,22 @@ Archive nodes bootstrapped before the new minimal indexing strategy was adopted 
 
 *** Find Performance
 
-We measure the performance of index lookups by creating an empty index structure with same parameters as used in Tezos Octez (key size of 30 bytes, value size of 13 bytes and log size of 2_500_000), adding ~c~ random bindings and performing ~c~ lookups for random bindings. We use the [[https://github.com/LexiFi/landmarks][LexiFi/landmarks]] library to measure performance in CPU cycles (as well as system time).
+We measure the performance of index lookups by creating an empty index structure with same parameters as used in Tezos Octez (key size of 30 bytes, value size of 13 bytes and log size of 2500000), adding ~c~ random bindings and performing ~c~ lookups for random bindings. We use the [[https://github.com/LexiFi/landmarks][LexiFi/landmarks]] library to measure performance in CPU cycles (as well as system time).
 
 #+tblname: find-performance
-| ^ |   count |           cpu_time |  sys_time | cpu_time per entry |
-|---+---------+--------------------+-----------+--------------------|
-| # |  250000 |  2132773826.000000 |  1.126439 |          8531.0953 |
-| # |  500000 |  4009158441.000000 |  2.119049 |          8018.3169 |
-| # | 1000000 |  8235106179.000000 |  4.351689 |          8235.1062 |
-| # | 2000000 | 16838605030.000000 |  8.893822 |          8419.3025 |
-| # | 2499999 | 20421445765.000000 | 10.791509 |          8168.5816 |
-| # | 2500001 | 23511451504.000000 | 12.446721 |          9404.5768 |
-| # | 3000000 | 31077192851.000000 | 16.442429 |          10359.064 |
-| # | 4000000 | 39358430251.000000 | 20.823590 |          9839.6076 |
-| # | 5000000 | 48122118368.000000 | 25.448949 |          9624.4237 |
-| # | 6000000 | 60941841080.000000 | 32.247097 |          10156.974 |
-| # | 7000000 | 72898690458.000000 | 38.564382 |          10414.099 |
-#+TBLFM: $5=$3/$2
+|   count |           cpu time |  sys time | cpu time per entry |
+|---------+--------------------+-----------+--------------------|
+|  250000 |  2132773826.000000 |  1.126439 |          8531.0953 |
+|  500000 |  4009158441.000000 |  2.119049 |          8018.3169 |
+| 1000000 |  8235106179.000000 |  4.351689 |          8235.1062 |
+| 2000000 | 16838605030.000000 |  8.893822 |          8419.3025 |
+| 2499999 | 20421445765.000000 | 10.791509 |          8168.5816 |
+| 2500001 | 23511451504.000000 | 12.446721 |          9404.5768 |
+| 3000000 | 31077192851.000000 | 16.442429 |          10359.064 |
+| 4000000 | 39358430251.000000 | 20.823590 |          9839.6076 |
+| 5000000 | 48122118368.000000 | 25.448949 |          9624.4237 |
+| 6000000 | 60941841080.000000 | 32.247097 |          10156.974 |
+| 7000000 | 72898690458.000000 | 38.564382 |          10414.099 |
 
 #+begin_src gnuplot :var data=find-performance :exports results :file find-performance.png
   reset
@@ -106,11 +106,11 @@ We measure the performance of index lookups by creating an empty index structure
 #+RESULTS:
 [[file:find-performance.png]]
 
-We note a sharp increase in CPU cycles needed to lookup an entry when the number of bindings jumps over the log size (2_500_000). The lookup performance stays relatively constant at a higher level for up to 7_000_000 entries.
+We note a sharp increase in CPU cycles needed to lookup an entry when the number of bindings jumps over the log size (2500000). The lookup performance stays relatively constant at a higher level for up to 7000000 entries.
 
 *** Conclusion
 
-With the currently implemented minimal indexing scheme no performance issues are expected when using the default Tezos Octez configurations. For nodes running in history modes "rolling" and "full" the index is an in-memory structure. For archive nodes, no considerable performance degradation is expected up to at least block level 7_000_000.
+With the currently implemented minimal indexing scheme no performance issues are expected when using the default Tezos Octez configurations. For nodes running in history modes "rolling" and "full" the index is an in-memory structure. For archive nodes, no considerable performance degradation is expected up to at least block level 7000000.
 
 Archive nodes that were bootstrapped using non-minimal indexing have a very large index structure. For better disk-usage it is recommended to re-bootstrap these nodes using minimal indexing.
 
@@ -120,11 +120,11 @@ Irmin stores values in a tree where paths are sequences of strings. In order to 
 
 The ~Dict~ maintains a mapping from path segments (strings) to integer identifiers. In the Irmin tree the integer identifiers can be used instead of the string path segment. As integer identifiers are in general smaller than the string path segments this results in a more compact on-disk representation.
 
-In ~irmin-pack~ the ~Dict~ is limited to 100_000 entries that were added on a first-come-first-serve basis. The ~Dict~ is currently full.
+In ~irmin-pack~ the ~Dict~ is limited to 100000 entries that were added on a first-come-first-serve basis. The ~Dict~ is currently full.
 
 *** Occurrences of Dict elements in store
 
-We count the number of occurrences of path segments that appear in the ~Dict~ in the store of the Tezos block 3_081_990.
+We count the number of occurrences of path segments that appear in the ~Dict~ in the store of the Tezos block 3081990.
 
 It seems like the some common path segments are de-duplicated a considerable amount of times:
 
@@ -144,7 +144,7 @@ It seems like the some common path segments are de-duplicated a considerable amo
 | 4001852857ca1c5dad1c1275f766fc5208e63c48ba0289127591ffef3c440d53 |                  388 |
 | 27e1640238d07d569852b3e4fe784f5adce0e6649673ea587aa7389d72b855af |                  381 |
 
-However we also note that most entries in the ~Dict~ do not occur in the store. We count 96_394 ~Dict~ entries that do not occur in the store.
+However we also note that most entries in the ~Dict~ do not occur in the store. We count 96394 ~Dict~ entries that do not occur in the store.
 
 Furthermore, we observe that most entries in the ~Dict~ are hashes. Commonly used short keywords like ~total_bytes~, ~missed_endorsement~ or ~index~ are not ~Dict~ entries.
 
@@ -160,7 +160,7 @@ In order to measure real disk IO accesses we add some [[https://github.com/mirag
 
 |                                         |              Read |             Write |
 |-----------------------------------------+-------------------+-------------------|
-| Bytes in 100_000 blocks                 | 59141777410 (56%) | 46354750320 (44%) |
+| Bytes in 100000 blocks                  | 59141777410 (56%) | 46354750320 (44%) |
 | Bytes per block (mean)                  |        591394.118 |        463528.962 |
 | Number of system calls per block (mean) |          9645.864 |             4.061 |
 | Bytes per system call (mean)            |         61.310642 |         114141.58 |
@@ -240,15 +240,15 @@ Having a compact on-disk representation is not only good for disk usage but can 
 
 We analyze the compactness of the on-disk representation of ~irmin-pack~ by compressing with the Zstandard compression algorithm. Compact representation have a low compression ratio, whereas less compact representations may admit a more compact representation (for example by compressing with Zstandard).
 
-| Store                              | Uncompressed |  Compressed | Compression Ratio |
-|------------------------------------+--------------+-------------+-------------------|
-| Level 2_981_990                    |   5108531200 |  3265930512 |         1.5641886 |
-| Level 3_081_990                    |  32111902720 | 10332988078 |         3.1077073 |
-| Single suffix from level 2_981_990 |   5101987840 |  3261700639 |         1.5642109 |
-| Single suffix from level 3_081_990 |   3633868800 |   940228651 |         3.8648778 |
+| Store                            | Uncompressed |  Compressed | Compression Ratio |
+|----------------------------------+--------------+-------------+-------------------|
+| Level 2981990                    |   5108531200 |  3265930512 |         1.5641886 |
+| Level 3081990                    |  32111902720 | 10332988078 |         3.1077073 |
+| Single suffix from level 2981990 |   5101987840 |  3261700639 |         1.5642109 |
+| Single suffix from level 3081990 |   3633868800 |   940228651 |         3.8648778 |
 #+TBLFM: $4=($2/$3)
 
-** TODO Why is there such a difference between store of level 2_981_990 and 3_081_990
+** TODO Why is there such a difference between store of level 2981990 and 3081990
 
 * Context structure and access patterns
 ** TODO Content Size distribution
@@ -296,7 +296,7 @@ We analyze the compactness of the on-disk representation of ~irmin-pack~ by comp
 ** TODO Access Patterns
 * CPU boundness
 
-We run a replay of 100_000 Tezos blocks with three different CPU frequencies:
+We run a replay of 100000 Tezos blocks with three different CPU frequencies:
 
 - 3.40GHz: Run on an Equinix Metal `c3.small.x86` machine with an Intel® Xeon® E-2278G CPU with 8 cores running at 3.40 GHz.
 - 2.5GHz: Run on an Equinix Metal `m3.large.x86` machine with an AMD EPYC 7502P CPU with 32 cores running at 2.5 GHz.
