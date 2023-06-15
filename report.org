@@ -299,7 +299,37 @@ We can not explain the difference in compression rates between the stores of lev
 
 We observe that the size of content in the Tezos store is very small.
 
-*** TODO Access Patterns
+*** Access Patterns
+:PROPERTIES:
+:CUSTOM_ID: access-patterns
+:END:
+
+In order to understand what paths in the Tezos Context are accessed we analyze the 10000 blocks starting at block level 2981990 and record what paths are accessed by read operations such as ~Context.find_tree~, ~Context.mem~ or ~Context.find~:
+
+| Path                                    | Read operations |
+|-----------------------------------------+-----------------|
+| ~contarcts/global_counter~              |         2121152 |
+| ~big_maps/index/347453/total_bytes~     |          614589 |
+| ~big_maps/index/347455/total_bytes~     |          614589 |
+| ~big_maps/index/347456/total_bytes~     |          614589 |
+| ~big_maps/index/103258/total_bytes~     |           79037 |
+| ~big_maps/index/149768/total_bytes~     |           46549 |
+| ~endorsement_branch~                    |           40004 |
+| ~grand_parent_branch~                   |           40004 |
+| ~v1/constants~                          |           40004 |
+| ~v1/cycle_eras~                         |           40004 |
+| ~version~                               |           40004 |
+| ~big_maps/index/149787/total_bytes~     |           32835 |
+| ~big_maps/index/149771/total_bytes~     |           29009 |
+| ~big_maps/index/149772/total_bytes~     |           29009 |
+| ~first_level_of_protocol~               |           20002 |
+| ~votes/current_period~                  |           20000 |
+| ~big_maps/index/103260/total_bytes~     |           19991 |
+| ~cycle/558/random_seed~                 |           16183 |
+| ~cycle/558/selected_stake_distribution~ |           16183 |
+
+We observe that certain paths are hit very often. The nodes on the commonly accessed paths should be kept in the ~irmin-pack~ LRU cache and should not incur any disk I/O.
+
 ** CPU boundness
 :PROPERTIES:
 :CUSTOM_ID: cpu-boundness

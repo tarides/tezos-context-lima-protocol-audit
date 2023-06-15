@@ -1,4 +1,3 @@
 _build
 .*.swp
 *.install
-/audits/context_activity/context_activity.out

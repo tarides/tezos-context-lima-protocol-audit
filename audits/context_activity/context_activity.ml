@@ -120,7 +120,7 @@ let run (config : Replay.Config.t) =
   let activity : Activity.t = Activity.init () in
 
   let () =
-    blocks |> Seq.take 1000
+    blocks |> Seq.take 10000
     |> Seq.flat_map (fun (block : Replay.Block.t) -> Array.to_seq block.ops)
     |> Seq.filter_map classify_op
     |> Seq.iter (fun key -> Activity.increment_read_at activity key)
