@@ -442,9 +442,10 @@ Maintain a cache from ~path -> node~
 :CUSTOM_ID: tezos-storage-functors
 :END:
 ** Decrease system call overhead
-*** Batching Reads
 
-Read performance seems to be bad because of the small size of individual reads that incur a very high system call overhead.
+Read performance seems to be bad because of the large amount of small reads that are performed with individual system calls. The system call overhead seems to be significant and reducing it should increase performance.
+
+*** Batching Reads
 
 Performance could be improved by batching read operations into larger blocks. For example if we use 4KiB blocks:
 
@@ -505,7 +506,12 @@ Disk stats (read/write):
 
 We observe a read bandwidth of 34.1MiB/s (a 60% performance improvement to the baseline). However, it is not clear how reads could be batched without major re-organization of the on-disk representation.
 
-*** TODO Memory-mapped reads
+*** Memory-mapped reads
+
+Another strategy is to memory-map files for reads. This reduces the amount of system calls drastically as database files are accessible via regular memory access.
+
+However, there are well known issues with memory-mapping files (see [[https://cs.brown.edu/people/acrotty/pubs/p13-crotty.pdf][Are You Sure You Want to Use MMAP in Your Database Management System?]]) that need to be evaluated and weighed in light of potential performance improvements.
+
 ** Multicore
 :PROPERTIES:
 :CUSTOM_ID: multicore
