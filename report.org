@@ -327,6 +327,29 @@ In order to understand what paths in the Tezos Context are accessed we analyze t
 
 We observe that certain paths are hit very often. The nodes on the commonly accessed paths should be kept in the ~irmin-pack~ LRU cache and should not incur any disk I/O.
 
+We also analyze a single block (block level 2981990), breaking down into categories of  ~mem~, ~read~, and ~write~ operations. Here is the top 15, sorted by ~read~ and then ~mem~.
+
+| Path                                                   | ~mem~ | ~read~ | ~write~ |
+|--------------------------------------------------------+-------+--------+---------|
+| contracts/index/0001f46d...63a0/balance                |   444 |    888 |     444 |
+| contracts/index/01e12d94...da00/used_bytes             |   222 |    443 |     222 |
+| contracts/index/0001f46d...63a0/delegate               |     0 |    443 |       0 |
+| contracts/global_counter                               |   225 |    224 |     225 |
+| contracts/index/01e12d94...da00/len/storage            |   222 |    222 |     222 |
+| contracts/index/0001f46d...63a0/counter                |   222 |    222 |     222 |
+| contracts/index/01e12d94...da00/paid_bytes             |   222 |    221 |     222 |
+| contracts/index/01e12d94...da00/balance                |     0 |    221 |       0 |
+| big_maps/index/347456/total_bytes                      |   111 |    110 |     111 |
+| big_maps/index/347455/total_bytes                      |   111 |    110 |     111 |
+| big_maps/index/347453/total_bytes                      |   111 |    110 |     111 |
+| big_maps/index/149776/contents/af067ef3...5bad/data    |     6 |      6 |       1 |
+| contracts/index/00006027...b77a/balance                |     3 |      6 |       3 |
+| big_maps/index/149776/contents/af067ef3...5bad/len     |     0 |      6 |       1 |
+| contracts/index/0002358c...8636/delegate_desactivation |     0 |      5 |       2 |
+| ...                                                    |       |        |         |
+|--------------------------------------------------------+-------+--------+---------|
+| Total                                                  |  2363 |   3892 |    3180 |
+
 ** CPU boundness
 :PROPERTIES:
 :CUSTOM_ID: cpu-boundness
