@@ -25,7 +25,7 @@ If not noted all tests were run on StarLabs Starbook Mk VI with a AMD Ryzen 7 58
 
 For replays a recording of 100000 blocks starting at block level 2981990 was used.
 
-We use the [[https://fio.readthedocs.io/][fio]] tool to simulate disk access patterns and measure performance. A baseline, based on observed access patterns of ~irmin-pack~ is provided in section [[*Baseline ~fio~ job]]
+We use the [[https://fio.readthedocs.io/][fio]] tool to simulate disk access patterns and measure performance. A baseline, based on observed access patterns of ~irmin-pack~ is provided in the section [[#baseline-fio-job][Baseline ~fio~ job]].
 
 * Sub-components
 ** Index
@@ -169,6 +169,9 @@ We observe:
 As read performance dominates the overall performance we concentrate on it in the following.
 
 *** Baseline ~fio~ job
+:PROPERTIES:
+:CUSTOM_ID: baseline-fio-job
+:END:
 
 Based on the observations we can create a baseline ~fio~ job description that simulates the read access pattern of ~irmin-pack~:
 
@@ -331,9 +334,9 @@ We observe that certain paths are hit very often. The nodes on the commonly acce
 
 We run a replay of 100000 Tezos blocks with three different CPU frequencies:
 
-- 3.40GHz: Run on an Equinix Metal `c3.small.x86` machine with an Intel® Xeon® E-2278G CPU with 8 cores running at 3.40 GHz.
-- 2.5GHz: Run on an Equinix Metal `m3.large.x86` machine with an AMD EPYC 7502P CPU with 32 cores running at 2.5 GHz.
-- 1.5GHz: Run on an Equinix Metal `m3.large.x86` machine with an AMD EPYC 7502P CPU with 32 cores at 1.5 GHz. The CPU frequency was set using `cpupower frequency-set 1.5GHz`.
+- 3.40GHz: Run on an Equinix Metal ~c3.small.x86~ machine with an Intel® Xeon® E-2278G CPU with 8 cores running at 3.40 GHz.
+- 2.5GHz: Run on an Equinix Metal ~m3.large.x86~ machine with an AMD EPYC 7502P CPU with 32 cores running at 2.5 GHz.
+- 1.5GHz: Run on an Equinix Metal ~m3.large.x86~ machine with an AMD EPYC 7502P CPU with 32 cores at 1.5 GHz. The CPU frequency was set using ~cpupower frequency-set 1.5GHz~.
 
 | CPU Frequency           | 3.40GHz  | 2.5GHz        | 1.5GHz        |
 |-------------------------+----------+---------------+---------------|
