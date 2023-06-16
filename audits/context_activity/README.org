@@ -74,3 +74,36 @@ See [[./context_activity.out]] for full output.
 What are the significances of these paths? Would it make sense to have specialized indices for these hot paths?
 
 Seems like the way stuff is stored in the context is defined by ~storage_functors.ml~ in the ~tezos-protocol-015-PtLimaPt.environment~ library.
+
+* one_block.ml
+
+Measures ~mem~, ~read~, and ~write~ operations for one block. Output is comma-separated rows.
+
+Looking at the top 15, sorted by ~read~ and then ~mem~:
+
+#+begin_src shell
+path,mem,read,write
+contracts/index/0001f46da5a13d5cfbfd6e728226a3dbedfeceeb63a0/balance,444,888,444
+contracts/index/01e12d9416bade1607ab6579d80cf327ad991844da00/used_bytes,222,443,222
+contracts/index/0001f46da5a13d5cfbfd6e728226a3dbedfeceeb63a0/delegate,0,443,0
+contracts/global_counter,225,224,225
+contracts/index/01e12d9416bade1607ab6579d80cf327ad991844da00/len/storage,222,222,222
+contracts/index/0001f46da5a13d5cfbfd6e728226a3dbedfeceeb63a0/counter,222,222,222
+contracts/index/01e12d9416bade1607ab6579d80cf327ad991844da00/paid_bytes,222,221,222
+contracts/index/01e12d9416bade1607ab6579d80cf327ad991844da00/balance,0,221,0
+big_maps/index/347456/total_bytes,111,110,111
+big_maps/index/347455/total_bytes,111,110,111
+big_maps/index/347453/total_bytes,111,110,111
+big_maps/index/149776/contents/af067ef3cde20cc28cdce4f31e90e5b0558f696d97bd5b155af67e9250765bad/data,6,6,1
+contracts/index/000060273df44edefc931973d4addbc0cae6f387b77a/balance,3,6,3
+big_maps/index/149776/contents/af067ef3cde20cc28cdce4f31e90e5b0558f696d97bd5b155af67e9250765bad/len,0,6,1
+contracts/index/0002358cbffa97149631cfb999fa47f0035fb1ea8636/delegate_desactivation,0,5,2
+#+end_src
+
+Totals for each category:
+
+#+begin_src shell
+totals: mem = 2363; read = 3892; write = 3180
+#+end_src
+
+See ./one_block.csv for full, unsorted output.
