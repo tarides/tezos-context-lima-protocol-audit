@@ -702,6 +702,6 @@ Based on the audits performed we can propose following improvements and changes 
 | [[#cpu-boundness][General CPU efficiency improvments]]  | -                                                 | High      |
 | [[#compactness][More compact on-disk representation]] | -                                                 | High      |
 | [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | -                                                 | High      |
-| [[#multicore][Multicore]]                           | 700%                                              | Very High |
-| [[#async-io][Asynchronous I/O]]                    | 40000%                                            | Very high |
+| [[#multicore][Multicore]]                           | 700%                                              | Very high |
+| [[#async-io][Asynchronous I/O]]                    | 40000%                                            | Epic      |
 
