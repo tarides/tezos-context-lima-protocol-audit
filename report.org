@@ -255,6 +255,9 @@ We can not explain the difference in compression rates between the stores of lev
 
 ** Context structure and access patterns
 *** Content Size distribution
+:PROPERTIES:
+:CUSTOM_ID: content-size-distribution
+:END:
 
 #+tblname: context-content-size
 | Content Size (logarithmic with base 2) |    Count |
@@ -441,12 +444,12 @@ Disk stats (read/write):
 
 We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable performance improvement (around 30%) that can be implemented fairly easily.
 
-** TODO Inline small objects
+** Inline small objects
 :PROPERTIES:
 :CUSTOM_ID: inline
 :END:
 
-https://github.com/mirage/irmin/issues/884
+We note that the size of most content in the Tezos Context Store is very small (see [[#content-size-distribution][Content Size distribution]]). These small pieces of content are stored in individual leaf nodes of the tree with their own hash, incurring a large overhead. An optimization would be to inline the small content into the parent node. Preliminary work towards this has already been done (see [[https://github.com/mirage/irmin/issues/884][mirage/irmin#884]]).
 
 ** TODO Optimize tree descent
 *** TODO Flatten Path
