@@ -451,14 +451,29 @@ We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable perfor
 
 We note that the size of most content in the Tezos Context Store is very small (see [[#content-size-distribution][Content Size distribution]]). These small pieces of content are stored in individual leaf nodes of the tree with their own hash, incurring a large overhead. An optimization would be to inline the small content into the parent node. Preliminary work towards this has already been done (see [[https://github.com/mirage/irmin/issues/884][mirage/irmin#884]]).
 
-** TODO Optimize tree descent
-*** TODO Flatten Path
+** Optimize tree descent
 
-- Use Irmin as a key-value store
+Access to content in Irmin requires descending a path. Every node on the path needs to be de-referenced, accessed from disk and unpacked individually. The cost for accessing a piece of content is a function of the path size. It might make sense to optimize the tree descent.
 
-*** TODO Path Cache
+*** Flatten Path
+:PROPERTIES:
+:CUSTOM_ID: flatten-path
+:END:
 
-Maintain a cache from ~path -> node~
+Currently Octez uses Irmin with keys that are a list of string (a path). A potential optimization would be to use Irmin with keys that are only strings, i.e. use Irmin as a key-value store instead of a tree-based object storage. This would be a considerable change in how Octez uses Irmin.
+
+The Irmin tree would be reduced to a single Node with many leaf node children. We would need to check if ~irmin-pack~ can support this. Related work includes the added support for large inodes ([[https://github.com/mirage/irmin/pull/807][mirage/irmin#807]]).
+
+*** Path Cache
+:PROPERTIES:
+:CUSTOM_ID: path-cache
+:END:
+
+We note that read accesses to the Tezos Context Store are focused on few paths (see [[#access-patterns][Access Patterns]]).
+
+The existing LRU cache in ~irmin-pack~ should prevent re-fetching these paths from the disk, increasing performance considerably. This is done by maintaining a mapping from position in pack file to tree object. When fetching a path, we need to sequentially iterate over the cache until we reach the object. This should be mostly in-memory operations as tree objects are cached. Still this incurs a lot of CPU cycles.
+
+A potential optimization would be use a cache that maintains a mapping from path to tree object. When fetching a path that is cached, only a single lookup would be required to get the final tree object.
 
 ** TODO Optimize Tezos Storage Functors
 :PROPERTIES:
@@ -682,10 +697,11 @@ Based on the audits performed we can propose following improvements and changes 
 | Description                         | Potential improvement [fn:: On raw I/O bandwidth] | Effort    |
 |-------------------------------------+---------------------------------------------------+-----------|
 | [[#disable-os-page-cache][Disable OS page cache]]               | 30%                                               | Low       |
-| [[#multicore][Multicore]]                           | 700%                                              | High      |
-| [[#cpu-boundness][General CPU efficiency improvments]]  | unknown                                           | Medium    |
-| [[#compactness][More compact on-disk representation]] | unknown                                           | High      |
-| [[#inline][Inline small objects]]                | unknown                                           | High      |
-| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | unknown                                           | High      |
+| [[#path-cache][Path Cache]]                          | -                                                 | Medium    |
+| [[#inline][Inline small objects]]                | -                                                 | High      |
+| [[#cpu-boundness][General CPU efficiency improvments]]  | -                                                 | High      |
+| [[#compactness][More compact on-disk representation]] | -                                                 | High      |
+| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | -                                                 | High      |
+| [[#multicore][Multicore]]                           | 700%                                              | Very High |
 | [[#async-io][Asynchronous I/O]]                    | 40000%                                            | Very high |
 
