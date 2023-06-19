@@ -690,18 +690,20 @@ We observe a read bandwidth of about 8955MiB/s this is an improvement of more th
 
 On-going research is investigating how the performance of such hardware can be used in database systems (see [[https://db.in.tum.de/~leis/papers/leanstore.pdf][LeanStore: In-Memory Data Management Beyond Main Memory]]). We note that the main ingredients for doing this in the OCaml ecosystem are present or are being actively worked on: OCaml 5 with Multicore support and Algebraic Effects as well as the [[https://github.com/ocaml-multicore/eio][eio]] library. The question seems to be: [[https://db.in.tum.de/~fent/papers/coroutines.pdf][What Are You Waiting For? Use Coroutines for Asynchronous I/O to Hide I/O Latencies and Maximize the Read Bandwidth!]]
 
-* TODO Conclusion
+* Conclusion
 
-Based on the audits performed we can propose following improvements and changes to the Octez storage backend:
+In this report we have identified storage performance bottlenecks of Irmin and ~irmin-pack~ as used by Octez and propose potential improvements.
 
-| Description                         | Potential improvement [fn:: On raw I/O bandwidth] | Effort    |
-|-------------------------------------+---------------------------------------------------+-----------|
-| [[#disable-os-page-cache][Disable OS page cache]]               | 30%                                               | Low       |
-| [[#path-cache][Path Cache]]                          | -                                                 | Medium    |
-| [[#inline][Inline small objects]]                | -                                                 | High      |
-| [[#cpu-boundness][General CPU efficiency improvments]]  | -                                                 | High      |
-| [[#compactness][More compact on-disk representation]] | -                                                 | High      |
-| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | -                                                 | High      |
-| [[#multicore][Multicore]]                           | 700%                                              | Very high |
-| [[#async-io][Asynchronous I/O]]                    | 40000%                                            | Epic      |
+A selection of proposed improvements is provided in the following table:
+
+| Description                         | Potential improvement [fn:: On raw I/O bandwidth] | Effort    | On-disk format   |
+|-------------------------------------+---------------------------------------------------+-----------+------------------|
+| [[#disable-os-page-cache][Disable OS page cache]]               | 30%                                               | Low       | No change        |
+| [[#path-cache][Path Cache]]                          | -                                                 | Medium    | No change        |
+| [[#inline][Inline small objects]]                | -                                                 | High      | Change           |
+| [[#cpu-boundness][General CPU efficiency improvments]]  | -                                                 | High      | Potential change |
+| [[#compactness][More compact on-disk representation]] | -                                                 | High      | Change           |
+| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | -                                                 | High      | No change        |
+| [[#multicore][Multicore]]                           | 700%                                              | Very high | No change        |
+| [[#async-io][Asynchronous I/O]]                    | 40000%                                            | Epic      | Change           |
 
