@@ -305,9 +305,13 @@ We observe that the size of content in the Tezos store is very small.
 :CUSTOM_ID: access-patterns
 :END:
 
-In order to understand what paths in the Tezos Context are accessed we analyze the 10000 blocks starting at block level 2981990 and record what paths are accessed by read operations such as ~Context.find_tree~, ~Context.mem~ or ~Context.find~:
+We perform some audits in order to understand what paths in the Tezos Context are accessed how frequently.
 
-| Path                                    | Read operations |
+**** Read Operations over 100000 blocks 
+
+We analyze the 10000 blocks starting at block level 2981990 and record what paths are accessed by read operations such as ~Context.find_tree~, ~Context.mem~ or ~Context.find~:
+
+| Path                                    | Read operations *
 |-----------------------------------------+-----------------|
 | ~contarcts/global_counter~              |         2121152 |
 | ~big_maps/index/347453/total_bytes~     |          614589 |
@@ -331,6 +335,8 @@ In order to understand what paths in the Tezos Context are accessed we analyze t
 
 We observe that certain paths are hit very often. The nodes on the commonly accessed paths should be kept in the ~irmin-pack~ LRU cache and should not incur any disk I/O.
 
+**** Operations in a signle block
+
 We also analyze a single block (block level 2981990), breaking down into categories of  ~mem~, ~read~, and ~write~ operations. Here is the top 15, sorted by ~read~ and then ~mem~.
 
 | Path                                                     | ~mem~ | ~read~ | ~write~ |
@@ -353,6 +359,8 @@ We also analyze a single block (block level 2981990), breaking down into categor
 | ...                                                      |       |        |         |
 |----------------------------------------------------------+-------+--------+---------|
 | Total                                                    |  2363 |   3892 |    3180 |
+
+We note a symmetry in number of ~mem~ and ~write~ operations to certain paths.
 
 ** CPU boundness
 :PROPERTIES:
