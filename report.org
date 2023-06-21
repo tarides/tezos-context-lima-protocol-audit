@@ -487,12 +487,16 @@ The existing LRU cache in ~irmin-pack~ should prevent re-fetching these paths fr
 
 A potential optimization would be use a cache that maintains a mapping from path to tree object. When fetching a path that is cached, only a single lookup would be required to get the final tree object.
 
-** TODO Optimize Tezos Storage Functors
+** Optimize Tezos Storage Functors
 :PROPERTIES:
 :CUSTOM_ID: tezos-storage-functors
 :END:
 
+Tezos usage of ~irmin-pack~ goes through the ~tezos_context~ library but also various storage functors implemented in the ~tezos-protocol-015-PtLimaPt.environment~. This is where commonly appearing keywords like ~index~ or ~total_bytes~  are defined.
 
+It may be possible that the way these storage functors use ~irmin-pack~ (indirectly via the ~tezos_context~ library) could be improved. In particular, it seems like many small files are created with long, nested paths. It may be more efficient to create larger files with shorter paths.
+
+The performance charateristics of ~irmin-pack~ (and Irmin) seems to be closer to a file-system than a key-value store, whereas the way it is used from Tezos seems to be more like a key-value store.
 
 ** Decrease system call overhead
 
