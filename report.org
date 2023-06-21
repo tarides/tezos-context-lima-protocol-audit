@@ -1,6 +1,6 @@
 #+title: Tezos Context Lima Performance Audit
-#+date: June 2023
-#+author: Irmin Team
+#+date: 2023-06-21
+#+author: Tarides Irmin Team
 #+STARTUP: inlineimages
 
 * Introduction
