@@ -1811,7 +1811,6 @@ dune exec ./measure_io_activity.exe | tee activity.csv
 Row count: 100004
 #+end_src
 
-
 ** Per file
 
 #+begin_src gnuplot :exports code :file activity.png
@@ -1919,6 +1918,25 @@ Some insights:
 
 - Most time is spend doing a `Context.find` operation.
 - `Tree.find_tree` is an expensive operation not too much time spent doing IO
+
+
+** Relative I/O time
+
+
+ROOT;                       src/landmark.ml;        0; 18554.44G; 9638.602
+Io.Util.really_read;          src/irmin-pack/unix/io.ml:38; 964610035; 2522.83G; 1259.393
+Io.Util.really_write;          src/irmin-pack/unix/io.ml:27;   406103;   92.15G;   48.436
+
+| I/OType   |     Time | Relative to I/O | Relative to root |
+|-----------+----------+-----------------+------------------|
+| Root      | 18554.44 |                 |               1. |
+| Read      |  2522.83 |      0.96476072 |       0.13596907 |
+| Write     |    92.15 |     0.035239275 |     4.9664662e-3 |
+|-----------+----------+-----------------+------------------|
+| TOTAL I/O |  2614.98 |      1.00000000 |                  |
+#+TBLFM: @5$2=@3+@4::@3$3=$2/@5$2::@4$3=$2/@5$2::@5$3=@3+@4::@2$4=@2$2/@2$2::@3$4=@3$2/@2$2::@4$4=@4$2/@2$2
+
+
 
 
 * blktrace

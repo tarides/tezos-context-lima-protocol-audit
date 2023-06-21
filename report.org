@@ -159,12 +159,13 @@ In order to measure real disk IO accesses we add some [[https://github.com/mirag
 | Bytes per block (mean)                  |        591394.118 |        463528.962 |
 | Number of system calls per block (mean) |          9645.864 |             4.061 |
 | Bytes per system call (mean)            |         61.310642 |         114141.58 |
-| I/O time                                |             96.5% |              3.5% |
+| Relative time                           |             13.6% |              0.4% |
+| Relative time in I/O                    |             96.5% |              3.5% |
 
 We observe:
 
 - Total I/O activity in bytes consists of about 56% reads and 44% writes. However, reads take 96.5% of the time [fn:: We measure this by tracing the ~Irmin_pack_unix.Io.Util.really_read~ and ~Irmin_pack_unix.Io.Util.really_write~ functions].
-- Reads are performed in many very small chunks (61 bytes per system call).
+- Reads are performed in many very small chunks (in mean 61 bytes per system call).
 
 As read performance dominates the overall performance we concentrate on it in the following.
 
@@ -479,6 +480,9 @@ A potential optimization would be use a cache that maintains a mapping from path
 :PROPERTIES:
 :CUSTOM_ID: tezos-storage-functors
 :END:
+
+
+
 ** Decrease system call overhead
 
 Read performance seems to be bad because of the large amount of small reads that are performed with individual system calls. The system call overhead seems to be significant and reducing it should increase performance.
