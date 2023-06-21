@@ -335,7 +335,10 @@ We analyze the 10000 blocks starting at block level 2981990 and record what path
 
 We observe that certain paths are hit very often. The nodes on the commonly accessed paths should be kept in the ~irmin-pack~ LRU cache and should not incur any disk I/O.
 
-**** Operations in a signle block
+**** Operations in a single block
+:PROPERTIES:
+:CUSTOM_ID: operations-in-single-block
+:END:
 
 We also analyze a single block (block level 2981990), breaking down into categories of  ~mem~, ~read~, and ~write~ operations. Here is the top 15, sorted by ~read~ and then ~mem~.
 
@@ -496,7 +499,9 @@ Tezos usage of ~irmin-pack~ goes through the ~tezos_context~ library but also va
 
 It may be possible that the way these storage functors use ~irmin-pack~ (indirectly via the ~tezos_context~ library) could be improved. In particular, it seems like many small files are created with long, nested paths. It may be more efficient to create larger files with shorter paths.
 
-The performance charateristics of ~irmin-pack~ (and Irmin) seems to be closer to a file-system than a key-value store, whereas the way it is used from Tezos seems to be more like a key-value store.
+The performance characteristics of ~irmin-pack~ (and Irmin) seems to be closer to a file-system than a key-value store, whereas the way it is used from Tezos seems to be more like a key-value store.
+
+It would also be interesting to investigate the observed symmetry between ~mem~ and ~write~ access as observed in section [[#operations-in-single-block][Operations in a single block]].
 
 ** Decrease system call overhead
 
