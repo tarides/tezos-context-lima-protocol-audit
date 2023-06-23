@@ -113,7 +113,7 @@ Archive nodes that were bootstrapped using non-minimal indexing have a very larg
 
 ** Dict
 
-Irmin stores values in a tree where paths are sequences of strings. In order to de-duplicate commonly occuring path segments, some path segments are stored in an auxilary persistent structure called the ~Dict~.
+Irmin stores values in a tree where paths are sequences of strings. In order to de-duplicate commonly occurring path segments, some path segments are stored in an auxiliary persistent structure called the ~Dict~.
 
 The ~Dict~ maintains a mapping from path segments (strings) to integer identifiers. In the Irmin tree the integer identifiers can be used instead of the string path segment. As integer identifiers are in general smaller than the string path segments this results in a more compact on-disk representation.
 
@@ -141,15 +141,36 @@ It seems like the some common path segments are de-duplicated a considerable amo
 | 4001852857ca1c5dad1c1275f766fc5208e63c48ba0289127591ffef3c440d53 |                  388 |
 | 27e1640238d07d569852b3e4fe784f5adce0e6649673ea587aa7389d72b855af |                  381 |
 
-However we also note that most entries in the ~Dict~ do not occur in the store. We count 96394 ~Dict~ entries that do not occur in the store.
+However we also note that most entries in the ~Dict~ do not occur in the store. We count 96394 ~Dict~ entries that do not occur in the store (96%).
 
 Furthermore, we observe that most entries in the ~Dict~ are hashes. Commonly used short keywords like ~total_bytes~, ~missed_endorsement~ or ~index~ are not ~Dict~ entries.
 
-*** Conclussion
+*** TODO Increasing ~Dict~ capacity
 
-We conclude that the ~Dict~ is underused. This observation has [[https://github.com/mirage/irmin/issues/1807][been previously made]]. A more efficient use of the ~Dict~ could lead to a considerably more compact on-disk representation and potential performance improvements. Note that existing ~Dict~ entries can not be removed and it might be tricky to get a performant ~Dict~ that is considerably larger. Furthermore, potential performance improvements seem hard to quanitfy.
+**** TODO Capacity of 500000 entries
 
-We can not recommend any concrete measures for optimizing overall performance with improvements to the ~Dict~.
+**** Infinite capacity
+
+In order to evaluate potential performance improvement we remove limitations on the number of entries that the ~Dict~ can hold (see [[https://github.com/metanivek/irmin/commit/92d910b72b5f7140560c02d0d8d28728f95c39a0][metanivek/irmin-92d910b]]). Path segments are always added to the dictionary before writing.
+
+We run a replay benchmark:
+
+ |                           | baseline (3.7.1) | infinite-dict  |
+ |---------------------------+------------------+----------------|
+ | CPU time elapsed          | 104m07s          | 130m36s (125%) |
+ | total bytes read          | 66.466 G         | 60.747 G (91%) |
+ | total bytes written       | 46.360 G         | 37.903 G  82%  |
+ | max memory usage in bytes | 0.394 G          | 2.534 G 643%   |
+
+We note that total number of bytes read and written decreases, memory usage increases drasticly and performance is decreased. Performance decrease could be due to the in-memory Dict (a ~Hashtbl~) being taken to it's limits.
+
+*** TODO Conclusion
+
+We conclude that the ~Dict~ is underused. This observation has been previously made (see [[https://github.com/mirage/irmin/issues/1807][mirage/irmin#1807]]). An increased usage of the ~Dict~ could lead to a considerably more compact on-disk representation and potential performance improvements.
+
+Note that existing ~Dict~ entries can not be removed and it is not clear how to improve usage of the ~Dict~ without rewriting existing data.
+
+One suggestion would be to make the ~Dict~ local to individual chunks. Since version 3.5.0 ~irmin-pack~ supports splitting on-disk data into multiple smaller chunks (see [[https://github.com/mirage/irmin/pull/2115][mirage/irmin#2115]]). Instead of having one single global ~Dict~ we could implement a ~Dict~ per chunk. This might allow the chunk-local ~Dict~s to perform much better as they hold entries to data that has been accessed recently. This design seems to also fit well with how the garbage collector works.
 
 * Audits
 ** IO Activity
