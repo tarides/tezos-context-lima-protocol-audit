@@ -51,7 +51,7 @@ Archive nodes that were bootstrapped before the new minimal indexing strategy wa
 #+RESULTS:
 : Number of bindings in Index: 2036584177
 
-Archive nodes bootstrapped before the new minimal indexing strategy was adopted use around 90GiB of space just for the index structure.
+Archive nodes bootstrapped before the new minimal indexing strategy was adopted use around 90GiB of space just for the index structure. With the new minimal indexing the size of a freshly bootstrapped archive node is about 2.4MiB.
 
 *** Rolling and full node
 
