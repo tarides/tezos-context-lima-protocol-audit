@@ -21,7 +21,7 @@ Conceptually ~irmin-pack~ stores content-addressed objects to an append-only fil
 
 ** Methodology
 
-If not noted all tests were run on StarLabs Starbook Mk VI with a AMD Ryzen 7 5800U and a PCIe-3 connected 960GiB SSD.
+If not noted all tests were run on StarLabs Starbook Mk VI with a AMD Ryzen 7 5800U and a PCIe-3 connected 960GiB SSD running Debain Linux 11 and the Linux Kernel version 6.1.0.
 
 For replays a recording of 100000 blocks starting at block level 2981990 was used.
 
