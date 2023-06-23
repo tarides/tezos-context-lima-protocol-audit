@@ -170,6 +170,8 @@ Note that existing ~Dict~ entries can not be removed and it is not clear how to 
 
 One suggestion would be to make the ~Dict~ local to individual chunks. Since version 3.5.0 ~irmin-pack~ supports splitting on-disk data into multiple smaller chunks (see [[https://github.com/mirage/irmin/pull/2115][mirage/irmin#2115]]). Instead of having one single global ~Dict~ we could implement a ~Dict~ per chunk. This might allow the chunk-local ~Dict~s to perform much better as they hold entries to data that has been accessed recently. This design seems to also fit well with how the garbage collector works.
 
+It might also be worth to reconsider the first-come-first-serve strategy. An improvement might be to only add a ~Dict~ entry for path segments that appear at least ~n~ times. This would prevent the addition of ~Dict~ entries for single-shot accessed path-segments.
+
 * Audits
 ** IO Activity
 
