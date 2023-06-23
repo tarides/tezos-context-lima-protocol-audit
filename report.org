@@ -90,6 +90,9 @@ We measure the performance of index lookups by creating an empty index structure
 
   set arrow from 2500000, graph 0 to 2500000, graph 1 nohead lc 2 title "log size"
 
+  set arrow from 0,8274 to 2500000,8274 nohead lc 3
+  set arrow from 2500000,9966 to 7000000,9966 nohead lc 4
+
   set ylabel "CPU cycles"
 
   plot data u 1:4 with point lw 2 title 'CPU cycles per entry'
