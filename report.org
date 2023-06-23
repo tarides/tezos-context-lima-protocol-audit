@@ -470,15 +470,6 @@ We note that the size of most content in the Tezos Context Store is very small (
 
 Access to content in Irmin requires descending a path. Every node on the path needs to be de-referenced, accessed from disk and unpacked individually. The cost for accessing a piece of content is a function of the path size. It might make sense to optimize the tree descent.
 
-*** Flatten Path
-:PROPERTIES:
-:CUSTOM_ID: flatten-path
-:END:
-
-Currently Octez uses Irmin with keys that are a list of string (a path). A potential optimization would be to use Irmin with keys that are only strings, i.e. use Irmin as a key-value store instead of a tree-based object storage. This would be a considerable change in how Octez uses Irmin.
-
-The Irmin tree would be reduced to a single Node with many leaf node children. We would need to check if ~irmin-pack~ can support this. Related work includes the added support for large inodes ([[https://github.com/mirage/irmin/pull/807][mirage/irmin#807]]).
-
 *** Path Cache
 :PROPERTIES:
 :CUSTOM_ID: path-cache
@@ -567,12 +558,6 @@ Disk stats (read/write):
 #+end_src
 
 We observe a read bandwidth of 34.1MiB/s (a 60% performance improvement to the baseline). However, it is not clear how reads could be batched without major re-organization of the on-disk representation.
-
-*** Memory-mapped reads
-
-Another strategy is to memory-map files for reads. This reduces the amount of system calls drastically as database files are accessible via regular memory access.
-
-However, there are well known issues with memory-mapping files (see [[https://cs.brown.edu/people/acrotty/pubs/p13-crotty.pdf][Are You Sure You Want to Use MMAP in Your Database Management System?]]) that need to be evaluated and weighed in light of potential performance improvements.
 
 ** Multicore
 :PROPERTIES:
