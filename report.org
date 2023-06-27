@@ -285,27 +285,28 @@ We can not explain the difference in compression rates between the stores of lev
 :END:
 
 #+tblname: context-content-size
-| Content Size (logarithmic with base 2) |    Count |
-|----------------------------------------+----------|
-|                                      0 |   596661 |
-|                                      1 | 23722650 |
-|                                      2 | 38698770 |
-|                                      3 |  1125580 |
-|                                      4 |  3131048 |
-|                                      5 |  4194650 |
-|                                      6 |  7477058 |
-|                                      7 |   532486 |
-|                                      8 |   194262 |
-|                                      9 |    35410 |
-|                                     10 |    35600 |
-|                                     11 |    71535 |
-|                                     12 |     4289 |
-|                                     13 |     2583 |
-|                                     14 |      260 |
-|                                     15 |        9 |
-|                                     16 |        1 |
-|                                     17 |        3 |
-|                                     18 |        7 |
+| Content Size (logarithmic with base 2) |    Count | Percentage of Content |
+|----------------------------------------+----------+-----------------------|
+|                                      0 |   596661 |            0.74748116 |
+|                                      1 | 23722650 |             29.719110 |
+|                                      2 | 38698770 |             48.480798 |
+|                                      3 |  1125580 |             1.4100969 |
+|                                      4 |  3131048 |             3.9224944 |
+|                                      5 |  4194650 |             5.2549469 |
+|                                      6 |  7477058 |             9.3670611 |
+|                                      7 |   532486 |            0.66708442 |
+|                                      8 |   194262 |            0.24336631 |
+|                                      9 |    35410 |           0.044360714 |
+|                                     10 |    35600 |           0.044598741 |
+|                                     11 |    71535 |           0.089617161 |
+|                                     12 |     4289 |          5.3731461e-3 |
+|                                     13 |     2583 |          3.2359143e-3 |
+|                                     14 |      260 |          3.2572114e-4 |
+|                                     15 |        9 |          1.1274963e-5 |
+|                                     16 |        1 |          1.2527736e-6 |
+|                                     17 |        3 |          3.7583209e-6 |
+|                                     18 |        7 |          8.7694154e-6 |
+#+TBLFM: $3=($2/79822881)*100
 
 #+begin_src gnuplot :var data=context-content-size :exports results :file context-content-size.png
   reset
@@ -489,6 +490,8 @@ We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable perfor
 :END:
 
 We note that the size of most content in the Tezos Context Store is very small (see [[#content-size-distribution][Content Size distribution]]). These small pieces of content are stored in individual leaf nodes of the tree with their own hash, incurring a large overhead. An optimization would be to inline the small content into the parent node. Preliminary work towards this has already been done (see [[https://github.com/mirage/irmin/issues/884][mirage/irmin#884]]).
+
+Concretely we can imagine a scheme where all content that is smaller than the size of the has is inlined. Based on observations around this would be about 80% of the content in the Tezos Context Store. We can expect considerable optimization in disk usage and hopefully also overall performance.
 
 ** Optimize tree descent
 
