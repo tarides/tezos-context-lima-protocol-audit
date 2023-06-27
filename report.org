@@ -491,7 +491,7 @@ We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable perfor
 
 We note that the size of most content in the Tezos Context Store is very small (see [[#content-size-distribution][Content Size distribution]]). These small pieces of content are stored in individual leaf nodes of the tree with their own hash, incurring a large overhead. An optimization would be to inline the small content into the parent node. Preliminary work towards this has already been done (see [[https://github.com/mirage/irmin/issues/884][mirage/irmin#884]]).
 
-Concretely we can imagine a scheme where all content that is smaller than the size of the has is inlined. Based on observations this would be about 80% of the content in the Tezos Context Store. We can expect considerable optimization in disk usage and hopefully also overall performance.
+Concretely we can imagine a scheme where all content that is smaller than the size of the hash is inlined. Based on observations this would be about 80% of the content in the Tezos Context Store. We can expect considerable optimization in disk usage and hopefully also overall performance.
 
 ** Optimize tree descent
 
