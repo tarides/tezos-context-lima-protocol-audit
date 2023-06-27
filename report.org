@@ -145,26 +145,27 @@ However we also note that most entries in the ~Dict~ do not occur in the store. 
 
 Furthermore, we observe that most entries in the ~Dict~ are hashes. Commonly used short keywords like ~total_bytes~, ~missed_endorsement~ or ~index~ are not ~Dict~ entries.
 
-*** TODO Increasing ~Dict~ capacity
-**** TODO Capacity of 500000 entries
-**** Infinite capacity
+*** Increasing ~Dict~ capacity
 
-In order to evaluate potential performance improvement we remove limitations on the number of entries that the ~Dict~ can hold (see [[https://github.com/metanivek/irmin/commit/92d910b72b5f7140560c02d0d8d28728f95c39a0][metanivek/irmin-92d910b]]). Path segments are always added to the dictionary before writing.
+In order to evaluate potential performance improvement we run benchmarks with following changes to the ~Dict~:
 
-We run a replay benchmark:
+- Increase capacity to 500000 entries.
+- Remove limitations on the number of entries that the ~Dict~ can hold (see [[https://github.com/metanivek/irmin/commit/92d910b72b5f7140560c02d0d8d28728f95c39a0][metanivek/irmin-92d910b]]). Path segments are always added to the dictionary before writing.
 
- |                           | baseline (3.7.1) | infinite-dict  |
- |---------------------------+------------------+----------------|
- | CPU time elapsed          | 104m07s          | 130m36s (125%) |
- | total bytes read          | 66.466 G         | 60.747 G (91%) |
- | total bytes written       | 46.360 G         | 37.903 G  82%  |
- | max memory usage in bytes | 0.394 G          | 2.534 G 643%   |
+ |                          | 3.7.1   | 500k-dict      | infinite-dict  |
+ |--------------------------+---------+----------------+----------------|
+ | CPU time elapsed         | 104m07s | 109m42s (105%) | 130m36s (125%) |
+ | total bytes read         | 66.466G | 64.976G (98%)  | 60.747G (91%)  |
+ | total bytes written      | 46.360G | 41.671G (90%)  | 37.903G (82%)  |
+ | max memory usage (bytes) | 0.394G  | 0.508G (129%)  | 2.534G (643%)  |
 
-We note that total number of bytes read and written decreases, memory usage increases drasticly and performance is decreased. Performance decrease could be due to the in-memory Dict (a ~Hashtbl~) being taken to it's limits.
+The amount of bytes read and written decreases as improved usage of the ~Dict~ results in more compact representations. Memory usage increases as expected. Unfortunately it seems that overall performance degrades.
 
-*** TODO Conclusion
+Performance decrease could be due to the in-memory Dict (a ~Hashtbl~) being taken to it's limits. A more efficient in-memory datastructure might offset this and result in performance increase.
 
-We conclude that the ~Dict~ is underused. This observation has been previously made (see [[https://github.com/mirage/irmin/issues/1807][mirage/irmin#1807]]). An increased usage of the ~Dict~ could lead to a considerably more compact on-disk representation and potential performance improvements.
+*** Conclusion
+
+We conclude that the ~Dict~ is underused. This observation has been previously made (see [[https://github.com/mirage/irmin/issues/1807][mirage/irmin#1807]]). An increased usage of the ~Dict~ could lead to a considerably more compact on-disk representation and potential performance improvements. However, we note that the in-memory ~Dict~ seems to need considerable performance optimizations before we see any overall performance improvments.
 
 Note that existing ~Dict~ entries can not be removed and it is not clear how to improve usage of the ~Dict~ without rewriting existing data.
 
