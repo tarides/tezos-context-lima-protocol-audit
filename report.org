@@ -177,14 +177,13 @@ It might also be worth to reconsider the first-come-first-serve strategy. An imp
 
 In order to measure real disk IO accesses we add some [[https://github.com/mirage/irmin/pull/2250][instrumentation to irmin-pack]] that allows us to measure how many bytes are read/written to individual files in how many system calls. In addition we also trace calls to IO reads and writes using the [[https://github.com/LexiFi/landmarks][landmarks]] library.
 
-|                                         |              Read |             Write |
-|-----------------------------------------+-------------------+-------------------|
-| Bytes in 100000 blocks                  | 59141777410 (56%) | 46354750320 (44%) |
-| Bytes per block (mean)                  |        591394.118 |        463528.962 |
-| Number of system calls per block (mean) |          9645.864 |             4.061 |
-| Bytes per system call (mean)            |         61.310642 |         114141.58 |
-| Relative time                           |             13.6% |              0.4% |
-| Relative time in I/O                    |             96.5% |              3.5% |
+|                                         |             Read |            Write |
+|-----------------------------------------+------------------+------------------|
+| Bytes per block (mean)                  | 591394.118 (56%) | 463528.962 (44%) |
+| Number of system calls per block (mean) |         9645.864 |            4.061 |
+| Bytes per system call (mean)            |        61.310642 |        114141.58 |
+| Relative time                           |            13.6% |             0.4% |
+| Relative time in I/O                    |            96.5% |             3.5% |
 
 We observe:
 
