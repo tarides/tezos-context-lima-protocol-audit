@@ -1,0 +1,57 @@
+#+title: Inlining Objects
+
+* Approximating perf gains
+
+We use a modified ~irmin-pack~ and ~bench/irmin-pack/tree.ml~ bench to
+approximate time we could save if we inlined "small" contents objects into their
+parent inode.
+
+The benchmark is run against ~10k blocks (I think from Hangzhou era but needs
+confirmation). Total time for the benchmark is 38s.
+
+Counts loaded in ~Pack_store.find_in_pack_file~.
+
+| Type     |   Count |
+|----------+---------|
+| Commit   |      12 |
+| Inode    | 1478220 |
+| Contents |   78700 |
+
+Counts and percentages when split at a 64 byte boundary. Objects less than 64
+bytes might be good candidates for inlining since this is the point where the
+size of the hash (32 bytes) is equal to the size of the actual content.
+
+| Type     | < 64B (%)       |   64B+ |   Total |
+|----------+-----------------+--------+---------|
+| Inode    | 1292769 (87.5%) | 185451 | 1478220 |
+| Contents | 9068 (11.5%)    |  69632 |   78700 |
+
+Duration of key sections in that function, reading from disk and decoding into
+in-memory objects.
+
+| Type     |   Read (us) | Decode (us) |  Total (us) |
+|----------+-------------+-------------+-------------|
+| Commit   |      73.478 |      77.477 |     150.955 |
+| Inode    | 1516744.706 | 1721268.547 | 3238013.253 |
+| Contents |  115519.722 |   16060.434 |  131580.156 |
+
+Lets assume we can inline inodes or contents objects that are less than 64 bytes
+and eliminate the read time but maintain the decode time.
+
+| Type     | Read, < 64B (us) | Read, 64B+ (us) |  Total (us) |
+|----------+------------------+-----------------+-------------|
+| Inode    |      1305857.425 |      210887.281 | 1516744.706 |
+| Contents |         8836.786 |      106682.936 |  115519.722 |
+|----------+------------------+-----------------+-------------|
+|          |      1314694.211 |      317570.217 | 1632264.428 |
+
+We could theoretically avoid 1314694.211us out of 1632264.428us read time, which
+is 19.5% savings of time spent reading. The entire bench takes 38s, so this would
+represent a 3.5% savings in total time.
+
+For completeness, here is the breakdown of decode times on the 64 byte boundary.
+
+| Type     | Decode, < 64B (us) | Decode, 64B+ (us) |  Total (us) |
+|----------+--------------------+-------------------+-------------|
+| Inode    |         866570.158 |        854698.389 | 1721268.547 |
+| Contents |           2179.074 |          13881.36 |   16060.434 |
