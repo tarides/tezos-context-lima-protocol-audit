@@ -46,8 +46,8 @@ and eliminate the read time but maintain the decode time.
 |          |      1314694.211 |      317570.217 | 1632264.428 |
 
 We could theoretically avoid 1314694.211us out of 1632264.428us read time, which
-is 19.5% savings of time spent reading. The entire bench takes 38s, so this would
-represent a 3.5% savings in total time.
+is 80.5% savings of time spent reading. The entire bench takes 38s, so this
+would represent a 3.5% savings in total time.
 
 For completeness, here is the breakdown of decode times on the 64 byte boundary.
 
