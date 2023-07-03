@@ -503,7 +503,58 @@ We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable perfor
 
 We note that the size of most content in the Tezos Context Store is very small (see [[#content-size-distribution][Content Size distribution]]). These small pieces of content are stored in individual leaf nodes of the tree with their own hash, incurring a large overhead. An optimization would be to inline the small content into the parent node. Preliminary work towards this has already been done (see [[https://github.com/mirage/irmin/issues/884][mirage/irmin#884]]).
 
-Concretely we can imagine a scheme where all content that is smaller than the size of the hash is inlined. Based on observations this would be about 80% of the content in the Tezos Context Store. We can expect considerable optimization in disk usage and hopefully also overall performance.
+Concretely we can imagine a scheme where all content that is smaller than the size of the hash as well as small ~Inodes~ are inlined.
+
+In order to approximate potential performance gains we use a modified ~irmin-pack~ and ~bench/irmin-pack/tree.ml~ bench to approximate time we could save if we inlined "small" contents objects into their parent inode.
+
+The benchmark is run against ~10k blocks (I think from Hangzhou era but needs confirmation). Total time for the benchmark is 38s.
+
+Counts loaded in ~Pack_store.find_in_pack_file~.
+
+| Type     |   Count |
+|----------+---------|
+| Commit   |      12 |
+| Inode    | 1478220 |
+| Contents |   78700 |
+
+Counts and percentages when split at a 64 byte boundary. Objects less than 64
+bytes might be good candidates for inlining since this is the point where the
+size of the hash (32 bytes) is equal to the size of the actual content.
+
+| Type     | < 64B (%)       |   64B+ |   Total |
+|----------+-----------------+--------+---------|
+| Inode    | 1292769 (87.5%) | 185451 | 1478220 |
+| Contents | 9068 (11.5%)    |  69632 |   78700 |
+
+Duration of key sections in that function, reading from disk and decoding into
+in-memory objects.
+
+| Type     |   Read (us) | Decode (us) |  Total (us) |
+|----------+-------------+-------------+-------------|
+| Commit   |      73.478 |      77.477 |     150.955 |
+| Inode    | 1516744.706 | 1721268.547 | 3238013.253 |
+| Contents |  115519.722 |   16060.434 |  131580.156 |
+
+Lets assume we can inline inodes or contents objects that are less than 64 bytes
+and eliminate the read time but maintain the decode time.
+
+| Type     | Read, < 64B (us) | Read, 64B+ (us) |  Total (us) |
+|----------+------------------+-----------------+-------------|
+| Inode    |      1305857.425 |      210887.281 | 1516744.706 |
+| Contents |         8836.786 |      106682.936 |  115519.722 |
+|----------+------------------+-----------------+-------------|
+|          |      1314694.211 |      317570.217 | 1632264.428 |
+
+We could theoretically avoid 1314694.211us out of 1632264.428us read time, which
+is 19.5% savings of time spent reading. The entire bench takes 38s, so this would
+represent a 3.5% savings in total time.
+
+For completeness, here is the breakdown of decode times on the 64 byte boundary.
+
+| Type     | Decode, < 64B (us) | Decode, 64B+ (us) |  Total (us) |
+|----------+--------------------+-------------------+-------------|
+| Inode    |         866570.158 |        854698.389 | 1721268.547 |
+| Contents |           2179.074 |          13881.36 |   16060.434 |
 
 ** Optimize tree descent
 
@@ -744,15 +795,15 @@ In this report we have identified storage performance bottlenecks of Irmin and ~
 
 A selection of proposed improvements is provided in the following table:
 
-| Description                         | I/O    | Overall | Effort    | On-disk format   |
+| Description                         |    I/O | Overall | Effort    | On-disk format   |
 |-------------------------------------+--------+---------+-----------+------------------|
 | [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% |    -20% | Medium    | Potential change |
-| [[#disable-os-page-cache][Disable OS page cache]]               | 30%    |         | Low       | No change        |
-| [[#inline][Inline small objects]]                | -      |         | High      | Change           |
-| [[#path-cache][Path Cache]]                          | -      |         | Medium    | No change        |
-| [[#cpu-boundness][General CPU efficiency improvments]]  | -      |         | High      | Potential change |
-| [[#compactness][More compact on-disk representation]] | -      |         | High      | Change           |
-| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | -      |         | High      | No change        |
-| [[#multicore][Multicore]]                           | 700%   |         | Very high | No change        |
+| [[#disable-os-page-cache][Disable OS page cache]]               |    30% |         | Low       | No change        |
+| [[#inline][Inline small objects]]                |  19.5% |    3.5% | High      | Change           |
+| [[#path-cache][Path Cache]]                          |      - |         | Medium    | No change        |
+| [[#cpu-boundness][General CPU efficiency improvments]]  |      - |         | High      | Potential change |
+| [[#compactness][More compact on-disk representation]] |   300% |         | High      | Change           |
+| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |         | High      | No change        |
+| [[#multicore][Multicore]]                           |   700% |         | Very high | No change        |
 | [[#async-io][Asynchronous I/O]]                    | 40000% |         | Epic      | Change           |
 
