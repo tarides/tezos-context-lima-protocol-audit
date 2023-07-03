@@ -1,5 +1,5 @@
 #+title: Tezos Context Lima Performance Audit
-#+date: 2023-06-23
+#+date: 2023-07-03
 #+author: Tarides Irmin Team
 #+STARTUP: inlineimages
 
@@ -496,6 +496,14 @@ Disk stats (read/write):
 
 We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable performance improvement (around 30%) that can be implemented fairly easily.
 
+Unfortunately we cannot observe any performance improvement when testing these changes on the Tezos Context replay benchmarks:
+
+ |                         |    3.7.1 | POSIX_FADV_NOREUSE | POSIX_FADV_RANDOM |
+ |-------------------------+----------+--------------------+-------------------|
+ | CPU time elapsed        |  104m07s | 104m50s 101%       | 103m51s 100%      |
+ | TZ-transactions per sec |  736.349 | 731.387  99%       | 738.298 100%      |
+ | TZ-operations per sec   | 4809.664 | 4777.256  99%      | 4822.395 100%     |
+
 ** Inline small objects
 :PROPERTIES:
 :CUSTOM_ID: inline
@@ -801,7 +809,7 @@ A selection of proposed improvements is provided in the following table.
 | Description                         |    I/O | Overall | Effort    | On-disk format   |
 |-------------------------------------+--------+---------+-----------+------------------|
 | [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% |    -20% | Medium    | Potential change |
-| [[#disable-os-page-cache][Disable OS page cache]]               |    30% |         | Low       | No change        |
+| [[#disable-os-page-cache][Disable OS page cache]]               |    30% |      0% | Low       | No change        |
 | [[#inline][Inline small objects]]                |  19.5% |    3.5% | High      | Change           |
 | [[#path-cache][Path Cache]]                          |      - |         | Medium    | No change        |
 | [[#cpu-boundness][General CPU efficiency improvments]]  |      - |         | High      | Potential change |
@@ -813,7 +821,7 @@ A selection of proposed improvements is provided in the following table.
 
 Some details to the columns:
 
-- I/O :: Potential improvement in I/O performance.
-- Overall :: Potential improvement in overall performance of the Tezos Context store.
+- I/O :: Potential improvement in I/O performance measured and estimated with ~fio~.
+- Overall :: Potential improvement in overall performance of the Tezos Context store based on performance of current implementation and structure of Context Store.
 - Effort :: Estimated effort to implement performance.
-- On-disk format :: Does the on-disk format change.
+- On-disk format :: Indication if an on-disk format change is needed.
