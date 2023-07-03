@@ -344,7 +344,7 @@ We observe that the size of content in the Tezos store is very small.
 
 We perform some audits in order to understand what paths in the Tezos Context are accessed how frequently.
 
-**** Read Operations over 100000 blocks 
+**** Read Operations over 100000 blocks
 
 We analyze the 10000 blocks starting at block level 2981990 and record what paths are accessed by read operations such as ~Context.find_tree~, ~Context.mem~ or ~Context.find~:
 
@@ -825,3 +825,18 @@ Some details to the columns:
 - Overall :: Potential improvement in overall performance of the Tezos Context store based on performance of current implementation and structure of Context Store.
 - Effort :: Estimated effort to implement performance.
 - On-disk format :: Indication if an on-disk format change is needed.
+
+The performance improvements shown in column "Overall" are indicative
+and purely theoretical. Experiments on dict and OS page cache have shown
+that some results may be counter-intuitive.
+
+In conclusion, even if input-outputs represent a small percentage (14%)
+of the total time, some optimisations can still be very interesting
+(inlining small objects, multicore I/O, asynchronous I/O ...), as the
+potential improvement in I/O is huge.  As Irmin+Irmin-pack is CPU-bound,
+we also recommend to focus on optimisations related to CPU usage, even
+at the cost of more I/O. Recent work on Tree.length
+(https://github.com/mirage/irmin/pull/2253) has shown that there might
+be potential improvements in unexpected places of the code-base.
+However, identifying areas that could potentially be improved seems to
+be non-trivial.
