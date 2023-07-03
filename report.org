@@ -589,6 +589,9 @@ It would also be interesting to investigate the observed symmetry between ~mem~ 
 Read performance seems to be bad because of the large amount of small reads that are performed with individual system calls. The system call overhead seems to be significant and reducing it should increase performance.
 
 *** Batching Reads
+:PROPERTIES:
+:CUSTOM_ID: batching-reads
+:END:
 
 Performance could be improved by batching read operations into larger blocks. For example if we use 4KiB blocks:
 
@@ -804,6 +807,7 @@ A selection of proposed improvements is provided in the following table:
 | [[#cpu-boundness][General CPU efficiency improvments]]  |      - |         | High      | Potential change |
 | [[#compactness][More compact on-disk representation]] |   300% |         | High      | Change           |
 | [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |         | High      | No change        |
+| [[#batching-reads][Batching reads]]                      |    60% |         | Very high | Change           |
 | [[#multicore][Multicore]]                           |   700% |         | Very high | No change        |
 | [[#async-io][Asynchronous I/O]]                    | 40000% |         | Epic      | Change           |
 
