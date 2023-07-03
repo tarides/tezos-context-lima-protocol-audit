@@ -3,6 +3,12 @@
 #+author: Tarides Irmin Team
 #+STARTUP: inlineimages
 
+#+BEGIN_EXPORT html
+<style>
+body { min-width: 60% !important; }
+</style>
+#+END_EXPORT
+
 * Introduction
 
 The Octez ~tezos-context~ package maintains an on-disk representation of Tezos blocks. It is implemented using [[https://irmin.org/][Irmin]] and the purpose-built Irmin backend [[https://mirage.github.io/irmin/irmin-pack/index.html][~irmin-pack~]].
@@ -151,19 +157,25 @@ In order to evaluate potential performance improvement we run benchmarks with fo
 
 - Increase capacity to 500000 entries.
 - Remove limitations on the number of entries that the ~Dict~ can hold (see [[https://github.com/metanivek/irmin/commit/92d910b72b5f7140560c02d0d8d28728f95c39a0][metanivek/irmin-92d910b]]). Path segments are always added to the dictionary before writing.
+- Don't use ~Dict~ for any newly written content
 
- |                          | 3.7.1   | 500k-dict      | infinite-dict  |
- |--------------------------+---------+----------------+----------------|
- | CPU time elapsed         | 104m07s | 109m42s (105%) | 130m36s (125%) |
- | total bytes read         | 66.466G | 64.976G (98%)  | 60.747G (91%)  |
- | total bytes written      | 46.360G | 41.671G (90%)  | 37.903G (82%)  |
- | max memory usage (bytes) | 0.394G  | 0.508G (129%)  | 2.534G (643%)  |
+ |                          | 3.7.1   | 500k-dict      | infinite-dict  | ignore-dict    |
+ |--------------------------+---------+----------------+----------------+----------------|
+ | CPU time elapsed         | 104m07s | 109m42s (105%) | 130m36s (125%) | 101m39s (98%)  |
+ | total bytes read         | 66.466G | 64.976G (98%)  | 60.747G (91%)  | 67.489G (102%) |
+ | total bytes written      | 46.360G | 41.671G (90%)  | 37.903G (82%)  | 46.891G (101%) |
+ | max memory usage (bytes) | 0.394G  | 0.508G (129%)  | 2.534G (643%)  | 0.396G (100%)  |
 
-The amount of bytes read and written decreases as improved usage of the ~Dict~ results in more compact representations. Memory usage increases as expected. Unfortunately it seems that overall performance degrades.
+When increasing the capacity of the ~Dict~, the amount of bytes read and written decreases as improved usage of the ~Dict~ results in more compact representations. Memory usage increases as expected. Unfortunately it seems that overall performance degrades.
 
-Performance decrease could be due to the in-memory Dict (a ~Hashtbl~) being taken to it's limits. A more efficient in-memory datastructure might offset this and result in performance increase.
+When disabling the ~Dict~ for newly written content we see that slightly more content is written and read. This small change again indicates that the ~Dict~ is underused. However, we see that disabling the ~Dict~, even at the cost of causing more I/O, increases performance slightly.
+
+The performance decrease when increasing ~Dict~ capacity could be due to the in-memory Dict (a ~Hashtbl~) being taken to it's limits. A more efficient in-memory datastructure might offset this and result in performance increase.
 
 *** Conclusion
+:PROPERTIES:
+:CUSTOM_ID: dict-conclusion
+:END:
 
 We conclude that the ~Dict~ is underused. This observation has been previously made (see [[https://github.com/mirage/irmin/issues/1807][mirage/irmin#1807]]). An increased usage of the ~Dict~ could lead to a considerably more compact on-disk representation and potential performance improvements. However, we note that the in-memory ~Dict~ seems to need considerable performance optimizations before we see any overall performance improvments.
 
@@ -732,14 +744,15 @@ In this report we have identified storage performance bottlenecks of Irmin and ~
 
 A selection of proposed improvements is provided in the following table:
 
-| Description                         | Potential improvement [fn:: On raw I/O bandwidth] | Effort    | On-disk format   |
-|-------------------------------------+---------------------------------------------------+-----------+------------------|
-| [[#disable-os-page-cache][Disable OS page cache]]               | 30%                                               | Low       | No change        |
-| [[#path-cache][Path Cache]]                          | -                                                 | Medium    | No change        |
-| [[#inline][Inline small objects]]                | -                                                 | High      | Change           |
-| [[#cpu-boundness][General CPU efficiency improvments]]  | -                                                 | High      | Potential change |
-| [[#compactness][More compact on-disk representation]] | -                                                 | High      | Change           |
-| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | -                                                 | High      | No change        |
-| [[#multicore][Multicore]]                           | 700%                                              | Very high | No change        |
-| [[#async-io][Asynchronous I/O]]                    | 40000%                                            | Epic      | Change           |
+| Description                         | I/O    | Overall | Effort    | On-disk format   |
+|-------------------------------------+--------+---------+-----------+------------------|
+| [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% |    -20% | Medium    | Potential change |
+| [[#disable-os-page-cache][Disable OS page cache]]               | 30%    |         | Low       | No change        |
+| [[#inline][Inline small objects]]                | -      |         | High      | Change           |
+| [[#path-cache][Path Cache]]                          | -      |         | Medium    | No change        |
+| [[#cpu-boundness][General CPU efficiency improvments]]  | -      |         | High      | Potential change |
+| [[#compactness][More compact on-disk representation]] | -      |         | High      | Change           |
+| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     | -      |         | High      | No change        |
+| [[#multicore][Multicore]]                           | 700%   |         | Very high | No change        |
+| [[#async-io][Asynchronous I/O]]                    | 40000% |         | Epic      | Change           |
 
