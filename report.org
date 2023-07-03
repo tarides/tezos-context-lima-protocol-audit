@@ -110,6 +110,9 @@ We measure the performance of index lookups by creating an empty index structure
 We note a sharp increase in CPU cycles needed to lookup an entry when the number of bindings jumps over the log size (2500000). The lookup performance stays relatively constant at a higher level for up to 7000000 entries.
 
 *** Conclusion
+:PROPERTIES:
+:CUSTOM_ID: index-conclusion
+:END:
 
 With the currently implemented minimal indexing scheme no performance issues are expected when using the default Tezos Octez configurations. No considerable performance degradation is expected up to at least block level 7000000.
 
@@ -804,10 +807,11 @@ On-going research is investigating how the performance of such hardware can be u
 
 In this report we have identified storage performance bottlenecks of Irmin and ~irmin-pack~ as used by Octez and propose potential improvements.
 
-A selection of proposed improvements is provided in the following table.
+A selection of the different scenarios considered, with expected impact on performances is provided in the following table:
 
 | Description                         |    I/O | Overall | Effort    | On-disk format   |
 |-------------------------------------+--------+---------+-----------+------------------|
+| [[#index-conclusion][Improve ~Index~ usage]]                | - |    0% | -    | - |
 | [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% |    -20% | Medium    | Potential change |
 | [[#disable-os-page-cache][Disable OS page cache]]               |    30% |      0% | Low       | No change        |
 | [[#inline][Inline small objects]]                |  19.5% |    3.5% | High      | Change           |
