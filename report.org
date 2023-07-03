@@ -796,7 +796,7 @@ On-going research is investigating how the performance of such hardware can be u
 
 In this report we have identified storage performance bottlenecks of Irmin and ~irmin-pack~ as used by Octez and propose potential improvements.
 
-A selection of proposed improvements is provided in the following table:
+A selection of proposed improvements is provided in the following table.
 
 | Description                         |    I/O | Overall | Effort    | On-disk format   |
 |-------------------------------------+--------+---------+-----------+------------------|
@@ -811,3 +811,9 @@ A selection of proposed improvements is provided in the following table:
 | [[#multicore][Multicore]]                           |   700% |         | Very high | No change        |
 | [[#async-io][Asynchronous I/O]]                    | 40000% |         | Epic      | Change           |
 
+Some details to the columns:
+
+- I/O :: Potential improvement in I/O performance.
+- Overall :: Potential improvement in overall performance of the Tezos Context store.
+- Effort :: Estimated effort to implement performance.
+- On-disk format :: Does the on-disk format change.
