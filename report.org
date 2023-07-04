@@ -811,7 +811,7 @@ A selection of the different scenarios considered, with expected impact on perfo
 |-------------------------------------+--------+---------------------------------------------------------+-----------+------------------|
 | [[#index-conclusion][Improve ~Index~ usage]]               |      - | 0%                                                      | -         | No change        |
 | [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% | -20%                                                    | Medium    | Potential change |
-| [[#disable-os-page-cache][Disable OS page cache]]               |     0% | 30%                                                     | Low       | No change        |
+| [[#disable-os-page-cache][Disable OS page cache]]               |    30% | 0%                                                      | Low       | No change        |
 | [[#inline][Inline small objects]]                |  19.5% | 3.5%                                                    | High      | Change           |
 | [[#path-cache][Path Cache]]                          |      - | n/a [fn::hard to estimate]                              | Medium    | No change        |
 | [[#cpu-boundness][General CPU efficiency improvements]] |      - | n/a [fn::could be important, but difficult to identify] | High      | Potential change |
