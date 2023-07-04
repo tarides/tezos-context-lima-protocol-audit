@@ -828,21 +828,10 @@ A selection of the different scenarios considered, with expected impact on perfo
 Some details to the columns:
 
 - I/O :: Potential improvement in I/O performance measured and estimated with ~fio~.
-- Overall :: Potential improvement in overall performance of the Tezos Context store based on performance of current implementation and structure of Context Store.
+- Overall :: Potential improvement in overall performance of the Tezos Context store based on performance of current implementation and structure of Context Store. The performance improvements are indicative and purely theoretical. Experiments on dict and OS page cache have shown that some results may be counter-intuitive.
 - Effort :: Estimated effort to implement performance.
 - On-disk format :: Indication if an on-disk format change is needed.
 
-The performance improvements shown in column "Overall" are indicative
-and purely theoretical. Experiments on dict and OS page cache have shown
-that some results may be counter-intuitive.
+Note that performance improvements may not be additive and individual improvements may have unexpected results on the effect of other improvements.
 
-In conclusion, even if input-outputs represent a small percentage (14%)
-of the total time, some optimisations can still be very interesting
-(inlining small objects, multicore I/O, asynchronous I/O ...), as the
-potential improvement in I/O is huge.  As Irmin+Irmin-pack is CPU-bound,
-we also recommend to focus on optimisations related to CPU usage, even
-at the cost of more I/O. Recent work on Tree.length
-(https://github.com/mirage/irmin/pull/2253) has shown that there might
-be potential improvements in unexpected places of the code-base.
-However, identifying areas that could potentially be improved seems to
-be non-trivial.
+In conclusion, even if input-outputs represent a small percentage (14%) of the total time, some optimisations can still be very interesting (inlining small objects, multicore I/O, asynchronous I/O ...), as the potential improvement in I/O is huge.  As Irmin+Irmin-pack is CPU-bound, we also recommend to focus on optimisations related to CPU usage, even at the cost of more I/O. Recent work on Tree.length ([[https://github.com/mirage/irmin/pull/2253][mirage/irmin#2253]]) has shown that there might be potential improvements in unexpected places of the code-base. However, identifying areas that could potentially be improved seems to be non-trivial.
