@@ -822,8 +822,9 @@ A selection of the different scenarios considered, with expected impact on perfo
 | [[#compactness][More compact on-disk representation]] |   300% | n/a [fn::could be negative]                             | High      | Change           |
 | [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |                                                         | High      | No change        |
 | [[#batching-reads][Batching reads]]                      |    60% | up to 4%?                                               | Very high | Change           |
-| [[#multicore][Multicore]]                           |   700% | up to 8%?                                               | Very high | No change        |
+| [[#multicore][Multicore I/O]]                           |   700% | up to 8%?                                               | Very high | No change        |
 | [[#async-io][Asynchronous I/O]]                    | 40000% | up to 10%?                                              | Epic      | Change           |
+| Multicore Irmin                           |  |                                                | Very high | No change        |
 
 Some details to the columns:
 
@@ -845,4 +846,7 @@ at the cost of more I/O. Recent work on Tree.length
 (https://github.com/mirage/irmin/pull/2253) has shown that there might
 be potential improvements in unexpected places of the code-base.
 However, identifying areas that could potentially be improved seems to
-be non-trivial.
+be non-trivial. Finally, switching to a fully multicore version of Irmin could
+provide huge improvements.
+
+
