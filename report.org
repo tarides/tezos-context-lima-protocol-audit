@@ -497,11 +497,11 @@ We observe a read bandwidth of 27.7MiB/s. This seems to be a considerable perfor
 
 Unfortunately we cannot observe any performance improvement when testing these changes on the Tezos Context replay benchmarks:
 
- |                         |    3.7.1 | POSIX_FADV_NOREUSE | POSIX_FADV_RANDOM |
- |-------------------------+----------+--------------------+-------------------|
- | CPU time elapsed        |  104m07s | 104m50s 101%       | 103m51s 100%      |
- | TZ-transactions per sec |  736.349 | 731.387  99%       | 738.298 100%      |
- | TZ-operations per sec   | 4809.664 | 4777.256  99%      | 4822.395 100%     |
+ |                         |    3.7.1 | ~POSIX_FADV_NOREUSE~ | ~POSIX_FADV_RANDOM~ |
+ |-------------------------+----------+----------------------+---------------------|
+ | CPU time elapsed        |  104m07s | 104m50s (101%)       | 103m51s (100%)      |
+ | TZ-transactions per sec |  736.349 | 731.387 (99%)        | 738.298 (100%)      |
+ | TZ-operations per sec   | 4809.664 | 4777.256 (99%)       | 4822.395 (100%)     |
 
 ** Inline small objects
 :PROPERTIES:
