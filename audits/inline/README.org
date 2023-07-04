@@ -1,6 +1,6 @@
 #+title: Inlining Objects
 
-* Approximating perf gains
+* Approximating perf gains with tree bench
 
 We use a modified ~irmin-pack~ and ~bench/irmin-pack/tree.ml~ bench to
 approximate time we could save if we inlined "small" contents objects into their
@@ -46,8 +46,8 @@ and eliminate the read time but maintain the decode time.
 |          |      1314694.211 |      317570.217 | 1632264.428 |
 
 We could theoretically avoid 1314694.211us out of 1632264.428us read time, which
-is 19.5% savings of time spent reading. The entire bench takes 38s, so this would
-represent a 3.5% savings in total time.
+is 80.5% savings of time spent reading. The entire bench takes 38s, so this
+would represent a 3.5% savings in total time.
 
 For completeness, here is the breakdown of decode times on the 64 byte boundary.
 
@@ -55,3 +55,54 @@ For completeness, here is the breakdown of decode times on the 64 byte boundary.
 |----------+--------------------+-------------------+-------------|
 | Inode    |         866570.158 |        854698.389 | 1721268.547 |
 | Contents |           2179.074 |          13881.36 |   16060.434 |
+
+* Approximating perf gains with replay trace
+
+Lima replay of 100 blocks. Total runtime was 14s.
+
+Counts loaded in ~Pack_store.find_in_pack_file~.
+
+| Type     |  Count |
+|----------+--------|
+| Commit   |      1 |
+| Inode    | 133292 |
+| Contents |  17310 |
+
+Counts and percentages when split at a 64 byte boundary. Objects less than 64
+bytes might be good candidates for inlining since this is the point where the
+size of the hash (32 bytes) is equal to the size of the actual content.
+
+| Type     | < 64B (%)     |   64B+ |  Total |
+|----------+---------------+--------+--------|
+| Inode    | 5650 (4.2%)   | 127642 | 133292 |
+| Contents | 12445 (71.9%) |   4865 |  17310 |
+
+Duration of key sections in that function, reading from disk and decoding into
+in-memory objects.
+
+| Type     |  Read (us) | Decode (us) |  Total (us) |
+|----------+------------+-------------+-------------|
+| Commit   |      7.661 |        6.93 |      14.591 |
+| Inode    | 160403.616 | 2561997.823 | 2722401.439 |
+| Contents |   14598.24 |   15494.227 |   30092.467 |
+
+Lets assume we can inline inodes or contents objects that are less than 64 bytes
+and eliminate the read time but maintain the decode time.
+
+| Type     | Read, < 64B (us) | Read, 64B+ (us) | Total (us) |
+|----------+------------------+-----------------+------------|
+| Inode    |         4664.936 |       155738.68 | 160403.616 |
+| Contents |         9704.756 |        4893.484 |   14598.24 |
+|----------+------------------+-----------------+------------|
+|          |        14369.692 |      160632.164 | 175001.856 |
+
+We could theoretically save 14369.692us out of 175001.856us read time, which is
+8.2% savings of time spent reading. The entire bench took 14s, so this would
+represent a 0.1% overall improvement.
+
+For completeness, here is the breakdown of decode times on the 64 byte boundary.
+
+| Type     | Decode, < 64B (us) | Decode, 64B+ (us) |  Total (us) |
+|----------+--------------------+-------------------+-------------|
+| Inode    |           16065.45 |       2545932.373 | 2561997.823 |
+| Contents |            3838.62 |         11655.607 |   15494.227 |

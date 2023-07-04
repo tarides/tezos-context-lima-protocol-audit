@@ -516,9 +516,11 @@ We note that the size of most content in the Tezos Context Store is very small (
 
 Concretely we can imagine a scheme where all content that is smaller than the size of the hash as well as small ~Inodes~ are inlined.
 
-In order to approximate potential performance gains we use a modified ~irmin-pack~ and ~bench/irmin-pack/tree.ml~ bench to approximate time we could save if we inlined "small" contents objects into their parent inode.
+In order to approximate potential performance gains we use a modified
+~irmin-pack~ and ~bench/irmin-pack/tree.ml~ bench to approximate time we could
+save if we inlined "small" contents objects into their parent inode.
 
-The benchmark is run against ~10k blocks (I think from Hangzhou era but needs confirmation). Total time for the benchmark is 38s.
+The benchmark is run against ~10k blocks. Total time for the benchmark is 38s.
 
 Counts loaded in ~Pack_store.find_in_pack_file~.
 
@@ -557,8 +559,8 @@ and eliminate the read time but maintain the decode time.
 |          |      1314694.211 |      317570.217 | 1632264.428 |
 
 We could theoretically avoid 1314694.211us out of 1632264.428us read time, which
-is 19.5% savings of time spent reading. The entire bench takes 38s, so this would
-represent a 3.5% savings in total time.
+is 80.5% savings of time spent reading. The entire bench takes 38s, so this
+would represent a 3.5% savings in total time.
 
 For completeness, here is the breakdown of decode times on the 64 byte boundary.
 
