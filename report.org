@@ -205,6 +205,7 @@ We observe:
 
 - Total I/O activity in bytes consists of about 56% reads and 44% writes. However, reads take 96.5% of the time [fn:: We measure this by tracing the ~Irmin_pack_unix.Io.Util.really_read~ and ~Irmin_pack_unix.Io.Util.really_write~ functions].
 - Reads are performed in many very small chunks (in mean 61 bytes per system call).
+- Total time spend doing I/O is only 14%. This is an upper-bound for the effect on overall performance by improving I/O.
 
 As read performance dominates the overall performance we concentrate on it in the following.
 
