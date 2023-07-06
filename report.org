@@ -662,6 +662,24 @@ Disk stats (read/write):
 
 We observe a read bandwidth of 34.1MiB/s (a 60% performance improvement to the baseline). However, it is not clear how reads could be batched without major re-organization of the on-disk representation.
 
+** CPU efficiency
+:PROPERTIES:
+:CUSTOM_ID: cpu-efficiency
+:END:
+
+As noted in section [[#cpu-boundness][CPU boundness]] improving CPU efficiency of ~irmin-pack~ may have a great effect on overall performance of the Tezos Context Store.
+
+Some potential improvements are described in the following.
+
+*** Cache datastructure
+:PROPERTIES:
+:CUSTOM_ID: cpu-efficient-cache
+:END:
+
+The currently implemented LRU cache in ~irmin-pack~ is implemented using doubly-linked-lists which requires non-negligible datastructure manipulations even while only accessing objects in the cache.
+
+Other cache replacement policies and cache datastructures exist that might decrease the number of required CPU cycles. Futhermore they may provide better cache hit rates that will also improve overall performance.
+
 ** Multicore
 :PROPERTIES:
 :CUSTOM_ID: multicore
@@ -812,12 +830,16 @@ A selection of the different scenarios considered, with expected impact on perfo
 |-------------------------------------+--------+------------+-----------+------------------|
 | [[#index-conclusion][Improve ~Index~ usage]]               |      - | 0%         | -         | No change        |
 | [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% | -20%       | Medium    | Potential change |
+|-------------------------------------+--------+------------+-----------+------------------|
 | [[#disable-os-page-cache][Disable OS page cache]]               |    30% | 0%         | Low       | No change        |
 | [[#inline][Inline small objects]]                |  19.5% | 3.5%       | High      | Change           |
 | [[#path-cache][Path Cache]]                          |      - | -          | Medium    | No change        |
-| [[#cpu-boundness][General CPU efficiency improvements]] |      - | -          | High      | Potential change |
 | [[#compactness][More compact on-disk representation]] |   300% | -          | High      | Change           |
+|-------------------------------------+--------+------------+-----------+------------------|
+| [[#cpu-efficient-cache][More efficient cache datastructure]]  |        |            |           | No change        |
+|-------------------------------------+--------+------------+-----------+------------------|
 | [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |            | High      | No change        |
+|-------------------------------------+--------+------------+-----------+------------------|
 | [[#batching-reads][Batching reads]]                      |    60% | up to 4%?  | Very high | Change           |
 | [[#multicore][Multicore I/O]]                       |   700% | up to 8%?  | Very high | No change        |
 | [[#async-io][Asynchronous I/O]]                    | 40000% | up to 10%? | Epic      | Change           |
