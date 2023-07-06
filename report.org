@@ -506,7 +506,7 @@ Unfortunately we cannot observe any performance improvement when testing these c
 
 ** Inline small objects
 :PROPERTIES:
-:CUSTOM_ID: inline
+:CUSTOM_ID: inline-small-objects
 :END:
 
 We note that the size of most content in the Tezos Context Store is very small (see [[#content-size-distribution][Content Size distribution]]). These small pieces of content are stored in individual leaf nodes of the tree with their own hash, incurring a large overhead. An optimization would be to inline the small content into the parent node. Preliminary work towards this has already been done (see [[https://github.com/mirage/irmin/issues/884][mirage/irmin#884]]).
@@ -673,7 +673,7 @@ Some potential improvements are described in the following.
 
 *** Cache datastructure
 :PROPERTIES:
-:CUSTOM_ID: cpu-efficient-cache
+:CUSTOM_ID: cache-datastructure
 :END:
 
 The currently implemented LRU cache in ~irmin-pack~ is implemented using doubly-linked-lists which requires non-negligible datastructure manipulations even while only accessing objects in the cache.
@@ -836,9 +836,9 @@ A selection of the different scenarios considered, with expected impact on perfo
 | [[#path-cache][Path Cache]]                          |      - |      5% | 8-16w  | No change        |
 | [[#compactness][More compact on-disk representation]] |   300% |     10% | 16-32w | Change           |
 |-------------------------------------+--------+---------+--------+------------------|
-| [[#cpu-efficient-cache][More efficient cache datastructure]]  |      - |         | 8-16w  | No change        |
+| [[#cache-datastructure][More efficient cache datastructure]]  |      - |         | 8-16w  | No change        |
 |-------------------------------------+--------+---------+--------+------------------|
-| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |         | 16-32w | No change        |
+| [[#optimize-tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |         | 16-32w | No change        |
 |-------------------------------------+--------+---------+--------+------------------|
 | [[#batching-reads][Batching reads]]                      |    60% |      5% | 16-32w | Change           |
 | [[#multicore][Multicore I/O]]                       |   700% |     12% | 32-64w | No change        |
