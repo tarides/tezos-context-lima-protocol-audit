@@ -509,62 +509,76 @@ Unfortunately we cannot observe any performance improvement when testing these c
 :CUSTOM_ID: inline-small-objects
 :END:
 
-We note that the size of most content in the Tezos Context Store is very small (see [[#content-size-distribution][Content Size distribution]]). These small pieces of content are stored in individual leaf nodes of the tree with their own hash, incurring a large overhead. An optimization would be to inline the small content into the parent node. Preliminary work towards this has already been done (see [[https://github.com/mirage/irmin/issues/884][mirage/irmin#884]]).
+We note that the size of most content in the Tezos Context Store is very small
+(see [[#content-size-distribution][Content Size distribution]]). These small pieces of content are stored in
+individual leaf nodes of the tree with their own hash, incurring a large
+overhead. An optimization would be to inline the small contents, and possible
+inodes, into the parent node. Some explorations into this idea has already been
+done (see [[https://github.com/mirage/irmin/issues/884][mirage/irmin#884]]).
 
-Concretely we can imagine a scheme where all content that is smaller than the size of the hash as well as small ~Inodes~ are inlined.
+In order to approximate potential performance gains we measure the time for
+reading and decoding objects from disk. We measure these times for 100 blocks
+from Lima. Total runtime of the measurement is 14s.
 
-In order to approximate potential performance gains we use a modified
-~irmin-pack~ and ~bench/irmin-pack/tree.ml~ bench to approximate time we could
-save if we inlined "small" contents objects into their parent inode.
+We can consider inlining objects that are smaller than a certain number of
+bytes. In our analysis, we consider 64, 128, 256, and 512 bytes. These byte
+lengths are measures of on-disk data, which means that they are inclusive of the
+32 byte hash.
 
-The benchmark is run against ~10k blocks. Total time for the benchmark is 38s.
+For considering 64 bytes as the boundary, we observe this distribution of
+objects.
 
-Counts loaded in ~Pack_store.find_in_pack_file~.
+| type     | < 64B | % < 64B | >= 64B |
+|----------+-------+---------+--------|
+| contents | 12445 | (71.9%) |   4865 |
+| inode    |  5650 | (4.2%)  | 127642 |
 
-| Type     |   Count |
-|----------+---------|
-| Commit   |      12 |
-| Inode    | 1478220 |
-| Contents |   78700 |
+Note: this percentage of contents is different from the content size
+distribution analysis. The current analysis considers the entire length of bytes
+on disk, which includes the 32 bytes of hash, but the content distribution
+analysis only looks at the content length.  When accounting for the hash size,
+the content distribution analysis shows that 89.5% of contents are less than 32
+bytes. This is more than the current analysis of 71.9%, but the current analysis
+is only contents that are read as a part of processing the 100 blocks, whereas
+the content distribution analysis is for the entire context. The current
+analysis only sees 17310 (possibly with some duplicates) of 79822881 contents
+objects in the context, which is only 0.02%.  This is the most likely
+explanation for the difference in observed ratios.
 
-Counts and percentages when split at a 64 byte boundary. Objects less than 64
-bytes might be good candidates for inlining since this is the point where the
-size of the hash (32 bytes) is equal to the size of the actual content.
+When going to 512 bytes, we observe the following distribution.
 
-| Type     | < 64B (%)       |   64B+ |   Total |
-|----------+-----------------+--------+---------|
-| Inode    | 1292769 (87.5%) | 185451 | 1478220 |
-| Contents | 9068 (11.5%)    |  69632 |   78700 |
+| type     | < 512B | % < 512B | >=512B |
+|----------+--------+----------+--------|
+| contents |  16415 | (94.8%)  |    895 |
+| inode    |  98070 | (73.6%)  |  35222 |
 
-Duration of key sections in that function, reading from disk and decoding into
-in-memory objects.
+To simulate possible performance improvements of inlining contents or inodes, we
+assume that inlined objects will save all of observed read time and then look at
+different percentages of saving of decode time to calculate overall saving of
+total runtime.
 
-| Type     |   Read (us) | Decode (us) |  Total (us) |
-|----------+-------------+-------------+-------------|
-| Commit   |      73.478 |      77.477 |     150.955 |
-| Inode    | 1516744.706 | 1721268.547 | 3238013.253 |
-| Contents |  115519.722 |   16060.434 |  131580.156 |
+For 64 bytes:
+|   % | %-save-find | %-save-runtime |
+|-----+-------------+----------------|
+|   0 |        0.5% |           0.1% |
+|  20 |        0.7% |           0.1% |
+|  50 |        0.9% |           0.2% |
+|  75 |        1.1% |           0.2% |
+| 100 |        1.2% |           0.2% |
 
-Lets assume we can inline inodes or contents objects that are less than 64 bytes
-and eliminate the read time but maintain the decode time.
+For 512 bytes:
+|   % | %-save-find | %-save-runtime |
+|-----+-------------+----------------|
+|   0 |        4.9% |           1.0% |
+|  20 |       19.9% |           3.9% |
+|  50 |       42.4% |           8.3% |
+|  75 |       61.1% |          12.0% |
+| 100 |       79.9% |          15.7% |
 
-| Type     | Read, < 64B (us) | Read, 64B+ (us) |  Total (us) |
-|----------+------------------+-----------------+-------------|
-| Inode    |      1305857.425 |      210887.281 | 1516744.706 |
-| Contents |         8836.786 |      106682.936 |  115519.722 |
-|----------+------------------+-----------------+-------------|
-|          |      1314694.211 |      317570.217 | 1632264.428 |
-
-We could theoretically avoid 1314694.211us out of 1632264.428us read time, which
-is 80.5% savings of time spent reading. The entire bench takes 38s, so this
-would represent a 3.5% savings in total time.
-
-For completeness, here is the breakdown of decode times on the 64 byte boundary.
-
-| Type     | Decode, < 64B (us) | Decode, 64B+ (us) |  Total (us) |
-|----------+--------------------+-------------------+-------------|
-| Inode    |         866570.158 |        854698.389 | 1721268.547 |
-| Contents |           2179.074 |          13881.36 |   16060.434 |
+If we assume we can save between 0-50% of time from decoding, we would expect a
+range of 0.1-8.3% overall improvement, depending on configuration. We also think
+there is a chance for this to improve unobserved improvements in the overall
+functioning of the system, so this could improve performance in the 0-10% range.
 
 ** Optimize tree descent
 :PROPERTIES:
@@ -844,23 +858,23 @@ In this report we have identified storage performance bottlenecks of Irmin and ~
 
 A selection of the different scenarios considered, with expected impact on performances is provided in the following table:
 
-| Description                                                                                                                                                  |    I/O | Overall | Effort (FTE) | On-disk format   |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
-| [[#index-conclusion][Improve ~Index~ usage]]                                                                                                                                        |      - |      0% | -            | No change        |
-| [[#dict-conclusion][Improve ~Dict~ usage]]                                                                                                                                         | 10-20% |    -20% | 8-16w        | Potential change |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
-| [[#disable-os-page-cache][Disable OS page cache]]                                                                                                                                        |    30% |    0-3% | 2-4w         | No change        |
-| [[#inline-small-objects][Inline small objects]]                                                                                                                                         |  19.5% |   0-10% | 16-32w       | Change           |
-| [[#path-cache][Path Cache]]                                                                                                                                                   |      - |      5% | 8-16w        | No change        |
-| [[#compactness][More compact on-disk representation]]                                                                                                                          |   300% |     10% | 16-32w       | Change           |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
-| [[#cache-datastructure][More efficient cache datastructure]]                                                                                                                           |      - |         | 8-16w        | No change        |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
-| [[#optimize-tezos-storage-functors][Optimize Tezos Storage Functors]]                                                                                                                              |      - |         | 16-32w       | No change        |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
-| [[#batching-reads][Batching reads]]                                                                                                                                               |    60% |      5% | 16-32w       | Change           |
-| [[#multicore][Multicore I/O]] [fn::Only considering I/O. We expect even larger performance improvements when CPU intensive operations are parallelized over multiple cores.] |   700% |     12% | 32-64w       | No change        |
-| [[#async-io][Asynchronous I/O with modern APIs]]                                                                                                                            | 40000% |         | 64w+         | Change           |
+| Description                         |    I/O | Overall | Effort (FTE) | On-disk format   |
+|-------------------------------------+--------+---------+--------------+------------------|
+| [[#index-conclusion][Improve ~Index~ usage]]               |      - |      0% | -            | No change        |
+| [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% |    -20% | 8-16w        | Potential change |
+|-------------------------------------+--------+---------+--------------+------------------|
+| [[#disable-os-page-cache][Disable OS page cache]]               |    30% |    0-3% | 2-4w         | No change        |
+| [[#inline-small-objects][Inline small objects]]                |  0-40% |   0-10% | 8-16w        | Change           |
+| [[#path-cache][Path Cache]]                          |      - |      5% | 8-16w        | No change        |
+| [[#compactness][More compact on-disk representation]] |   300% |     10% | 16-32w       | Change           |
+|-------------------------------------+--------+---------+--------------+------------------|
+| [[#cache-datastructure][More efficient cache datastructure]]  |      - |         | 8-16w        | No change        |
+|-------------------------------------+--------+---------+--------------+------------------|
+| [[#optimize-tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |         | 16-32w       | No change        |
+|-------------------------------------+--------+---------+--------------+------------------|
+| [[#batching-reads][Batching reads]]                      |    60% |      5% | 16-32w       | Change           |
+| [[#multicore][Multicore I/O]] [fn:multicore_io]     |   700% |     12% | 32-64w       | No change        |
+| [[#async-io][Asynchronous I/O with modern APIs]]   | 40000% |         | 64w+         | Change           |
 
 Some details to the columns:
 
@@ -876,3 +890,5 @@ We conclude with following recommendations:
 1. Implement [[#inline-small-objects][Inlining of small objects]]: This seems to be an obvious optimization. Even if the estimated performance gains from decreased I/O might be low we can expect more performance gains by doing larger reads (see [[#batching-reads][Batching Reads]]), improved CPU efficiency while decoding content (see [[#cpu-efficiency][CPU efficiency]]) as well a more shallow tree (see [[#optimize-tree-descent][Optimize tree descent]]).
 2. Investigate CPU usage: We observe that the Tezos Context Storage seems to be CPU bound (see [[#cpu-boundness][CPU boundness]]). Currently we have little insight into what are the bottlenecks and what areas should be optimized for best overall performance improvement. We propose using the OCaml 5.1 ~Runtime_events~ library for observing running applications (see [[https://github.com/ocaml/ocaml/pull/11474][ocaml/ocaml#11474]]). This approach can be used for also observing overall Octez code and identifying performance bottlenecks beyond the Tezos Context Store.
 3. Explore Multicore and Asynchronous APIs: Modern hardware, APIs such as ~io_uring~ and multicore capabilities in OCaml 5 allow massively improved performance for storage intensive applications. However, they require fundamental redesign of the storage backends (see [[#async-io][Asynchronous I/O]]). To remain competitive with regards to performance in the medium to longer-term, it is imperative to explore such ideas now.
+
+[fn:multicore_io] Only considering I/O. We expect even larger performance improvements when CPU intensive operations are parallelized over multiple cores.
