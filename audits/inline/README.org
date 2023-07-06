@@ -1,61 +1,5 @@
 #+title: Inlining Objects
 
-* Approximating perf gains with tree bench
-
-We use a modified ~irmin-pack~ and ~bench/irmin-pack/tree.ml~ bench to
-approximate time we could save if we inlined "small" contents objects into their
-parent inode.
-
-The benchmark is run against ~10k blocks (I think from Hangzhou era but needs
-confirmation). Total time for the benchmark is 38s.
-
-Counts loaded in ~Pack_store.find_in_pack_file~.
-
-| Type     |   Count |
-|----------+---------|
-| Commit   |      12 |
-| Inode    | 1478220 |
-| Contents |   78700 |
-
-Counts and percentages when split at a 64 byte boundary. Objects less than 64
-bytes might be good candidates for inlining since this is the point where the
-size of the hash (32 bytes) is equal to the size of the actual content.
-
-| Type     | < 64B (%)       |   64B+ |   Total |
-|----------+-----------------+--------+---------|
-| Inode    | 1292769 (87.5%) | 185451 | 1478220 |
-| Contents | 9068 (11.5%)    |  69632 |   78700 |
-
-Duration of key sections in that function, reading from disk and decoding into
-in-memory objects.
-
-| Type     |   Read (us) | Decode (us) |  Total (us) |
-|----------+-------------+-------------+-------------|
-| Commit   |      73.478 |      77.477 |     150.955 |
-| Inode    | 1516744.706 | 1721268.547 | 3238013.253 |
-| Contents |  115519.722 |   16060.434 |  131580.156 |
-
-Lets assume we can inline inodes or contents objects that are less than 64 bytes
-and eliminate the read time but maintain the decode time.
-
-| Type     | Read, < 64B (us) | Read, 64B+ (us) |  Total (us) |
-|----------+------------------+-----------------+-------------|
-| Inode    |      1305857.425 |      210887.281 | 1516744.706 |
-| Contents |         8836.786 |      106682.936 |  115519.722 |
-|----------+------------------+-----------------+-------------|
-|          |      1314694.211 |      317570.217 | 1632264.428 |
-
-We could theoretically avoid 1314694.211us out of 1632264.428us read time, which
-is 80.5% savings of time spent reading. The entire bench takes 38s, so this
-would represent a 3.5% savings in total time.
-
-For completeness, here is the breakdown of decode times on the 64 byte boundary.
-
-| Type     | Decode, < 64B (us) | Decode, 64B+ (us) |  Total (us) |
-|----------+--------------------+-------------------+-------------|
-| Inode    |         866570.158 |        854698.389 | 1721268.547 |
-| Contents |           2179.074 |          13881.36 |   16060.434 |
-
 * Approximating perf gains with replay trace
 
 Lima replay of 100 blocks. Total runtime was 14s.
@@ -106,3 +50,135 @@ For completeness, here is the breakdown of decode times on the 64 byte boundary.
 |----------+--------------------+-------------------+-------------|
 | Inode    |           16065.45 |       2545932.373 | 2561997.823 |
 | Contents |            3838.62 |         11655.607 |   15494.227 |
+
+
+* More detailed breakdown
+Look at inlining at different boundary breakpoints.
+
+** 512B boundary
+Counts
+| type     | <512B | %       | >=512B |
+|----------+-------+---------+--------|
+| contents | 16415 | (94.8%) |    895 |
+| inode    | 98070 | (73.6%) |  35222 |
+
+< 512B
+| type     |       read |      decode |       total |
+|----------+------------+-------------+-------------|
+| contents |  13029.848 |    5067.838 |   18097.686 |
+| inode    | 122386.512 | 2058106.939 | 2180493.451 |
+|----------+------------+-------------+-------------|
+|          |  135416.36 | 2063174.777 | 2198591.137 |
+
+>= 512B
+| type     |      read |     decode |      total |
+|----------+-----------+------------+------------|
+| contents |  1568.392 |  10426.389 |  11994.781 |
+| inode    | 38017.104 | 503890.884 | 541907.988 |
+|----------+-----------+------------+------------|
+|          | 39585.496 | 514317.273 | 553902.769 |
+
+Savings
+|   % | %-save-find | %-save-runtime |
+|-----+-------------+----------------|
+|   0 |        4.9% |           1.0% |
+|  20 |       19.9% |           3.9% |
+|  50 |       42.4% |           8.3% |
+|  75 |       61.1% |          12.0% |
+| 100 |       79.9% |          15.7% |
+
+** 256B boundary
+Counts
+| type     | <256B | %       | >=256B |
+|----------+-------+---------+--------|
+| contents | 16038 | (92.7%) |   1272 |
+| inode    | 38988 | (29.3%) |  94304 |
+
+< 256B
+| type     |      read |     decode |      total |
+|----------+-----------+------------+------------|
+| contents | 12733.683 |   4966.777 |   17700.46 |
+| inode    | 36205.907 | 208629.892 | 244835.799 |
+|----------+-----------+------------+------------|
+|          |  48939.59 | 213596.669 | 262536.259 |
+
+>= 256B
+| type     |       read |      decode |       total |
+|----------+------------+-------------+-------------|
+| contents |   1864.557 |    10527.45 |   12392.007 |
+| inode    | 124197.709 | 2353367.931 |  2477565.64 |
+|----------+------------+-------------+-------------|
+|          | 126062.266 | 2363895.381 | 2489957.647 |
+
+Savings
+|   % | %-save-find | %-save-runtime |
+|-----+-------------+----------------|
+|   0 |        1.8% |           0.3% |
+|  20 |        3.3% |           0.7% |
+|  50 |        5.7% |           1.1% |
+|  75 |        7.6% |           1.5% |
+| 100 |        9.5% |           1.9% |
+
+** 128B boundary
+Counts
+| type     | <128B | %       | >=128B |
+|----------+-------+---------+--------|
+| contents | 15074 | (87.1%) |   2236 |
+| inode    | 22449 | (16.8%) | 110843 |
+
+< 128B
+| type     |      read |    decode |      total |
+|----------+-----------+-----------+------------|
+| contents | 12036.622 |  4479.075 |  16515.697 |
+| inode    | 20041.991 | 82217.115 | 102259.106 |
+|----------+-----------+-----------+------------|
+|          | 32078.613 |  86696.19 | 118774.803 |
+
+>= 128B
+| type     |       read |      decode |       total |
+|----------+------------+-------------+-------------|
+| contents |   2561.618 |   11015.152 |    13576.77 |
+| inode    | 140361.625 | 2479780.708 | 2620142.333 |
+|----------+------------+-------------+-------------|
+|          | 142923.243 |  2490795.86 | 2633719.103 |
+
+Savings
+|   % | %-save-find | %-save-runtime |
+|-----+-------------+----------------|
+|   0 |        1.2% |           0.2% |
+|  20 |        1.8% |           0.4% |
+|  50 |        2.7% |           0.5% |
+|  75 |        3.5% |           0.7% |
+| 100 |        4.3% |           0.8% |
+
+** 64B boundary
+Counts
+| type     |  <64B | %       |  >=64B |
+|----------+-------+---------+--------|
+| contents | 12445 | (71.9%) |   4865 |
+| inode    |  5650 | (4.2%)  | 127642 |
+
+< 64B
+| type     |      read |   decode |     total |
+|----------+-----------+----------+-----------|
+| contents |  9704.756 |  3838.62 | 13543.376 |
+| inode    |  4664.936 | 16065.45 | 20730.386 |
+|----------+-----------+----------+-----------|
+|          | 14369.692 | 19904.07 | 34273.762 |
+
+>= 64B
+| type     |       read |      decode |       total |
+|----------+------------+-------------+-------------|
+| contents |   4893.484 |   11655.607 |   16549.091 |
+| inode    |  155738.68 | 2545932.373 | 2701671.053 |
+|----------+------------+-------------+-------------|
+|          | 160632.164 |  2557587.98 | 2718220.144 |
+
+Savings
+|   % | %-save-find | %-save-runtime |
+|-----+-------------+----------------|
+|   0 |        0.5% |           0.1% |
+|  20 |        0.7% |           0.1% |
+|  50 |        0.9% |           0.2% |
+|  75 |        1.1% |           0.2% |
+| 100 |        1.2% |           0.2% |
