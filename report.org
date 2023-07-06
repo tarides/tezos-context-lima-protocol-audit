@@ -826,24 +826,24 @@ In this report we have identified storage performance bottlenecks of Irmin and ~
 
 A selection of the different scenarios considered, with expected impact on performances is provided in the following table:
 
-| Description                         |    I/O | Overall    | Effort    | On-disk format   |
-|-------------------------------------+--------+------------+-----------+------------------|
-| [[#index-conclusion][Improve ~Index~ usage]]               |      - | 0%         | -         | No change        |
-| [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% | -20%       | Medium    | Potential change |
-|-------------------------------------+--------+------------+-----------+------------------|
-| [[#disable-os-page-cache][Disable OS page cache]]               |    30% | 0%         | Low       | No change        |
-| [[#inline][Inline small objects]]                |  19.5% | 3.5%       | High      | Change           |
-| [[#path-cache][Path Cache]]                          |      - | -          | Medium    | No change        |
-| [[#compactness][More compact on-disk representation]] |   300% | -          | High      | Change           |
-|-------------------------------------+--------+------------+-----------+------------------|
-| [[#cpu-efficient-cache][More efficient cache datastructure]]  |        |            |           | No change        |
-|-------------------------------------+--------+------------+-----------+------------------|
-| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |            | High      | No change        |
-|-------------------------------------+--------+------------+-----------+------------------|
-| [[#batching-reads][Batching reads]]                      |    60% | up to 4%?  | Very high | Change           |
-| [[#multicore][Multicore I/O]]                       |   700% | up to 8%?  | Very high | No change        |
-| [[#async-io][Asynchronous I/O]]                    | 40000% | up to 10%? | Epic      | Change           |
-| Multicore Irmin                     |        |            | Very high | No change        |
+| Description                         |    I/O | Overall | Effort | On-disk format   |
+|-------------------------------------+--------+---------+--------+------------------|
+| [[#index-conclusion][Improve ~Index~ usage]]               |      - |      0% | -      | No change        |
+| [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% |    -20% | 8-16w  | Potential change |
+|-------------------------------------+--------+---------+--------+------------------|
+| [[#disable-os-page-cache][Disable OS page cache]]               |    30% |      0% | 4-8w   | No change        |
+| [[#inline][Inline small objects]]                |  19.5% |    3.5% | 16-32w | Change           |
+| [[#path-cache][Path Cache]]                          |      - |      5% | 8-16w  | No change        |
+| [[#compactness][More compact on-disk representation]] |   300% |     10% | 16-32w | Change           |
+|-------------------------------------+--------+---------+--------+------------------|
+| [[#cpu-efficient-cache][More efficient cache datastructure]]  |      - |         | 8-16w  | No change        |
+|-------------------------------------+--------+---------+--------+------------------|
+| [[#tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |         | 16-32w | No change        |
+|-------------------------------------+--------+---------+--------+------------------|
+| [[#batching-reads][Batching reads]]                      |    60% |      5% | 16-32w | Change           |
+| [[#multicore][Multicore I/O]]                       |   700% |     12% | 32-64w | No change        |
+| [[#async-io][Asynchronous I/O]]                    | 40000% |     14% | 32-64w | Change           |
+| Multicore Irmin                     |        |         | 32-64w | No change        |
 
 Some details to the columns:
 
