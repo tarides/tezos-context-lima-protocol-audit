@@ -844,23 +844,23 @@ In this report we have identified storage performance bottlenecks of Irmin and ~
 
 A selection of the different scenarios considered, with expected impact on performances is provided in the following table:
 
-| Description                         |    I/O | Overall | Effort | On-disk format   |
-|-------------------------------------+--------+---------+--------+------------------|
-| [[#index-conclusion][Improve ~Index~ usage]]               |      - |      0% | -      | No change        |
-| [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% |    -20% | 8-16w  | Potential change |
-|-------------------------------------+--------+---------+--------+------------------|
-| [[#disable-os-page-cache][Disable OS page cache]]               |    30% |    0-3% | 4-8w   | No change        |
-| [[#inline-small-objects][Inline small objects]]                |  19.5% |   0-10% | 16-32w | Change           |
-| [[#path-cache][Path Cache]]                          |      - |      5% | 8-16w  | No change        |
-| [[#compactness][More compact on-disk representation]] |   300% |     10% | 16-32w | Change           |
-|-------------------------------------+--------+---------+--------+------------------|
-| [[#cache-datastructure][More efficient cache datastructure]]  |      - |         | 8-16w  | No change        |
-|-------------------------------------+--------+---------+--------+------------------|
-| [[#optimize-tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |         | 16-32w | No change        |
-|-------------------------------------+--------+---------+--------+------------------|
-| [[#batching-reads][Batching reads]]                      |    60% |      5% | 16-32w | Change           |
-| [[#multicore][Multicore]]                           |   700% |     12% | 32-64w | No change        |
-| [[#async-io][Asynchronous I/O with modern APIs]]   | 40000% |         | 64w+   | Change           |
+| Description                                                                                                                                                  |    I/O | Overall | Effort (FTE) | On-disk format   |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
+| [[#index-conclusion][Improve ~Index~ usage]]                                                                                                                                        |      - |      0% | -            | No change        |
+| [[#dict-conclusion][Improve ~Dict~ usage]]                                                                                                                                         | 10-20% |    -20% | 8-16w        | Potential change |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
+| [[#disable-os-page-cache][Disable OS page cache]]                                                                                                                                        |    30% |    0-3% | 2-4w         | No change        |
+| [[#inline-small-objects][Inline small objects]]                                                                                                                                         |  19.5% |   0-10% | 16-32w       | Change           |
+| [[#path-cache][Path Cache]]                                                                                                                                                   |      - |      5% | 8-16w        | No change        |
+| [[#compactness][More compact on-disk representation]]                                                                                                                          |   300% |     10% | 16-32w       | Change           |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
+| [[#cache-datastructure][More efficient cache datastructure]]                                                                                                                           |      - |         | 8-16w        | No change        |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
+| [[#optimize-tezos-storage-functors][Optimize Tezos Storage Functors]]                                                                                                                              |      - |         | 16-32w       | No change        |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------+--------+---------+--------------+------------------|
+| [[#batching-reads][Batching reads]]                                                                                                                                               |    60% |      5% | 16-32w       | Change           |
+| [[#multicore][Multicore I/O]] [fn::Only considering I/O. We expect even larger performance improvements when CPU intensive operations are parallelized over multiple cores.] |   700% |     12% | 32-64w       | No change        |
+| [[#async-io][Asynchronous I/O with modern APIs]]                                                                                                                            | 40000% |         | 64w+         | Change           |
 
 Some details to the columns:
 
