@@ -836,7 +836,7 @@ Disk stats (read/write):
 
 We observe a read bandwidth of about 8955MiB/s this is an improvement of more than 40000% compared to the baseline. Note that this is pure I/O read bandwidth without any data management.
 
-On-going research is investigating how the performance of such hardware can be used in database systems (see [[https://db.in.tum.de/~leis/papers/leanstore.pdf][LeanStore: In-Memory Data Management Beyond Main Memory]]). We note that the main ingredients for doing this in the OCaml ecosystem are present or are being actively worked on: OCaml 5 with Multicore support and Algebraic Effects as well as the [[https://github.com/ocaml-multicore/eio][eio]] library. The question seems to be: [[https://db.in.tum.de/~fent/papers/coroutines.pdf][What Are You Waiting For? Use Coroutines for Asynchronous I/O to Hide I/O Latencies and Maximize the Read Bandwidth!]]
+On-going research is investigating how the performance of such hardware can be used in database systems (see [[https://db.in.tum.de/~leis/papers/leanstore.pdf][LeanStore: In-Memory Data Management Beyond Main Memory]]). We note that the main ingredients for doing this in the OCaml ecosystem are present or are being actively worked on: OCaml 5 with Multicore support and Algebraic Effects as well as the [[https://github.com/ocaml-multicore/eio][eio]] library. The question seems to be: [[https://db.in.tum.de/~fent/papers/coroutines.pdf][What Are We Waiting For? Let's Use Coroutines for Asynchronous I/O to Hide I/O Latencies and Maximize the Read Bandwidth!]]
 
 * Conclusion
 
