@@ -567,6 +567,9 @@ For completeness, here is the breakdown of decode times on the 64 byte boundary.
 | Contents |           2179.074 |          13881.36 |   16060.434 |
 
 ** Optimize tree descent
+:PROPERTIES:
+:CUSTOM_ID: optimize-tree-descent
+:END:
 
 Access to content in Irmin requires descending a path. Every node on the path needs to be de-referenced, accessed from disk and unpacked individually. The cost for accessing a piece of content is a function of the path size. It might make sense to optimize the tree descent.
 
@@ -610,6 +613,8 @@ It would also be interesting to investigate the observed symmetry between ~mem~ 
 ** Decrease system call overhead
 
 Read performance seems to be bad because of the large amount of small reads that are performed with individual system calls. The system call overhead seems to be significant and reducing it should increase performance.
+
+Proposal such as [[#inline][Inline small objects]] would also help in increasing the size of reads and quite possibly will improve read performance.
 
 *** Batching Reads
 :PROPERTIES:
@@ -854,9 +859,8 @@ A selection of the different scenarios considered, with expected impact on perfo
 | [[#optimize-tezos-storage-functors][Optimize Tezos Storage Functors]]     |      - |         | 16-32w | No change        |
 |-------------------------------------+--------+---------+--------+------------------|
 | [[#batching-reads][Batching reads]]                      |    60% |      5% | 16-32w | Change           |
-| [[#multicore][Multicore I/O]]                       |   700% |     12% | 32-64w | No change        |
-| [[#async-io][Asynchronous I/O]]                    | 40000% |     14% | 32-64w | Change           |
-| Multicore Irmin                     |        |         | 32-64w | No change        |
+| [[#multicore][Multicore]]                           |   700% |     12% | 32-64w | No change        |
+| [[#async-io][Asynchronous I/O with modern APIs]]   | 40000% |         | 64w+   | Change           |
 
 Some details to the columns:
 
@@ -867,5 +871,8 @@ Some details to the columns:
 
 Note that performance improvements may not be additive and individual improvements may have unexpected results on the effect of other improvements.
 
-In conclusion, even if input-outputs represent a small percentage (14%) of the total time, some optimisations can still be very interesting (inlining small objects, multicore I/O, asynchronous I/O ...), as the potential improvement in I/O is huge.  As Irmin+Irmin-pack is CPU-bound, we also recommend to focus on optimisations related to CPU usage, even at the cost of more I/O. Recent work on Tree.length ([[https://github.com/mirage/irmin/pull/2253][mirage/irmin#2253]]) has shown that there might be potential improvements in unexpected places of the code-base. However, identifying areas that could potentially be improved seems to be non-trivial. Finally, switching to a fully multicore version of Irmin could provide huge improvements.
+We conclude with following recommendations:
 
+1. Implement [[#inline][Inlining of small objects]]: This seems to be an obvious optimization. Even if the estimated performance gains from decreased I/O might be low we can expect more performance gains by doing larger reads (see [[#batching-reads][Batching Reads]]), improved CPU efficiency while decoding content (see [[#cpu-efficiency][CPU efficiency]]) as well a more shallow tree (see [[#optimize-tree-descent][Optimize tree descent]]).
+2. Investigate CPU usage: We observe that the Tezos Context Storage seems to be CPU bound (see [[#cpu-boundness][CPU boundness]]). Currently we have little insight into what are the bottlenecks and what areas should be optimized for best overall performance improvement. We propose using the OCaml 5.1 ~Runtime_events~ library for observing running applications (see [[https://github.com/ocaml/ocaml/pull/11474][ocaml/ocaml#11474]]). This approach can be used for also observing overall Octez code and identifying performance bottlenecks beyond the Tezos Context Store.
+3. Explore Multicore and Asynchronous APIs: Modern hardware, APIs such as ~io_uring~ and multicore capabilities in OCaml 5 allow massively improved performance for storage intensive applications. However, they require fundamental redesign of the storage backends (see [[#async-io][Asynchronous I/O]]). To remain competitive with regards to performance in the medium to longer-term, it is imperative to explore such ideas now.
