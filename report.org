@@ -849,8 +849,8 @@ A selection of the different scenarios considered, with expected impact on perfo
 | [[#index-conclusion][Improve ~Index~ usage]]               |      - |      0% | -      | No change        |
 | [[#dict-conclusion][Improve ~Dict~ usage]]                | 10-20% |    -20% | 8-16w  | Potential change |
 |-------------------------------------+--------+---------+--------+------------------|
-| [[#disable-os-page-cache][Disable OS page cache]]               |    30% |      0% | 4-8w   | No change        |
-| [[#inline-small-objects][Inline small objects]]                |  19.5% |    3.5% | 16-32w | Change           |
+| [[#disable-os-page-cache][Disable OS page cache]]               |    30% |    0-3% | 4-8w   | No change        |
+| [[#inline-small-objects][Inline small objects]]                |  19.5% |   0-10% | 16-32w | Change           |
 | [[#path-cache][Path Cache]]                          |      - |      5% | 8-16w  | No change        |
 | [[#compactness][More compact on-disk representation]] |   300% |     10% | 16-32w | Change           |
 |-------------------------------------+--------+---------+--------+------------------|
