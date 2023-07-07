@@ -590,7 +590,20 @@ Tezos usage of ~irmin-pack~ goes through the ~tezos_context~ library but also va
 
 It may be possible that the way these storage functors use ~irmin-pack~ (indirectly via the ~tezos_context~ library) could be improved. In particular, it seems like many small files are created with long, nested paths. It may be more efficient to create larger files with shorter paths.
 
-The performance characteristics of ~irmin-pack~ (and Irmin) seems to be closer to a file-system than a key-value store, whereas the way it is used from Tezos seems to be more like a key-value store.
+A concrete proposal would be to add additional Irmin types for the various storage abstractions offered by the storage functors. Irmin allows variable content types. Currently the only type used is ~bytes~. Instead one could define more complex types such as:
+
+#+begin_src ocaml
+  module Contents = struct
+    module StringMap = Map.Make(String)
+
+    type t =
+      | Bytes of bytes
+      | KVMap of string StringMap.t
+
+  end
+#+end_src
+
+The type ~KVMap~ would be serialized to a single larger content object in the Irmin store. This might improve locality of data as well as increase the size of content objects that would improve I/O bandwidth (see [[#batching-reads][Batching Reads]]). This proposal can be seen as a form of explicity  inlining (see [[#inline][Inline small objects]]) that uses the existing Irmin API.
 
 It would also be interesting to investigate the observed symmetry between ~mem~ and ~write~ access as observed in section [[#operations-in-single-block][Operations in a single block]].
 
