@@ -878,9 +878,9 @@ A selection of the different scenarios considered, with expected impact on perfo
 
 Some details to the columns:
 
-- I/O :: Potential improvement in I/O performance measured and estimated with ~fio~.
-- Overall :: Potential improvement in overall performance of the Tezos Context store based on performance of current implementation and structure of Context Store. The performance improvements are indicative and purely theoretical. Experiments on dict and OS page cache have shown that some results may be counter-intuitive.
-- Effort :: Estimated effort to implement performance.
+- I/O :: Potential increase in I/O throughput (i.e. as bytes/s) measured and estimated with ~fio~.
+- Overall :: Potential improvement in overall performance of the Tezos Context store based on performance of current implementation and structure of Context Store measured as decrease in time to replay a recording of 100000 blocks. The performance improvements are indicative and purely theoretical. Experiments on dict and OS page cache have shown that some results may be counter-intuitive.
+- Effort :: Estimated effort to implement performance in FTE weeks.
 - On-disk format :: Indication if an on-disk format change is needed.
 
 Note that performance improvements may not be additive and individual improvements may have unexpected results on the effect of other improvements.
